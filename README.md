@@ -4,7 +4,7 @@
 
 **Creative Studio MCP** is a smart business assistant that helps creative professionals automate everyday work.
 
-Instead of typing the same information over and over, this tool does it for you automatically. It works with AI assistants like ChatGPT or Claude, so your AI can help you generate quotes, calculate payments, organize projects, and list your services—instantly.
+Instead of typing the same information over and over, this tool does it for you automatically. It works with AI assistants like ChatGPT or Claude, so your AI can help you generate quotes, calculate payments, organize projects, and list your services - instantly.
 
 ### Think of it like this:
 
@@ -54,7 +54,7 @@ Every project follows the same checklist. Nothing gets forgotten.
 
 ### 🎯 Be Consistent
 
-Your pricing, payment terms, and process are always the same—no mistakes.
+Your pricing, payment terms, and process are always the same - no mistakes.
 
 ### 📱 Work Anywhere
 
@@ -126,7 +126,7 @@ Just three things:
 
 1. **A computer** (Windows, Mac, or Linux)
 2. **An internet connection** (to download and use ChatGPT/Claude)
-3. **30 minutes of time** (for the first setup—then it's automatic)
+3. **30 minutes of time** (for the first setup - then it's automatic)
 
 **Optional but recommended:**
 - ChatGPT Plus subscription ($20/month) OR Claude subscription
@@ -153,7 +153,7 @@ The easiest way to install: **Double-click one file and everything is done autom
 
 ### Step 2: Download This Project (1 minute)
 
-1. Go to https://github.com/yourusername/creative-studio-mcp
+1. Go to https://github.com/Senseiglobal/creative-studio-mcp
 2. Click the green "Code" button
 3. Click "Download ZIP"
 4. Save it to your computer
@@ -268,7 +268,7 @@ If you see that message, your setup worked! Press `Ctrl + C` to stop it.
 
 ---
 
-## Optional—Set Up Your OpenAI API Key
+## Optional - Set Up Your OpenAI API Key
 
 **What is an API key?** It's a password that lets ChatGPT know you're allowed to use it.
 
