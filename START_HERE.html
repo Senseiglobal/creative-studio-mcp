@@ -275,13 +275,13 @@
         <div class="mark">CS</div>
         <div>
           <h1>Creative Studio MCP</h1>
-          <p class="lead">A visual setup guide for people who want the tool working without long technical instructions.</p>
+          <p class="lead">A simple start page for people who want the tool installed, checked, and ready to connect without long technical instructions.</p>
         </div>
       </div>
       <div class="quick">
         <a class="btn" href="install.bat">Windows install</a>
+        <a class="btn secondary" href="CHECK_INSTALL.bat">Check install</a>
         <a class="btn secondary" href="QUICK_START.md">Quick start</a>
-        <a class="btn secondary" href="INSTALLER_GUIDE.md">Installer guide</a>
       </div>
     </section>
 
@@ -290,25 +290,25 @@
         <div class="num">1</div>
         <h2>Install</h2>
         <p>Open the project folder and double-click <strong>install.bat</strong> on Windows.</p>
-        <div class="mini">The installer sets up the project and checks that the tool can load.</div>
+        <div class="mini">Wait until you see Installation complete.</div>
       </article>
       <article class="card">
         <div class="num">2</div>
         <h2>Confirm</h2>
-        <p>Wait for the message that says <strong>Installation complete</strong>.</p>
-        <div class="mini">If there is an error, read the message on screen. It will tell you what is missing.</div>
+        <p>Double-click <strong>CHECK_INSTALL.bat</strong> to confirm the tool is installed correctly.</p>
+        <div class="mini">If it says Success, the setup is fine.</div>
       </article>
       <article class="card">
         <div class="num">3</div>
         <h2>Connect</h2>
         <p>Open <strong>QUICK_START.md</strong> and connect the tool to Claude Desktop or your AI assistant.</p>
-        <div class="mini">After connection, ask your AI to create a quote, payment breakdown, or checklist.</div>
+        <div class="mini">After connection, ask for a quote, payment breakdown, or checklist.</div>
       </article>
     </section>
 
     <section class="choice">
-      <h2>Choose Your Computer</h2>
-      <p>Pick the option that matches your computer. Use the copy button if you need the command.</p>
+      <h2>Quick Actions</h2>
+      <p>Most Windows users only need the buttons below. Use commands only if someone asks you to.</p>
 
       <div class="tabs" role="tablist" aria-label="Computer options">
         <button class="tab active" type="button" data-tab="windows">Windows</button>
@@ -317,8 +317,9 @@
       </div>
 
       <div id="windows" class="panel active">
-        <p><strong>Best option:</strong> double-click <strong>install.bat</strong>.</p>
-        <p>If you use PowerShell, open it inside the project folder and run this:</p>
+        <p><strong>Install:</strong> double-click <strong>install.bat</strong>.</p>
+        <p><strong>Check:</strong> double-click <strong>CHECK_INSTALL.bat</strong>.</p>
+        <p>If you must use PowerShell, run this from inside the project folder:</p>
         <div class="command">
           <code>.\install.bat</code>
           <button class="copy" type="button" data-copy=".\install.bat">Copy</button>
@@ -346,8 +347,8 @@
 
     <section class="help" aria-label="Helpful notes">
       <div class="note">
-        <strong>Do not open Activate.ps1</strong>
-        Windows may block it. The installer already avoids that problem.
+        <strong>No activation step</strong>
+        Do not open Activate.ps1. The installer and checker handle this safely.
       </div>
       <div class="note">
         <strong>Keep .env private</strong>

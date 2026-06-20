@@ -22,6 +22,8 @@ Your support helps fund ongoing open-source improvements, documentation, testing
 
 Visual start page: [START_HERE.html](START_HERE.html)
 
+Windows setup check: [CHECK_INSTALL.bat](CHECK_INSTALL.bat)
+
 Read the roadmap: [ROADMAP.md](ROADMAP.md)
 
 Share feedback: [FEEDBACK.md](FEEDBACK.md)

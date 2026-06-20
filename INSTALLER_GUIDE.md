@@ -7,6 +7,7 @@ For a visual setup guide, open START_HERE.html.
 Installer Files
 
 - Windows: install.bat
+- Windows setup check: CHECK_INSTALL.bat
 - Mac and Linux: install.sh
 
 What The Installer Does
@@ -60,7 +61,8 @@ Windows Setup
 3. Open the creative-studio-mcp folder.
 4. Double-click install.bat.
 5. Wait for the installation complete message.
-6. Follow the three short steps shown on screen.
+6. Double-click CHECK_INSTALL.bat if you want to confirm the setup later.
+7. Follow the three short steps shown on screen.
 
 Mac and Linux Setup
 

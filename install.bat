@@ -184,16 +184,20 @@ echo.
 echo [3/3] What to do next
 echo.
 echo Step 1:
-echo Open QUICK_START.md and follow the connection guide.
+echo Double-click CHECK_INSTALL.bat any time you want to confirm the setup.
 echo.
 echo Step 2:
-echo Open .env only if you need to add an API key.
+echo Open QUICK_START.md for the short connection steps.
 echo.
 echo Step 3:
 echo Connect the tool to Claude Desktop or your AI assistant.
-echo Use QUICK_START.md for the connection steps.
 echo.
 echo Important:
 echo Do not open or run Activate.ps1. It is not needed.
 echo.
+if exist START_HERE.html (
+    echo Opening the visual start page now...
+    start "" "START_HERE.html"
+    echo.
+)
 pause

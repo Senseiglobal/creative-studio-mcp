@@ -8,6 +8,7 @@
 
 ### 🎯 Just Built It? Start Here
 Open: **START_HERE.html** for the visual setup guide
+Check: **CHECK_INSTALL.bat** to confirm Windows setup
 
 👉 Read: **QUICK_START.md** (5 minutes)
 - Setup Claude Desktop
