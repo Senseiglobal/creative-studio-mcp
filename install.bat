@@ -9,11 +9,9 @@ echo Creative Studio MCP - Windows Installer
 echo ============================================
 echo.
 echo This installer will:
-echo 1. Check Python
-echo 2. Create a local workspace
-echo 3. Install required software
-echo 4. Create your .env file
-echo 5. Test the server file
+echo 1. Set up the project
+echo 2. Check that it works
+echo 3. Show you what to do next
 echo.
 
 echo [Setup] Finding the project folder...
@@ -111,7 +109,8 @@ echo Python found:
 python --version
 echo.
 
-echo [1/5] Creating local workspace...
+echo [1/3] Setting up the project...
+echo Creating the project workspace...
 if not exist .venv (
     python -m venv .venv
     if errorlevel 1 (
@@ -127,7 +126,7 @@ if not exist .venv (
 echo Done.
 echo.
 
-echo [2/5] Checking local Python...
+echo Checking the project Python...
 if not exist .venv\Scripts\python.exe (
     echo ERROR: Local Python was not created.
     echo.
@@ -137,7 +136,7 @@ if not exist .venv\Scripts\python.exe (
 echo Done.
 echo.
 
-echo [3/5] Installing required software...
+echo Installing the required files...
 .venv\Scripts\python.exe -m pip install --upgrade pip
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 if errorlevel 1 (
@@ -150,7 +149,7 @@ if errorlevel 1 (
 echo Done.
 echo.
 
-echo [4/5] Creating environment file...
+echo Creating the settings file...
 if not exist .env (
     copy .env.example .env >nul 2>nul
     if errorlevel 1 (
@@ -166,30 +165,35 @@ if not exist .env (
 )
 echo.
 
-echo [5/5] Testing server startup...
-.venv\Scripts\python.exe -m py_compile server.py
+echo [2/3] Checking that everything works...
+.venv\Scripts\python.exe -c "import server"
 if errorlevel 1 (
-    echo ERROR: server.py has a syntax problem.
+    echo ERROR: The tool could not be checked.
     echo Please check the error above.
     echo.
     pause
     exit /b 1
 )
-echo Server file looks good.
+echo Setup check passed.
 echo.
 
 echo ============================================
 echo Installation complete
 echo ============================================
 echo.
-echo Next steps:
-echo 1. Open .env and add your API key if you plan to use API features.
-echo 2. Run this command to test the server:
-echo    .venv\Scripts\python.exe server.py
-echo 3. Read QUICK_START.md for Claude or ChatGPT setup.
+echo [3/3] What to do next
 echo.
-echo Note:
-echo You do not need to run .venv\Scripts\Activate.ps1.
-echo This avoids Windows PowerShell execution policy errors.
+echo Step 1:
+echo Open QUICK_START.md and follow the connection guide.
+echo.
+echo Step 2:
+echo Open .env only if you need to add an API key.
+echo.
+echo Step 3:
+echo Connect the tool to Claude Desktop or your AI assistant.
+echo Use QUICK_START.md for the connection steps.
+echo.
+echo Important:
+echo Do not open or run Activate.ps1. It is not needed.
 echo.
 pause
