@@ -2,6 +2,8 @@ Creative Studio MCP Installer Guide
 
 This guide explains the beginner installer files included with Creative Studio MCP.
 
+For a visual setup guide, open START_HERE.html.
+
 Installer Files
 
 - Windows: install.bat

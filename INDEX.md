@@ -7,6 +7,8 @@
 ## 📖 Where to Start
 
 ### 🎯 Just Built It? Start Here
+Open: **START_HERE.html** for the visual setup guide
+
 👉 Read: **QUICK_START.md** (5 minutes)
 - Setup Claude Desktop
 - Test each tool

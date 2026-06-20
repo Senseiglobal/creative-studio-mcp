@@ -20,6 +20,8 @@ Your support helps fund ongoing open-source improvements, documentation, testing
 
 ## Project Roadmap and Feedback
 
+Visual start page: [START_HERE.html](START_HERE.html)
+
 Read the roadmap: [ROADMAP.md](ROADMAP.md)
 
 Share feedback: [FEEDBACK.md](FEEDBACK.md)
