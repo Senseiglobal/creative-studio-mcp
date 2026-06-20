@@ -16,6 +16,83 @@ echo 4. Create your .env file
 echo 5. Test the server file
 echo.
 
+echo [Setup] Finding the project folder...
+pushd "%~dp0" >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Could not open the folder where install.bat is located.
+    echo.
+    echo Move install.bat into the creative-studio-mcp folder and try again.
+    echo.
+    pause
+    exit /b 1
+)
+
+set "PROJECT_DIR="
+
+if exist "requirements.txt" (
+    set "PROJECT_DIR=."
+    goto project_found
+)
+
+if exist "..\requirements.txt" (
+    set "PROJECT_DIR=.."
+    goto project_found
+)
+
+for /d %%D in (*) do (
+    if not defined PROJECT_DIR (
+        if exist "%%D\requirements.txt" (
+            set "PROJECT_DIR=%%D"
+        )
+    )
+)
+
+if defined PROJECT_DIR goto project_found
+
+echo ERROR: requirements.txt was not found.
+echo.
+echo The installer looked in:
+echo - The folder where install.bat is located
+echo - One folder above install.bat
+echo - One folder below install.bat
+echo.
+echo Please place install.bat inside the creative-studio-mcp project folder.
+echo That folder should contain files like:
+echo - requirements.txt
+echo - server.py
+echo - README.md
+echo.
+popd >nul 2>nul
+pause
+exit /b 1
+
+:project_found
+pushd "%PROJECT_DIR%" >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: The project folder was found, but could not be opened.
+    echo.
+    echo Move install.bat into the creative-studio-mcp folder and try again.
+    echo.
+    popd >nul 2>nul
+    pause
+    exit /b 1
+)
+
+echo Project folder:
+echo %CD%
+echo.
+
+if not exist "requirements.txt" (
+    echo ERROR: requirements.txt is missing from the selected project folder.
+    echo.
+    echo The installer must be run from the creative-studio-mcp project folder.
+    echo.
+    popd >nul 2>nul
+    popd >nul 2>nul
+    pause
+    exit /b 1
+)
+
 where python >nul 2>nul
 if errorlevel 1 (
     echo ERROR: Python was not found.
@@ -33,14 +110,6 @@ if errorlevel 1 (
 echo Python found:
 python --version
 echo.
-
-if not exist requirements.txt (
-    echo ERROR: requirements.txt was not found.
-    echo Make sure install.bat is inside the creative-studio-mcp folder.
-    echo.
-    pause
-    exit /b 1
-)
 
 echo [1/5] Creating local workspace...
 if not exist .venv (
@@ -88,7 +157,7 @@ if not exist .env (
         (
             echo OPENAI_API_KEY=your_api_key_here
             echo MCP_SERVER_NAME=creative-studio
-            echo MCP_SERVER_PATH=%CD%
+            echo MCP_SERVER_PATH=server.py
         ) > .env
     )
     echo Created .env.
