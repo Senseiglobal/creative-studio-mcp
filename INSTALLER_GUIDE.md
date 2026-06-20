@@ -19,6 +19,7 @@ It will:
 - Create a .env file if one does not already exist
 - Check that server.py can compile
 - Show the next steps after setup
+- Avoid PowerShell activation commands that can be blocked by Windows security settings
 
 Important Folder Step
 
@@ -106,6 +107,16 @@ Check your internet connection and run the installer again.
 PowerShell says .venv is not recognized:
 
 You are in the wrong folder. Open the creative-studio-mcp folder, click the address bar, type `powershell`, press Enter, and try again.
+
+PowerShell says Activate.ps1 cannot be loaded:
+
+This is a Windows security setting. You do not need to run Activate.ps1. Use:
+
+```powershell
+.venv\Scripts\python.exe server.py
+```
+
+The Windows installer uses this safer method automatically.
 
 .env already exists:
 

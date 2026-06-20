@@ -13,7 +13,7 @@ echo 1. Check Python
 echo 2. Create a local workspace
 echo 3. Install required software
 echo 4. Create your .env file
-echo 5. Test the server startup
+echo 5. Test the server file
 echo.
 
 where python >nul 2>nul
@@ -58,10 +58,9 @@ if not exist .venv (
 echo Done.
 echo.
 
-echo [2/5] Activating local workspace...
-call .venv\Scripts\activate.bat
-if errorlevel 1 (
-    echo ERROR: Could not activate the local workspace.
+echo [2/5] Checking local Python...
+if not exist .venv\Scripts\python.exe (
+    echo ERROR: Local Python was not created.
     echo.
     pause
     exit /b 1
@@ -70,8 +69,8 @@ echo Done.
 echo.
 
 echo [3/5] Installing required software...
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m pip install --upgrade pip
+.venv\Scripts\python.exe -m pip install -r requirements.txt
 if errorlevel 1 (
     echo ERROR: Could not install required software.
     echo Check your internet connection and try again.
@@ -99,7 +98,7 @@ if not exist .env (
 echo.
 
 echo [5/5] Testing server startup...
-python -m py_compile server.py
+.venv\Scripts\python.exe -m py_compile server.py
 if errorlevel 1 (
     echo ERROR: server.py has a syntax problem.
     echo Please check the error above.
@@ -119,5 +118,9 @@ echo 1. Open .env and add your API key if you plan to use API features.
 echo 2. Run this command to test the server:
 echo    .venv\Scripts\python.exe server.py
 echo 3. Read QUICK_START.md for Claude or ChatGPT setup.
+echo.
+echo Note:
+echo You do not need to run .venv\Scripts\Activate.ps1.
+echo This avoids Windows PowerShell execution policy errors.
 echo.
 pause

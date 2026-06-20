@@ -110,49 +110,56 @@ python -m venv .venv
 
 ---
 
-### Command 2: Activate the workspace
+### Command 2: Install the required software
 
 **On Windows:**
 ```
-.venv\Scripts\activate
+.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 **On Mac/Linux:**
 ```
-source .venv/bin/activate
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-**What it does:** Tells your computer to use this project's software.
+**What it does:** Installs the software this project needs.
 
-**Expected output:** You see `(.venv)` at the beginning of your terminal line, like:
-```
-(.venv) C:\Users\YourName\creative-studio-mcp>
-```
+Important for Windows users:
+
+Do not run `.venv\Scripts\Activate.ps1`. Some Windows computers block that file because of PowerShell security settings. The commands in this guide avoid that problem.
 
 ---
 
-### Command 3: Install the required software
+### Command 3: Check the server file
+
+**On Windows:**
 ```
-pip install -r requirements.txt
+.venv\Scripts\python.exe -m py_compile server.py
 ```
 
-**What it does:** Downloads and installs the MCP software this project needs.
+**On Mac/Linux:**
+```
+.venv/bin/python -m py_compile server.py
+```
 
-**Expected output:** You see messages like:
-```
-Collecting mcp
-Downloading mcp-0.1.0.tar.gz
-...
-Successfully installed mcp-0.1.0
-```
+**What it does:** Checks that the server file is valid.
+
+**Expected output:** No messages, just returns to the prompt.
 
 ---
 
 ## Step 5: Test Your Installation (2 minutes)
 
 Type this command:
+
+**On Windows:**
 ```
-python server.py
+.venv\Scripts\python.exe server.py
+```
+
+**On Mac/Linux:**
+```
+.venv/bin/python server.py
 ```
 
 **Expected output:**
@@ -284,7 +291,8 @@ Your tool is on your computer. If your computer crashes, you lose it. Back it up
 
 ### "No module named 'mcp'"
 - Step 3 or 4 didn't work
-- **Solution:** Run `pip install -r requirements.txt` again
+- **Solution on Windows:** Run `.venv\Scripts\python.exe -m pip install -r requirements.txt` again
+- **Solution on Mac/Linux:** Run `.venv/bin/python -m pip install -r requirements.txt` again
 
 ### "Server starts but Claude doesn't see it"
 - Claude isn't configured correctly

@@ -264,36 +264,50 @@ python -m venv .venv
 
 ---
 
-**Command 2: Activate the workspace**
+**Command 2: Install the software**
 
 On Windows:
 ```
-.venv\Scripts\activate
+.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 On Mac/Linux:
 ```
-source .venv/bin/activate
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-**What it does:** Tells your computer to use this project's software.
+**What it does:** Installs the software this project needs without using the PowerShell activation command.
 
 ---
 
-**Command 3: Install the software**
+**Command 3: Check the server file**
+
+On Windows:
 ```
-pip install -r requirements.txt
+.venv\Scripts\python.exe -m py_compile server.py
 ```
 
-**What it does:** Installs the software this project needs.
+On Mac/Linux:
+```
+.venv/bin/python -m py_compile server.py
+```
+
+**What it does:** Checks that the server file is valid.
 
 ---
 
 ## Test It Works
 
 Type this command:
+
+On Windows:
 ```
-python server.py
+.venv\Scripts\python.exe server.py
+```
+
+On Mac/Linux:
+```
+.venv/bin/python server.py
 ```
 
 **What success looks like:**
@@ -499,8 +513,15 @@ Balance payment (30%): $1,500
 
 ### How do I know if it's working?
 **Run this command:**
+
+On Windows:
 ```
-python server.py
+.venv\Scripts\python.exe server.py
+```
+
+On Mac/Linux:
+```
+.venv/bin/python server.py
 ```
 
 If you see:
@@ -520,12 +541,12 @@ It's working. Press `Ctrl + C` to stop.
 
 **Solution:**
 1. Make sure you ran the commands in Step 4 above
-2. Make sure you see `(.venv)` in your terminal
+2. Make sure you are inside the `creative-studio-mcp` folder
 3. Run this command again:
    ```
-   pip install -r requirements.txt
+   .venv\Scripts\python.exe -m pip install -r requirements.txt
    ```
-4. Try `python server.py` again
+4. Try `.venv\Scripts\python.exe server.py` again
 
 ---
 
@@ -573,11 +594,11 @@ It's working. Press `Ctrl + C` to stop.
 1. Stop the server: Press `Ctrl + C`
 2. Reinstall the software:
    ```
-   pip install --upgrade mcp
+   .venv\Scripts\python.exe -m pip install --upgrade mcp
    ```
 3. Start it again:
    ```
-   python server.py
+   .venv\Scripts\python.exe server.py
    ```
 
 ---
@@ -586,7 +607,7 @@ It's working. Press `Ctrl + C` to stop.
 
 ### Today (30 minutes)
 - [ ] Follow the 5-Minute Setup above
-- [ ] Test by running `python server.py`
+- [ ] Test by running `.venv\Scripts\python.exe server.py` on Windows
 - [ ] Create your first test quote
 
 ### This Week (1 hour)
