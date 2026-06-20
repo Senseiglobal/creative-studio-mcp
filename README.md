@@ -18,6 +18,14 @@ Creative Studio MCP is developed to help creative professionals, freelancers, de
 
 Your support helps fund ongoing open-source improvements, documentation, testing, mobile app development, and future AI-powered business tools.
 
+## Project Roadmap and Feedback
+
+Read the roadmap: [ROADMAP.md](ROADMAP.md)
+
+Share feedback: [FEEDBACK.md](FEEDBACK.md)
+
+Join the community: https://github.com/Senseiglobal/creative-studio-mcp/discussions
+
 ## What Is This?
 
 **Creative Studio MCP** is a smart business assistant that helps creative professionals automate everyday work.
