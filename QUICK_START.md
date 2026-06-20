@@ -1,6 +1,6 @@
 # Quick Start Guide for Beginners
 
-**Get this tool working in 10 minutes—no coding experience required.**
+**Get this tool working in 10 minutes - no coding experience required.**
 
 ---
 
@@ -15,7 +15,7 @@ Make sure you have:
 
 ## Step 1: Download Python (2 minutes)
 
-**What is Python?** It's the software that powers this tool. Don't worry—you don't need to understand it.
+**What is Python?** It's the software that powers this tool. Don't worry - you don't need to understand it.
 
 1. Go to https://www.python.org/downloads/
 2. Click the large "Download Python" button (pick the latest version)
@@ -154,7 +154,7 @@ This means your setup worked! The server is running.
 
 ## Step 6: Connect to ChatGPT or Claude (3 minutes)
 
-### Option A: Use Claude Desktop (Recommended—it's free)
+### Option A: Use Claude Desktop (Recommended - it's free)
 
 Claude is a free AI chatbot. This tool works perfectly with it.
 
@@ -165,7 +165,7 @@ Claude is a free AI chatbot. This tool works perfectly with it.
 
 Now you can ask Claude questions like:
 ```
-"Generate a quote for John Smith for Brand Identity Design at ₦300,000"
+"Generate a quote for John Smith for Brand Identity Design at $3,000"
 ```
 
 And Claude will use this tool to create a professional quote instantly.
@@ -190,7 +190,7 @@ Once Claude or ChatGPT is connected, try this:
 
 **Ask Claude:**
 ```
-"Create a quote for ABC Company for Product Packaging Design at ₦200,000. Don't include printing."
+"Create a quote for ABC Company for Product Packaging Design at $2,000. Don't include printing."
 ```
 
 **You'll see a professional quote like:**
@@ -200,11 +200,11 @@ Hello ABC Company,
 Thank you for your interest in our creative services.
 
 Service: Product Packaging Design
-Creative Design Fee: ₦200,000
+Creative Design Fee: $2,000
 
 Payment Terms:
-70% upfront before project commencement (₦140,000)
-30% balance before final delivery (₦60,000)
+70% upfront before project commencement ($1,400)
+30% balance before final delivery ($600)
 
 Printing/production is not included and will be quoted separately after design approval.
 
@@ -232,7 +232,7 @@ Your quotes currently use default pricing. To customize them:
 1. Open `server.py` in a text editor (Notepad, VS Code, etc.)
 2. Find this section:
    ```python
-   "Brand Identity Design": "₦180,000 – ₦900,000+",
+   "Brand Identity Design": "$500 to $2,500+",
    ```
 3. Change the prices to yours
 4. Save the file

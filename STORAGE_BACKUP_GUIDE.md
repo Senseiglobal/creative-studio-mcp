@@ -276,11 +276,11 @@ If you want your team to use this tool:
 
 | Backup Type | Cost | Setup Time | Automatic | Best For |
 |-------------|------|-----------|-----------|----------|
-| Google Drive | Free–$20/mo | 5 min | Yes | Beginners |
-| OneDrive | Free–$2/mo | 5 min | Yes | Windows users |
-| Dropbox | Free–$10/mo | 5 min | Yes | Teams |
+| Google Drive | Free to $20/mo | 5 min | Yes | Beginners |
+| OneDrive | Free to $2/mo | 5 min | Yes | Windows users |
+| Dropbox | Free to $10/mo | 5 min | Yes | Teams |
 | GitHub | Free | 15 min | No (manual) | Code + teams |
-| External Drive | $30–$100 (one-time) | 5 min | No (manual) | Offline backup |
+| External Drive | $30 to $100 (one-time) | 5 min | No (manual) | Offline backup |
 
 ---
 

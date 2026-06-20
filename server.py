@@ -7,12 +7,12 @@ mcp = FastMCP("Creative Studio MCP")
 def list_services() -> dict:
     """List available creative studio services and price ranges."""
     return {
-        "Brand Identity Design": "₦180,000 – ₦900,000+",
-        "Product Packaging Design": "₦150,000 – ₦500,000+",
-        "Corporate Profile Design": "₦120,000 – ₦400,000+",
-        "Proposal / Presentation Design": "₦50,000 – ₦250,000+",
-        "Merchandise Design": "₦80,000 – ₦350,000+",
-        "Banner & Event Visual Design": "₦15,000 – ₦250,000+",
+        "Brand Identity Design": "$500 to $2,500+",
+        "Product Packaging Design": "$400 to $1,500+",
+        "Corporate Profile Design": "$300 to $1,200+",
+        "Proposal / Presentation Design": "$150 to $700+",
+        "Merchandise Design": "$250 to $1,000+",
+        "Banner & Event Visual Design": "$50 to $500+",
     }
 
 
@@ -23,10 +23,10 @@ def calculate_payment(total_fee: int, upfront_percent: int = 70) -> dict:
     balance = total_fee - upfront
 
     return {
-        "total_fee": f"₦{total_fee:,}",
+        "total_fee": f"${total_fee:,}",
         "upfront_percent": f"{upfront_percent}%",
-        "upfront_payment": f"₦{upfront:,}",
-        "balance_payment": f"₦{balance:,}",
+        "upfront_payment": f"${upfront:,}",
+        "balance_payment": f"${balance:,}",
     }
 
 
@@ -67,7 +67,7 @@ Hello {client_name},
 Thank you for your interest in our creative services.
 
 Service: {service}
-Creative Design Fee: ₦{design_fee:,}
+Creative Design Fee: ${design_fee:,}
 
 Payment Terms:
 70% upfront before project commencement.

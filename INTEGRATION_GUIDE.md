@@ -58,9 +58,9 @@ If you have a website built with:
 ### Step-by-Step (Non-Technical Version)
 
 1. **Get a chatbot service** (free options):
-   - ChatGPT (openai.com) — $20/month for best features
-   - Claude (claude.ai) — Free
-   - Microsoft Copilot — Free
+   - ChatGPT (openai.com): $20/month for best features
+   - Claude (claude.ai): Free
+   - Microsoft Copilot: Free
 
 2. **Tell the chatbot about your tool:**
    Write this in the chatbot's instructions:
@@ -111,13 +111,13 @@ Use this tool to generate your service list. Post it like this:
 📋 Our Creative Services:
 
 🎨 Brand Identity Design
-₦180,000 – ₦900,000+
+$500 to $2,500+
 
 📦 Product Packaging Design
-₦150,000 – ₦500,000+
+$400 to $1,500+
 
 💼 Corporate Profile Design
-₦120,000 – ₦400,000+
+$300 to $1,200+
 
 [... etc]
 
@@ -164,9 +164,9 @@ Use this tool to show your payment breakdown:
 
 Here's our transparent payment structure:
 
-For a ₦500,000 project:
-• Upfront: ₦350,000 (70%)
-• Balance: ₦150,000 (30%)
+For a $5,000 project:
+• Upfront: $3,500 (70%)
+• Balance: $1,500 (30%)
 
 Why 70/30?
 ✓ Protects us both
@@ -193,14 +193,14 @@ Your Guide to Creative Services Pricing
 **Slide 2:** Service 1
 ```
 Brand Identity Design
-₦180,000 – ₦900,000+
+$500 to $2,500+
 (show a logo example)
 ```
 
 **Slide 3:** Service 2
 ```
 Product Packaging
-₦150,000 – ₦500,000+
+$400 to $1,500+
 (show a package example)
 ```
 
@@ -234,9 +234,9 @@ Create a 15-30 second video:
 
 [Show your services on screen]
 
-Brand Identity: Starting at ₦180K
-Packaging: Starting at ₦150K
-Profiles: Starting at ₦120K
+Brand Identity: Starting at $500
+Packaging: Starting at $400
+Profiles: Starting at $300
 
 Payment? 70% up front, 30% at delivery.
 
@@ -260,7 +260,7 @@ POV: Client asks how much branding costs
 
 [Show on screen:]
 "It depends on scope..."
-"Starting at ₦180,000"
+"Starting at $500"
 "70% upfront, 30% at end"
 "Questions? DM me"
 ```
@@ -297,13 +297,13 @@ A client messages you on WhatsApp:
 Client: "Hi! How much for branding?"
 
 You (using this tool): 
-"Brand Identity starts at ₦180K with 70% upfront.
+"Brand Identity starts at $500 with 70% upfront.
 Want a custom quote?"
 
 Client: "Yes, send me one"
 
 You (using Claude/ChatGPT):
-"Create a quote for Sarah for Brand Identity at ₦300K"
+"Create a quote for Sarah for Brand Identity at $3,000"
 [Tool generates quote]
 You: [paste the quote into WhatsApp]
 ```
@@ -471,10 +471,10 @@ If you add this tool to your website:
 
 ## Next Steps
 
-1. ✅ **Test on your website** – Add a simple chatbot this week
-2. ✅ **Post on social media** – Create 3-5 posts using this tool
-3. ✅ **Measure results** – Track quotes and close rate
-4. ✅ **Scale it** – Add to more platforms based on results
+1. ✅ **Test on your website** to Add a simple chatbot this week
+2. ✅ **Post on social media** to Create 3-5 posts using this tool
+3. ✅ **Measure results** to Track quotes and close rate
+4. ✅ **Scale it** to Add to more platforms based on results
 
 ---
 

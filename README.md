@@ -36,23 +36,23 @@ Instead of typing the same information over and over, this tool does it for you 
 
 This tool is designed for creative professionals and small businesses:
 
-✔ **Graphic Designers** – Generate quotes and project plans instantly
+✔ **Graphic Designers** to Generate quotes and project plans instantly
 
-✔ **Branding Agencies** – Automate quote creation and client communications
+✔ **Branding Agencies** to Automate quote creation and client communications
 
-✔ **Freelance Creatives** – Reduce time spent on admin work
+✔ **Freelance Creatives** to Reduce time spent on admin work
 
-✔ **Marketing Teams** – Standardize pricing and proposals
+✔ **Marketing Teams** to Standardize pricing and proposals
 
-✔ **Print Shops** – Calculate costs and payment terms automatically
+✔ **Print Shops** to Calculate costs and payment terms automatically
 
-✔ **Design Studios** – Keep projects organized and consistent
+✔ **Design Studios** to Keep projects organized and consistent
 
-✔ **Virtual Assistants** – Help clients with quote automation
+✔ **Virtual Assistants** to Help clients with quote automation
 
-✔ **Small Business Owners** – Save hours every week on repetitive tasks
+✔ **Small Business Owners** to Save hours every week on repetitive tasks
 
-✔ **Students** – Learn how AI automation works
+✔ **Students** to Learn how AI automation works
 
 ---
 
@@ -94,25 +94,25 @@ You can ask your AI: *"What services do we offer?"*
 
 The AI instantly shows:
 ```
-Brand Identity Design: ₦180,000 – ₦900,000+
-Product Packaging Design: ₦150,000 – ₦500,000+
-Corporate Profile Design: ₦120,000 – ₦400,000+
+Brand Identity Design: $500 to $2,500+
+Product Packaging Design: $400 to $1,500+
+Corporate Profile Design: $300 to $1,200+
 ...and more
 ```
 
 ### 2. Calculate Payment Breakdowns
 
-You ask: *"What's the payment breakdown for a ₦500,000 project?"*
+You ask: *"What's the payment breakdown for a $5,000 project?"*
 
 The AI instantly shows:
 ```
-Upfront payment (70%): ₦350,000
-Balance payment (30%): ₦150,000
+Upfront payment (70%): $3,500
+Balance payment (30%): $1,500
 ```
 
 ### 3. Generate Professional Quotes
 
-You ask: *"Create a quote for John Smith for brand design at ₦300,000"*
+You ask: *"Create a quote for John Smith for brand design at $3,000"*
 
 The AI generates a complete, professional quote you can send directly to your client.
 
@@ -334,7 +334,7 @@ Think of an API key like this:
 ### How Much Does It Cost?
 
 - **ChatGPT Plus:** $20/month
-- **ChatGPT API:** You pay per usage (usually $0.01 – $0.10 per request)
+- **ChatGPT API:** You pay per usage (usually $0.01 to $0.10 per request)
 - **Claude Desktop:** Free with account creation
 - **Claude API:** You pay per usage
 
@@ -373,7 +373,7 @@ If you prefer ChatGPT, you can copy and paste quotes into ChatGPT manually, or f
 
 **You ask Claude:** 
 ```
-"Create a quote for John Smith for Brand Identity Design at ₦300,000. Printing not included."
+"Create a quote for John Smith for Brand Identity Design at $3,000. Printing not included."
 ```
 
 **Claude responds:**
@@ -383,11 +383,11 @@ Hello John,
 Thank you for your interest in our creative services.
 
 Service: Brand Identity Design
-Creative Design Fee: ₦300,000
+Creative Design Fee: $3,000
 
 Payment Terms:
-70% upfront (₦210,000) before project commencement
-30% balance (₦90,000) before final delivery
+70% upfront ($2,100) before project commencement
+30% balance ($900) before final delivery
 
 Printing/production is not included and will be quoted separately after design approval.
 
@@ -403,14 +403,14 @@ Thomas Ogun
 
 **You ask Claude:**
 ```
-"Calculate the payment breakdown for a ₦500,000 project with 70% upfront."
+"Calculate the payment breakdown for a $5,000 project with 70% upfront."
 ```
 
 **Claude responds:**
 ```
-Total project fee: ₦500,000
-Upfront payment (70%): ₦350,000
-Balance payment (30%): ₦150,000
+Total project fee: $5,000
+Upfront payment (70%): $3,500
+Balance payment (30%): $1,500
 ```
 
 **You do:** Add this to your invoice or send it to your client.
@@ -464,7 +464,7 @@ Balance payment (30%): ₦150,000
 **Monthly:** Depends on your AI choice
 - Claude Desktop: Free
 - ChatGPT Plus: $20/month
-- Usage-based APIs: Usually $0–$5/month for small businesses
+- Usage-based APIs: Usually $0 to $5/month for small businesses
 
 ### What if I lose my API key?
 **Create a new one immediately.** Go to https://platform.openai.com/api/keys and delete the old key. Create a new one and update your `.env` file.
