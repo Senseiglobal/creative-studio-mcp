@@ -26,6 +26,7 @@ Current features:
 - Quote generation workflow
 - Payment breakdown calculator
 - Project checklist generator
+- Beginner installer for Windows, Mac, and Linux
 - Beginner-friendly setup documentation
 - Claude and ChatGPT integration guidance
 - GitHub Sponsors support
@@ -34,6 +35,7 @@ Current features:
 Short Term Priorities
 
 - Improve beginner setup instructions
+- Improve one-click installer guidance
 - Add more service pricing templates
 - Add more quote examples
 - Add more creative business use cases

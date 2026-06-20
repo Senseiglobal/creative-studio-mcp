@@ -1,79 +1,123 @@
 @echo off
-REM Creative Studio MCP - One-Click Installation (Windows)
-REM This script sets up everything needed to run the project
+setlocal
+
+title Creative Studio MCP Installer
 
 echo.
 echo ============================================
-echo Creative Studio MCP - Installation
+echo Creative Studio MCP - Windows Installer
 echo ============================================
 echo.
+echo This installer will:
+echo 1. Check Python
+echo 2. Create a local workspace
+echo 3. Install required software
+echo 4. Create your .env file
+echo 5. Test the server startup
+echo.
 
-REM Check if Python is installed
-python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: Python is not installed or not in PATH
+where python >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Python was not found.
     echo.
-    echo Please install Python from: https://www.python.org/downloads/
-    echo Make sure to check "Add Python to PATH" during installation
+    echo Install Python from:
+    echo https://www.python.org/downloads/
+    echo.
+    echo During installation, check "Add Python to PATH".
+    echo Then close this window and run install.bat again.
     echo.
     pause
     exit /b 1
 )
 
-echo [1/4] Creating workspace...
-python -m venv .venv
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to create virtual environment
+echo Python found:
+python --version
+echo.
+
+if not exist requirements.txt (
+    echo ERROR: requirements.txt was not found.
+    echo Make sure install.bat is inside the creative-studio-mcp folder.
+    echo.
     pause
     exit /b 1
 )
-echo ✓ Workspace created
 
-echo.
-echo [2/4] Activating workspace...
-call .venv\Scripts\activate.bat
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to activate virtual environment
-    pause
-    exit /b 1
-)
-echo ✓ Workspace activated
-
-echo.
-echo [3/4] Installing software...
-pip install -r requirements.txt
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to install requirements
-    pause
-    exit /b 1
-)
-echo ✓ Software installed
-
-echo.
-echo [4/4] Creating environment file...
-if not exist .env (
-    (
-        echo # Creative Studio MCP Configuration
-        echo # Get your OpenAI API Key from: https://platform.openai.com/api-keys
-        echo OPENAI_API_KEY=your_api_key_here
+echo [1/5] Creating local workspace...
+if not exist .venv (
+    python -m venv .venv
+    if errorlevel 1 (
+        echo ERROR: Could not create the local workspace.
+        echo Try reinstalling Python and make sure the venv feature is available.
         echo.
-        echo # Server Configuration
-        echo MCP_SERVER_NAME=creative-studio
-        echo MCP_SERVER_PATH=%CD%
-    ) > .env
-    echo ✓ Environment file created (.env)
+        pause
+        exit /b 1
+    )
 ) else (
-    echo ✓ Environment file already exists
+    echo Local workspace already exists.
 )
-
+echo Done.
 echo.
+
+echo [2/5] Activating local workspace...
+call .venv\Scripts\activate.bat
+if errorlevel 1 (
+    echo ERROR: Could not activate the local workspace.
+    echo.
+    pause
+    exit /b 1
+)
+echo Done.
+echo.
+
+echo [3/5] Installing required software...
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+if errorlevel 1 (
+    echo ERROR: Could not install required software.
+    echo Check your internet connection and try again.
+    echo.
+    pause
+    exit /b 1
+)
+echo Done.
+echo.
+
+echo [4/5] Creating environment file...
+if not exist .env (
+    copy .env.example .env >nul 2>nul
+    if errorlevel 1 (
+        (
+            echo OPENAI_API_KEY=your_api_key_here
+            echo MCP_SERVER_NAME=creative-studio
+            echo MCP_SERVER_PATH=%CD%
+        ) > .env
+    )
+    echo Created .env.
+) else (
+    echo .env already exists.
+)
+echo.
+
+echo [5/5] Testing server startup...
+python -m py_compile server.py
+if errorlevel 1 (
+    echo ERROR: server.py has a syntax problem.
+    echo Please check the error above.
+    echo.
+    pause
+    exit /b 1
+)
+echo Server file looks good.
+echo.
+
 echo ============================================
-echo ✓ Installation Complete!
+echo Installation complete
 echo ============================================
 echo.
 echo Next steps:
-echo 1. Open .env file and add your OpenAI API Key
-echo 2. Read QUICK_START.md for next steps
-echo 3. Run: python server.py (to test)
+echo 1. Open .env and add your API key if you plan to use API features.
+echo 2. Run this command to test the server:
+echo    .venv\Scripts\python.exe server.py
+echo 3. Read QUICK_START.md for Claude or ChatGPT setup.
 echo.
 pause

@@ -11,6 +11,7 @@
 - Setup Claude Desktop
 - Test each tool
 - First backup
+- Installer help: **INSTALLER_GUIDE.md**
 
 ### 🌐 Want to Add to Website/Social Media?
 👉 Read: **INTEGRATION_GUIDE.md** (15 minutes)

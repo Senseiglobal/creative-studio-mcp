@@ -24,6 +24,8 @@ Read the roadmap: [ROADMAP.md](ROADMAP.md)
 
 Share feedback: [FEEDBACK.md](FEEDBACK.md)
 
+Installer guide: [INSTALLER_GUIDE.md](INSTALLER_GUIDE.md)
+
 Join the community: https://github.com/Senseiglobal/creative-studio-mcp/discussions
 
 ## What Is This?
@@ -165,6 +167,8 @@ Just three things:
 ## 1-Minute Setup (Automated)
 
 The easiest way to install: **Double-click one file and everything is done automatically.**
+
+For a fuller walkthrough, read [INSTALLER_GUIDE.md](INSTALLER_GUIDE.md).
 
 ### Step 1: Download Python (2 minutes)
 
