@@ -59,11 +59,11 @@ Planned mobile app features:
 - Custom service pricing
 - Backup and restore support
 
-Funding Target
+Open Contributions
 
-Target: 25,000 USD
+Creative Studio MCP is open for contributions and sponsorship support without a required amount.
 
-Funding will support:
+Support will help with:
 
 - Mobile app design
 - iOS and Android development
