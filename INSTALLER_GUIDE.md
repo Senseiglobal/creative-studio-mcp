@@ -20,6 +20,38 @@ It will:
 - Check that server.py can compile
 - Show the next steps after setup
 
+Important Folder Step
+
+Run the installer from inside the creative-studio-mcp folder.
+
+If your terminal shows this:
+
+```powershell
+PS C:\Users\User>
+```
+
+you are probably in the wrong folder.
+
+It should look more like this:
+
+```powershell
+PS C:\Users\User\creative-studio-mcp>
+```
+
+To fix it, open the creative-studio-mcp folder in File Explorer, click the address bar, type `powershell`, and press Enter. This opens PowerShell in the correct folder.
+
+You can also run:
+
+```powershell
+cd "C:\Users\User\creative-studio-mcp"
+```
+
+If your folder is in Downloads, use that path instead:
+
+```powershell
+cd "C:\Users\User\Downloads\creative-studio-mcp"
+```
+
 Windows Setup
 
 1. Download the project from GitHub.
@@ -48,12 +80,14 @@ Testing The Server
 On Windows:
 
 ```powershell
+cd "C:\Users\User\creative-studio-mcp"
 .venv\Scripts\python.exe server.py
 ```
 
 On Mac and Linux:
 
 ```bash
+cd ~/creative-studio-mcp
 .venv/bin/python server.py
 ```
 
@@ -68,6 +102,10 @@ Install Python from https://www.python.org/downloads/ and make sure Python is ad
 The installer cannot install requirements:
 
 Check your internet connection and run the installer again.
+
+PowerShell says .venv is not recognized:
+
+You are in the wrong folder. Open the creative-studio-mcp folder, click the address bar, type `powershell`, press Enter, and try again.
 
 .env already exists:
 

@@ -79,6 +79,20 @@ Option B: **Without Git**
 
 **Success looks like:** A terminal window opens showing your folder path.
 
+On Windows, the path should include `creative-studio-mcp`, like this:
+
+```powershell
+PS C:\Users\YourName\creative-studio-mcp>
+```
+
+If it only shows something like this:
+
+```powershell
+PS C:\Users\YourName>
+```
+
+you are in the wrong folder. Open the `creative-studio-mcp` folder in File Explorer, click the address bar, type `powershell`, and press Enter.
+
 ---
 
 ## Step 4: Run the Setup Commands
@@ -279,6 +293,7 @@ Your tool is on your computer. If your computer crashes, you lose it. Back it up
 ### Terminal commands aren't working
 - You're in the wrong folder
 - **Solution:** Right-click your `creative-studio-mcp` folder and choose "Open Terminal Here"
+- On Windows, you can also open the folder, click the address bar, type `powershell`, and press Enter
 
 ---
 

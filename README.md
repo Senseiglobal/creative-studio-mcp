@@ -200,6 +200,13 @@ For a fuller walkthrough, read [INSTALLER_GUIDE.md](INSTALLER_GUIDE.md).
 3. Wait for it to finish (you'll see "Installation Complete!")
 4. **Done!** The installer created everything you need.
 
+If you use PowerShell manually, make sure the terminal is inside the project folder:
+
+```powershell
+cd "C:\Users\User\creative-studio-mcp"
+.\install.bat
+```
+
 #### On Mac/Linux:
 1. Open Terminal in your `creative-studio-mcp` folder
 2. Type this one command:
@@ -555,7 +562,8 @@ It's working. Press `Ctrl + C` to stop.
 **Solution:**
 1. Make sure you're in the `creative-studio-mcp` folder
 2. Try right-clicking in the folder and choosing "Open Terminal Here" or "Open PowerShell Here"
-3. Try the commands again
+3. On Windows, you can also click the folder address bar, type `powershell`, and press Enter
+4. Try the commands again
 
 ---
 
