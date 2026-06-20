@@ -6,6 +6,7 @@ For a visual setup guide, open START_HERE.html.
 
 Installer Files
 
+- Windows start page launcher: START_WINDOWS.bat
 - Windows: install.bat
 - Windows setup check: CHECK_INSTALL.bat
 - Mac and Linux: install.sh
@@ -25,6 +26,8 @@ It will:
 Important Folder Step
 
 Run the installer from inside the creative-studio-mcp folder.
+
+If you downloaded a ZIP file, extract it first. Do not run START_HERE.html, install.bat, or CHECK_INSTALL.bat from inside the ZIP preview or a temporary folder.
 
 If your terminal shows this:
 
@@ -57,12 +60,10 @@ cd "C:\Users\User\Downloads\creative-studio-mcp"
 Windows Setup
 
 1. Download the project from GitHub.
-2. Extract the ZIP file.
+2. Right-click the ZIP file and choose Extract All.
 3. Open the creative-studio-mcp folder.
-4. Double-click install.bat.
-5. Wait for the installation complete message.
-6. Double-click CHECK_INSTALL.bat if you want to confirm the setup later.
-7. Follow the three short steps shown on screen.
+4. Double-click START_WINDOWS.bat.
+5. Follow the three short steps on the page.
 
 Mac and Linux Setup
 

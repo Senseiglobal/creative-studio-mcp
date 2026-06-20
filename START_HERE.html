@@ -117,6 +117,15 @@
       cursor: pointer;
     }
 
+    .alert {
+      padding: 14px 16px;
+      background: #fff8e6;
+      border: 1px solid #f1d28a;
+      border-left: 5px solid var(--gold);
+      border-radius: 8px;
+      color: var(--ink);
+    }
+
     .btn:hover {
       background: var(--green-dark);
     }
@@ -279,9 +288,11 @@
         </div>
       </div>
       <div class="quick">
-        <a class="btn" href="install.bat">Windows install</a>
-        <a class="btn secondary" href="CHECK_INSTALL.bat">Check install</a>
-        <a class="btn secondary" href="QUICK_START.md">Quick start</a>
+        <button class="btn" type="button" data-scroll="windows">Show me what to click</button>
+        <a class="btn secondary" href="QUICK_START.md">After install guide</a>
+      </div>
+      <div class="alert">
+        First extract the ZIP file. Do not run this page from inside the ZIP preview or a temporary folder.
       </div>
     </section>
 
@@ -306,9 +317,9 @@
       </article>
     </section>
 
-    <section class="choice">
-      <h2>Quick Actions</h2>
-      <p>Most Windows users only need the buttons below. Use commands only if someone asks you to.</p>
+    <section class="choice" id="windows-actions">
+      <h2>Windows Users: Do This</h2>
+      <p>This is the easiest path. No typing. No activation. Just double-click the files in order.</p>
 
       <div class="tabs" role="tablist" aria-label="Computer options">
         <button class="tab active" type="button" data-tab="windows">Windows</button>
@@ -317,9 +328,13 @@
       </div>
 
       <div id="windows" class="panel active">
-        <p><strong>Install:</strong> double-click <strong>install.bat</strong>.</p>
-        <p><strong>Check:</strong> double-click <strong>CHECK_INSTALL.bat</strong>.</p>
-        <p>If you must use PowerShell, run this from inside the project folder:</p>
+        <p><strong>Before you begin:</strong> right-click the downloaded ZIP file and choose <strong>Extract All</strong>. Open the extracted folder before double-clicking anything.</p>
+        <br>
+        <p><strong>1. Install:</strong> double-click <strong>install.bat</strong>.</p>
+        <p><strong>2. Check:</strong> double-click <strong>CHECK_INSTALL.bat</strong>.</p>
+        <p><strong>3. Connect:</strong> open <strong>QUICK_START.md</strong>.</p>
+        <br>
+        <p>If someone asks you to use PowerShell, run this from inside the project folder:</p>
         <div class="command">
           <code>.\install.bat</code>
           <button class="copy" type="button" data-copy=".\install.bat">Copy</button>
@@ -385,6 +400,13 @@
         } catch (error) {
           status.textContent = "Copy failed. Select the command and copy it manually.";
         }
+      });
+    });
+
+    document.querySelectorAll("[data-scroll]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.getElementById("windows-actions").scrollIntoView({ behavior: "smooth" });
+        status.textContent = "Extract the ZIP first, then double-click the file in the extracted folder.";
       });
     });
   </script>

@@ -7,6 +7,7 @@
 ## 📖 Where to Start
 
 ### 🎯 Just Built It? Start Here
+Windows: **START_WINDOWS.bat** opens the simple start page
 Open: **START_HERE.html** for the visual setup guide
 Check: **CHECK_INSTALL.bat** to confirm Windows setup
 

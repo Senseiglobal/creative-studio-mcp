@@ -2,7 +2,9 @@
 
 This guide is for people who already ran `install.bat`.
 
-If you have not installed yet, open `START_HERE.html` and follow the visual guide.
+If you have not installed yet, double-click `START_WINDOWS.bat` on Windows or open `START_HERE.html`.
+
+If you downloaded a ZIP file, extract it first. Do not run setup files from inside the ZIP preview or a temporary folder.
 
 ## What You Should See
 

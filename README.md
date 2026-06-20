@@ -22,6 +22,8 @@ Your support helps fund ongoing open-source improvements, documentation, testing
 
 Visual start page: [START_HERE.html](START_HERE.html)
 
+Windows launcher: [START_WINDOWS.bat](START_WINDOWS.bat)
+
 Windows setup check: [CHECK_INSTALL.bat](CHECK_INSTALL.bat)
 
 Read the roadmap: [ROADMAP.md](ROADMAP.md)
@@ -194,15 +196,17 @@ For a fuller walkthrough, read [INSTALLER_GUIDE.md](INSTALLER_GUIDE.md).
 5. Right-click the ZIP file and choose "Extract All"
 6. **What success looks like:** A folder called `creative-studio-mcp` on your computer
 
+Important: open the extracted folder before running `START_HERE.html`, `install.bat`, or `CHECK_INSTALL.bat`.
+
 ---
 
 ### Step 3: Run the Installer (1 minute)
 
 #### On Windows:
 1. Open your `creative-studio-mcp` folder
-2. Double-click `install.bat`
-3. Wait for it to finish (you'll see "Installation Complete!")
-4. **Done!** The installer created everything you need.
+2. Double-click `START_WINDOWS.bat`
+3. Follow the 3 steps on the page
+4. **Done!** The page tells you exactly what to click.
 
 If you use PowerShell manually, make sure the terminal is inside the project folder:
 
