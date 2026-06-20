@@ -13,13 +13,11 @@ The installer helps beginners set up the project without typing many commands.
 
 It will:
 
-- Check that Python is installed
-- Create a local workspace called .venv
-- Install the required Python package from requirements.txt
+- Set up the project
+- Check that the setup works
+- Show the next steps in plain language
 - Create a .env file if one does not already exist
-- Check that server.py can compile
-- Show the next steps after setup
-- Avoid PowerShell activation commands that can be blocked by Windows security settings
+- Avoid confusing PowerShell activation commands
 
 Important Folder Step
 
@@ -60,7 +58,7 @@ Windows Setup
 3. Open the creative-studio-mcp folder.
 4. Double-click install.bat.
 5. Wait for the installation complete message.
-6. Read QUICK_START.md for the next setup steps.
+6. Follow the three short steps shown on screen.
 
 Mac and Linux Setup
 

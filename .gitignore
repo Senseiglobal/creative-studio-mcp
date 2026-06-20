@@ -10,3 +10,19 @@ venv/
 .idea/
 .DS_Store
 .env
+
+# Build and package output
+build/
+dist/
+*.egg-info/
+
+# Test and tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local logs and temporary files
+*.log
+*.tmp
