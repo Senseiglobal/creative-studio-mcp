@@ -127,7 +127,7 @@ echo Done.
 echo.
 
 echo Checking the project Python...
-if not exist .venv\Scripts\python.exe (
+if not exist ".\.venv\Scripts\python.exe" (
     echo ERROR: Local Python was not created.
     echo.
     pause
@@ -137,8 +137,8 @@ echo Done.
 echo.
 
 echo Installing the required files...
-.venv\Scripts\python.exe -m pip install --upgrade pip
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+call ".\.venv\Scripts\python.exe" -m pip install --upgrade pip
+call ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 (
     echo ERROR: Could not install required software.
     echo Check your internet connection and try again.
@@ -166,7 +166,7 @@ if not exist .env (
 echo.
 
 echo [2/3] Checking that everything works...
-.venv\Scripts\python.exe -c "import server"
+call ".\.venv\Scripts\python.exe" -c "import server"
 if errorlevel 1 (
     echo ERROR: The tool could not be checked.
     echo Please check the error above.

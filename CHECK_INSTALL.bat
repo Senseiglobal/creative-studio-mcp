@@ -61,7 +61,7 @@ echo Project folder:
 echo %CD%
 echo.
 
-if not exist ".venv\Scripts\python.exe" (
+if not exist ".\.venv\Scripts\python.exe" (
     echo Setup is not complete yet.
     echo.
     echo Please double-click install.bat first.
@@ -71,7 +71,7 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 echo Checking the tool...
-".venv\Scripts\python.exe" -c "import server"
+call ".\.venv\Scripts\python.exe" -c "import server"
 if errorlevel 1 (
     echo.
     echo The setup check failed.

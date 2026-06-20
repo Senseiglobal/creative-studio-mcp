@@ -272,7 +272,7 @@ python -m venv .venv
 
 On Windows:
 ```
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 On Mac/Linux:
@@ -288,7 +288,7 @@ On Mac/Linux:
 
 On Windows:
 ```
-.venv\Scripts\python.exe -m py_compile server.py
+.\.venv\Scripts\python.exe -m py_compile server.py
 ```
 
 On Mac/Linux:
@@ -306,7 +306,7 @@ Type this command:
 
 On Windows:
 ```
-.venv\Scripts\python.exe server.py
+.\.venv\Scripts\python.exe server.py
 ```
 
 On Mac/Linux:
@@ -520,7 +520,7 @@ Balance payment (30%): $1,500
 
 On Windows:
 ```
-.venv\Scripts\python.exe server.py
+.\.venv\Scripts\python.exe server.py
 ```
 
 On Mac/Linux:
@@ -548,9 +548,9 @@ It's working. Press `Ctrl + C` to stop.
 2. Make sure you are inside the `creative-studio-mcp` folder
 3. Run this command again:
    ```
-   .venv\Scripts\python.exe -m pip install -r requirements.txt
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
    ```
-4. Try `.venv\Scripts\python.exe server.py` again
+4. Try `.\.venv\Scripts\python.exe server.py` again
 
 ---
 
@@ -598,11 +598,11 @@ It's working. Press `Ctrl + C` to stop.
 1. Stop the server: Press `Ctrl + C`
 2. Reinstall the software:
    ```
-   .venv\Scripts\python.exe -m pip install --upgrade mcp
+   .\.venv\Scripts\python.exe -m pip install --upgrade mcp
    ```
 3. Start it again:
    ```
-   .venv\Scripts\python.exe server.py
+   .\.venv\Scripts\python.exe server.py
    ```
 
 ---
@@ -611,7 +611,7 @@ It's working. Press `Ctrl + C` to stop.
 
 ### Today (30 minutes)
 - [ ] Follow the 5-Minute Setup above
-- [ ] Test by running `.venv\Scripts\python.exe server.py` on Windows
+- [ ] Test by running `.\.venv\Scripts\python.exe server.py` on Windows
 - [ ] Create your first test quote
 
 ### This Week (1 hour)

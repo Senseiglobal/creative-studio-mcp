@@ -84,7 +84,7 @@ On Windows:
 
 ```powershell
 cd "C:\Users\User\creative-studio-mcp"
-.venv\Scripts\python.exe server.py
+.\.venv\Scripts\python.exe server.py
 ```
 
 On Mac and Linux:
@@ -115,7 +115,7 @@ PowerShell says Activate.ps1 cannot be loaded:
 This is a Windows security setting. You do not need to run Activate.ps1. Use:
 
 ```powershell
-.venv\Scripts\python.exe server.py
+.\.venv\Scripts\python.exe server.py
 ```
 
 The Windows installer uses this safer method automatically.

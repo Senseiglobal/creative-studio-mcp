@@ -15,7 +15,7 @@ Setup check passed
 
 If you saw that, the tool is installed.
 
-You do not need to type `.venv\Scripts\python.exe server.py` in PowerShell.
+You do not need to type `.\.venv\Scripts\python.exe server.py` in PowerShell.
 
 You do not need to open `Activate.ps1`.
 
