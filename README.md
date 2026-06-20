@@ -1,5 +1,23 @@
 # Welcome to Creative Studio MCP
 
+<p>
+  <a href="https://github.com/sponsors/Senseiglobal">
+    <img src="https://img.shields.io/badge/Support%20Us-GitHub%20Sponsors-brightgreen?style=for-the-badge" alt="Support Us on GitHub Sponsors">
+  </a>
+</p>
+
+## Developer Information
+
+**Developer:** Thomas Ogun
+
+**Organization:** Senseiglobal
+
+**GitHub Repository:** https://github.com/Senseiglobal/creative-studio-mcp
+
+Creative Studio MCP is developed to help creative professionals, freelancers, design studios, agencies, print shops, and small businesses reduce admin work and manage client-ready business tasks with AI.
+
+Your support helps fund ongoing open-source improvements, documentation, testing, mobile app development, and future AI-powered business tools.
+
 ## What Is This?
 
 **Creative Studio MCP** is a smart business assistant that helps creative professionals automate everyday work.
