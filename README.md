@@ -1,5 +1,11 @@
 ﻿# Creative Studio MCP
 
+<p>
+  <a href="https://github.com/sponsors/Senseiglobal">
+    <img src="https://img.shields.io/badge/Support%20Us-GitHub%20Sponsors-brightgreen?style=for-the-badge" alt="Support Us on GitHub Sponsors">
+  </a>
+</p>
+
 Creative Studio MCP helps creative professionals create quotes, payment breakdowns, service lists, and project checklists with an AI assistant.
 
 It is made for designers, agencies, freelancers, print shops, virtual assistants, and small business owners.
