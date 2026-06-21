@@ -26,3 +26,12 @@ Open `Bin` to restore old projects.
 ## Theme
 
 Use `Theme` to switch system, dark, and light mode.
+
+## Connect Claude from the dashboard
+
+1. Open the local app.
+2. Click `Connect Claude`.
+3. Follow the short steps shown there.
+
+You can still use Creative Studio MCP without Claude.
+

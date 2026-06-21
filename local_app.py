@@ -315,6 +315,83 @@ textarea:focus {
   }
 }
 
+  
+
+/* Dashboard connection cards and footer info */
+.meta-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4, 16px);
+  margin-top: var(--space-5, 20px);
+}
+.meta-card {
+  min-height: 96px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius2, 14px);
+  background: color-mix(in srgb, var(--surface), transparent 5%);
+}
+.meta-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+.connection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4, 16px);
+  margin-top: var(--space-5, 20px);
+}
+.connection-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 20px);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface), transparent 2%), color-mix(in srgb, var(--surface2), transparent 4%));
+  min-height: 190px;
+  transition: transform var(--med, 240ms ease), border-color var(--fast, 150ms ease), box-shadow var(--fast, 150ms ease);
+}
+.connection-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.connection-card .status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #061108;
+  background: var(--primary);
+}
+.connection-card .status.soft {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface2), var(--primary) 18%);
+  border: 1px solid var(--line);
+}
+.developer-footer {
+  margin-top: var(--space-6, 24px);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius2, 14px);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface), transparent 12%);
+}
+.developer-footer a {
+  color: var(--primary2);
+  font-weight: 800;
+}
+@media (max-width: 980px) {
+  .meta-strip,
+  .connection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -323,18 +400,64 @@ textarea:focus {
   <aside class="side" aria-label="Sidebar">
     <div class="brand"><div class="mark">CS</div><div><strong>Creative Studio MCP</strong><p>Creative Workspace</p></div></div>
     <nav class="nav" aria-label="Main navigation">
-      <button class="active" data-view="home">Dashboard</button><button data-view="project">New Project</button><button data-view="settings">Preferences</button><button data-view="quote">Quote</button><button data-view="payment">Payment</button><button data-view="checklist">Checklist</button><button data-view="services">Services</button><button data-view="bin">Bin</button>
+      <button class="active" data-view="home">Dashboard</button><button data-view="project">New Project</button><button data-view="settings">Preferences</button><button data-view="quote">Quote</button><button data-view="payment">Payment</button><button data-view="checklist">Checklist</button><button data-view="services">Services</button><button data-view="bin">Bin</button><button data-view="claude">Connect Claude</button><button data-view="storage">Storage</button>
     </nav>
   </aside>
   <main id="main" class="main" tabindex="-1">
     <div class="top"><input class="search" aria-label="Search projects, clients, services" placeholder="Search projects, clients, services..."><div class="toolbar"><button class="btn ghost tip" id="theme">Theme<span>Switch light, dark, or system mode.</span></button><button class="btn primary" data-view="project">New Project</button></div></div>
-    <section id="home" class="section active"><h1 id="dashboardGreeting">Welcome</h1><p>Create quotes, manage projects, and grow your creative business.</p><div id="onboard" class="panel"><h2>Start here</h2><p>Set your preferences, create your first project, then copy, export, or share the package.</p><div class="toolbar"><button class="btn primary" data-view="project">New Project</button><button class="btn" data-view="settings">Preferences</button><button class="btn ghost" id="dismiss">Dismiss</button></div></div><div class="cards"><button class="card" data-view="project"><div class="icon">+</div><h3>New Project</h3><p>Create a project package</p></button><button class="card" data-view="quote"><div class="icon">Q</div><h3>Quote</h3><p>Generate client quotes</p></button><button class="card" data-view="payment"><div class="icon">$</div><h3>Payment</h3><p>Calculate terms</p></button><button class="card" data-view="checklist"><div class="icon">OK</div><h3>Checklist</h3><p>Create checklists</p></button><button class="card" data-view="services"><div class="icon">S</div><h3>Services</h3><p>Manage services</p></button></div><div class="panel"><div class="toolbar" style="justify-content:space-between"><h2>Recent Projects</h2><button class="btn" id="refresh">Refresh</button></div><div id="recent" class="recent" aria-live="polite"></div></div></section>
+    <section id="home" class="section active"><h1 id="dashboardGreeting">Welcome</h1><p>Create quotes, manage projects, and grow your creative business.</p>
+<div class="meta-strip" aria-label="App information">
+  <div class="meta-card" id="appVersionCard"><strong>App version</strong><p>Creative Studio MCP v1.0.0</p></div>
+  <div class="meta-card"><strong>Developer team</strong><p>Thomas Ogun under Senseiglobal.</p></div>
+  <div class="meta-card"><strong>Contact</strong><p><a href="https://github.com/Senseiglobal/creative-studio-mcp" target="_blank" rel="noreferrer">GitHub repo</a> and <a href="https://github.com/sponsors/Senseiglobal" target="_blank" rel="noreferrer">Support Us</a></p></div>
+</div>
+<div id="onboard" class="panel"><h2>Start here</h2><p>Set your preferences, create your first project, then copy, export, or share the package.</p><div class="toolbar"><button class="btn primary" data-view="project">New Project</button><button class="btn" data-view="settings">Preferences</button><button class="btn ghost" id="dismiss">Dismiss</button></div></div><div class="cards"><button class="card" data-view="project"><div class="icon">+</div><h3>New Project</h3><p>Create a project package</p></button><button class="card" data-view="quote"><div class="icon">Q</div><h3>Quote</h3><p>Generate client quotes</p></button><button class="card" data-view="payment"><div class="icon">$</div><h3>Payment</h3><p>Calculate terms</p></button><button class="card" data-view="checklist"><div class="icon">OK</div><h3>Checklist</h3><p>Create checklists</p></button><button class="card" data-view="services"><div class="icon">S</div><h3>Services</h3><p>Manage services</p></button></div>
+<div class="panel" id="connectionsPanel">
+  <div class="toolbar" style="justify-content:space-between">
+    <div>
+      <h2>Connect tools</h2>
+      <p>Use the app by itself, or connect it to Claude when you are ready.</p>
+    </div>
+  </div>
+  <div class="connection-grid">
+    <article class="connection-card" id="connectClaudeCard">
+      <span class="status">Recommended</span>
+      <h3>Connect Claude</h3>
+      <p>Use Creative Studio MCP inside Claude as an MCP tool. Best for people who want the assistant to call the business tools directly.</p>
+      <button class="btn primary" data-view="claude">Connect Claude</button>
+    </article>
+    <article class="connection-card">
+      <span class="status soft">Optional</span>
+      <h3>Enable more tools</h3>
+      <p>Add more creative business tools later, such as invoices, client records, templates, and analytics.</p>
+      <button class="btn" data-view="services">View Tools</button>
+    </article>
+    <article class="connection-card">
+      <span class="status soft">Coming soon</span>
+      <h3>Connect Google Drive</h3>
+      <p>Store project exports in Google Drive when cloud storage support is added. For now, exports are saved locally.</p>
+      <button class="btn" data-view="storage">Storage Options</button>
+    </article>
+  </div>
+</div>
+<div class="panel"><div class="toolbar" style="justify-content:space-between"><h2>Recent Projects</h2><button class="btn" id="refresh">Refresh</button></div><div id="recent" class="recent" aria-live="polite"></div></div>
+<div class="developer-footer" id="developerFooter">
+  <strong>Creative Studio MCP v1.0.0</strong><br>
+  Built by Thomas Ogun under Senseiglobal. For support, updates, and contributions, use the GitHub repository or the Support Us button.
+</div>
+</section>
     <section id="project" class="section"><h1>New Project</h1><p>Generate a complete package.</p><div class="panel"><form id="projectForm"><div class="grid"><label>Client name<input name="client_name" value="Israel Thomas" required><small>Who is this for?</small></label><label>Service<select name="service" id="projectService"></select><small>Choose from your services.</small></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required><small>Numbers only.</small></label><label>Upfront percent<input name="upfront_percent" type="number" min="0" max="100" value="70" required><small>Example: 70.</small></label><label>Project type<input name="project_type" value="Brand Identity Design" required><small>Short project category.</small></label></div><button class="btn primary" type="submit">Generate</button></form><div id="projectOut"></div></div></section>
     <section id="settings" class="section"><h1>Preferences</h1><div class="panel"><form id="settingsForm"><div class="grid"><label>Business name<input name="business_name"></label><label>Your name<input name="owner_name" autocomplete="name" placeholder="Your name"><small>This name is used for your greeting and client signature.</small></label><label>Email<input name="email"></label><label>Phone<input name="phone"></label><label>Website<input name="website"></label><label>Currency<input name="currency"></label></div><label>Payment terms<textarea name="payment_terms"></textarea></label><label>Services<textarea name="services_text"></textarea><small>One per line: Service | Price range</small></label><button class="btn primary" type="submit">Save</button></form></div></section>
     <section id="quote" class="section"><h1>Quote</h1><div class="panel"><form id="quoteForm"><div class="grid"><label>Client<input name="client_name" value="John Smith"></label><label>Service<select name="service" id="quoteService"></select></label><label>Fee<input name="design_fee" type="number" value="3000"></label></div><button class="btn primary">Generate</button></form><div id="quoteOut"></div></div></section>
     <section id="payment" class="section"><h1>Payment</h1><div class="panel"><form id="paymentForm"><div class="grid"><label>Total fee<input name="total_fee" type="number" value="5000"></label><label>Upfront percent<input name="upfront_percent" type="number" value="70"></label></div><button class="btn primary">Generate</button></form><div id="paymentOut"></div></div></section>
     <section id="checklist" class="section"><h1>Checklist</h1><div class="panel"><form id="checklistForm"><label>Project type<input name="project_type" value="Product packaging design"></label><button class="btn primary">Generate</button></form><div id="checklistOut"></div></div></section>
     <section id="services" class="section"><h1>Services</h1><div class="panel"><button class="btn primary" id="servicesBtn">Generate</button><div id="servicesOut"></div></div></section>
+
+    <section id="claude" class="section"><h1>Connect Claude</h1><p>This is optional. The local dashboard works without Claude.</p><div class="panel"><h2>Beginner steps</h2><div class="recent"><div class="row"><div><h3>Step 1</h3><p>Install and start Creative Studio MCP first.</p></div></div><div class="row"><div><h3>Step 2</h3><p>Use the Claude setup button or guide from this repo to add the MCP server to Claude.</p></div></div><div class="row"><div><h3>Step 3</h3><p>Restart Claude, then ask: Use Creative Studio MCP to list my services.</p></div></div></div><div class="toolbar"><button class="btn primary" data-view="project">Use Local App</button><button class="btn" data-view="settings">Check Preferences</button></div></div></section>
+
+
+    <section id="storage" class="section"><h1>Storage Options</h1><p>Exports are saved safely on this computer today. Cloud storage can be added later.</p><div class="panel"><div class="connection-grid"><article class="connection-card"><span class="status">Available</span><h3>Local exports</h3><p>TXT and MD files are saved in the exports folder inside the app folder.</p><button class="btn primary" data-view="project">Create Export</button></article><article class="connection-card"><span class="status soft">Coming soon</span><h3>Google Drive</h3><p>Future option for saving exports to your Drive account.</p><button class="btn" disabled aria-disabled="true">Coming Soon</button></article><article class="connection-card"><span class="status soft">Coming soon</span><h3>Dropbox or OneDrive</h3><p>Future options for teams that want shared project folders.</p><button class="btn" disabled aria-disabled="true">Coming Soon</button></article></div></div></section>
+
     <section id="bin" class="section"><h1>Bin</h1><div class="panel"><div class="toolbar"><button class="btn" id="binRefresh">Refresh</button><button class="btn danger" id="binEmpty">Empty Bin</button></div><div id="binList" class="recent"></div></div></section>
   </main>
   <aside class="preview" aria-label="Project package preview"><div class="toolbar" style="justify-content:space-between"><h2>Project Package Preview</h2><button class="btn ghost" id="clearPreview">Close</button></div><div id="preview"><p>Your generated package appears here.</p></div></aside>

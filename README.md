@@ -58,3 +58,9 @@ The dashboard includes clearer spacing, softer feedback messages, better tooltip
 
 The dashboard greeting uses the name saved in Preferences. If no name is saved, it only shows the time-based greeting. Morning, afternoon, evening, and night are based on the device time zone.
 
+## Dashboard connection cards
+
+The dashboard shows the app version, developer team, contact links, and beginner cards for connecting Claude, enabling more tools, and future storage options like Google Drive.
+
+Claude is optional. The local browser app works by itself.
+
