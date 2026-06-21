@@ -56,7 +56,22 @@ Read: [OPENAI_SETUP.md](OPENAI_SETUP.md)
 - [CHECK_INSTALL.bat](CHECK_INSTALL.bat): checks the install
 - [CONNECT_CLAUDE.bat](CONNECT_CLAUDE.bat): connects Claude Desktop
 - [QUICK_START.md](QUICK_START.md): short setup guide
+- [FIRST_CLAUDE_PROMPT.txt](FIRST_CLAUDE_PROMPT.txt): first prompt to test Claude
 
+
+## First Claude Test
+
+After setup, start a new Claude Desktop chat and paste:
+
+```text
+Use the Creative Studio MCP tool to list our services.
+
+If you can see the tool, show the service list.
+
+If you cannot see the tool, tell me that Creative Studio MCP is not connected yet.
+```
+
+If Claude says it has no business information, the tool is not connected yet. Run `CHECK_INSTALL.bat`, then `CONNECT_CLAUDE.bat`, then restart Claude Desktop.
 ## Example Questions
 
 Ask Claude:
@@ -92,3 +107,4 @@ https://github.com/sponsors/Senseiglobal
 Join the community:
 
 https://github.com/Senseiglobal/creative-studio-mcp/discussions
+
