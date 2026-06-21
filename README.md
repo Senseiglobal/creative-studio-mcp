@@ -64,3 +64,7 @@ The dashboard shows the app version, developer team, contact links, and beginner
 
 Claude is optional. The local browser app works by itself.
 
+## Generate results
+
+When you click `Generate`, the app now shows the full project package under the form and in the preview panel. If something is missing, it shows a clear message instead of failing silently.
+

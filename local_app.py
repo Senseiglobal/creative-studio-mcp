@@ -392,6 +392,34 @@ textarea:focus {
   }
 }
 
+  
+
+/* Generate results repair */
+.generated-results {
+  margin-top: 22px;
+  display: grid;
+  gap: 18px;
+}
+.result-banner {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 55%);
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+}
+.result-banner strong {
+  color: var(--ink);
+}
+.result-banner p {
+  margin: 0;
+}
+.generated-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
   </style>
 </head>
 <body>
@@ -600,6 +628,177 @@ let lastProject=null,lastPackageText="";const qs=s=>document.querySelector(s),qs
   }
 
   improvePreviewLabels();
+})();
+
+
+
+// Generate results repair: capture the New Project form and always show the package.
+(function () {
+  const $ = (selector) => document.querySelector(selector);
+
+  function htmlEscape(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function asText(value) {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.map((item, index) => `${index + 1}. ${item}`).join("\n");
+    if (value && typeof value === "object") {
+      return Object.entries(value).map(([key, item]) => `${key}: ${item}`).join("\n");
+    }
+    return String(value ?? "");
+  }
+
+  function notifyUser(title, detail) {
+    if (window.showSoftToast) {
+      window.showSoftToast(title, detail);
+      return;
+    }
+    const toast = $("#toast");
+    if (!toast) return;
+    toast.textContent = detail ? `${title}: ${detail}` : title;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2600);
+  }
+
+  async function apiPost(path, payload) {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload || {})
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch (error) {
+      throw new Error("The app did not return a readable response.");
+    }
+    if (!response.ok || data.error) {
+      throw new Error(data.error || "The project could not be generated.");
+    }
+    return data.result;
+  }
+
+  function section(title, value) {
+    const text = asText(value);
+    return `<section class="output" aria-label="${htmlEscape(title)}">
+      <div class="toolbar" style="justify-content:space-between">
+        <h3>${htmlEscape(title)}</h3>
+        <button class="btn" type="button" data-copy="${encodeURIComponent(text)}">Copy</button>
+      </div>
+      <pre>${htmlEscape(text)}</pre>
+    </section>`;
+  }
+
+  function renderGeneratedProject(project) {
+    const pkg = project.generated_package || {};
+    const packageText = [
+      "CLIENT QUOTE", asText(pkg.client_quote), "",
+      "PAYMENT", asText(pkg.payment_breakdown), "",
+      "CHECKLIST", asText(pkg.project_checklist), "",
+      "DELIVERABLES", asText(pkg.deliverables), "",
+      "EMAIL", asText(pkg.client_email)
+    ].join("\n");
+
+    window.lastProject = project;
+    window.lastPackageText = packageText;
+
+    const actions = `<div class="generated-actions">
+      <button class="btn primary" type="button" data-copy="${encodeURIComponent(packageText)}">Copy Full Package</button>
+      <button class="btn" type="button" data-export="txt">Export TXT</button>
+      <button class="btn" type="button" data-export="md">Export MD</button>
+      <button class="btn" type="button" id="shareBtn">Share</button>
+    </div>`;
+
+    const html = `<div class="generated-results">
+      <div class="result-banner" role="status" aria-live="polite">
+        <strong>Project package generated</strong>
+        <p>Review the sections below, then copy, export, or share.</p>
+      </div>
+      ${actions}
+      ${section("Client Quote", pkg.client_quote)}
+      ${section("Payment Breakdown", pkg.payment_breakdown)}
+      ${section("Project Checklist", pkg.project_checklist)}
+      ${section("Deliverables", pkg.deliverables)}
+      ${section("Client Email", pkg.client_email)}
+    </div>`;
+
+    const projectOut = $("#projectOut");
+    const preview = $("#preview");
+    if (projectOut) {
+      projectOut.innerHTML = html;
+      projectOut.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    if (preview) preview.innerHTML = html;
+
+    const app = $(".app");
+    const expand = $("#previewExpand");
+    if (app) app.classList.remove("preview-collapsed");
+    if (expand) expand.classList.remove("show");
+  }
+
+  function validate(payload) {
+    const fee = Number(payload.design_fee);
+    const upfront = Number(payload.upfront_percent);
+    if (!String(payload.client_name || "").trim()) return "Please enter the client name.";
+    if (!String(payload.service || "").trim()) return "Please choose a service.";
+    if (!Number.isFinite(fee) || fee <= 0) return "Please enter a design fee above 0.";
+    if (!Number.isFinite(upfront) || upfront < 0 || upfront > 100) return "Upfront percent must be from 0 to 100.";
+    if (!String(payload.project_type || "").trim()) return "Please enter the project type.";
+    return "";
+  }
+
+  const form = $("#projectForm");
+  if (!form || form.dataset.resultsRepairInstalled === "true") return;
+  form.dataset.resultsRepairInstalled = "true";
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+
+    const submit = form.querySelector("button[type='submit']");
+    const output = $("#projectOut");
+    const payload = Object.fromEntries(new FormData(form).entries());
+    const error = validate(payload);
+
+    if (error) {
+      if (output) output.innerHTML = `<div class="form-message error">${htmlEscape(error)}</div>`;
+      notifyUser("Please check the form", error);
+      return false;
+    }
+
+    try {
+      if (submit) {
+        submit.dataset.busy = "true";
+        submit.disabled = true;
+      }
+      if (output) {
+        output.innerHTML = `<div class="result-banner" role="status"><strong>Generating package...</strong><p>Please wait a moment.</p></div>`;
+      }
+      const project = await apiPost("/api/project", payload);
+      renderGeneratedProject(project);
+      notifyUser("Project generated", "Your results are now shown below and in the preview.");
+      if (window.showActionConfirm) {
+        window.showActionConfirm("Results ready", "Your project package is visible on the screen.");
+      }
+      if (typeof window.loadRecent === "function") window.loadRecent();
+      return false;
+    } catch (err) {
+      const message = err && err.message ? err.message : "The project could not be generated.";
+      if (output) output.innerHTML = `<div class="form-message error">${htmlEscape(message)}</div>`;
+      notifyUser("Generate failed", message);
+      return false;
+    } finally {
+      if (submit) {
+        delete submit.dataset.busy;
+        submit.disabled = false;
+      }
+    }
+  }, true);
 })();
 
 </script>
