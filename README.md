@@ -68,3 +68,15 @@ Claude is optional. The local browser app works by itself.
 
 When you click `Generate`, the app now shows the full project package under the form and in the preview panel. If something is missing, it shows a clear message instead of failing silently.
 
+## YC-style MCP interface
+
+The local app now uses a clean MCP dashboard layout with sticky navigation, startup-style cards, tool status indicators, activity feed, quick actions, copy, export, and share actions.
+
+No new frontend dependencies are required. The implementation stays local-first and uses the existing Python app with lightweight HTML, CSS, and JavaScript.
+
+Missing optional dependencies:
+
+- React / Next.js: not used because the repo does not currently ship a frontend build system.
+- Tailwind CSS: represented with equivalent local CSS tokens.
+- shadcn/ui, Framer Motion, Lucide icons: optional future upgrade if the project becomes a full React app.
+
