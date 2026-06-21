@@ -6,15 +6,16 @@
   </a>
 </p>
 
-Creative Studio MCP is a daily-use creative business workspace for quotes, payments, checklists, and project packages.
+Creative Studio MCP is a local-first creative business workspace for quotes, payments, checklists, project packages, and business preferences.
 
-Developer: Thomas Ogun  
-Organization: Senseiglobal  
-Repository: https://github.com/Senseiglobal/creative-studio-mcp
+## Install
 
-## Use Without Claude
+1. Download the ZIP file from GitHub.
+2. Right-click the ZIP file.
+3. Choose `Extract All`.
+4. Open the extracted `creative-studio-mcp` folder.
 
-Download the ZIP file, extract it, then open the `creative-studio-mcp` folder.
+## Start Local App
 
 Double-click:
 
@@ -22,35 +23,16 @@ Double-click:
 START_APP.bat
 ```
 
-The app opens in your browser. Claude and OpenAI are not required.
+The app opens in your browser and works without Claude or OpenAI.
 
-## New Project Workflow
+## Create First Project
 
-Use `New Project` to enter:
-
-- Client name
-- Service
-- Design fee
-- Upfront percent
-- Project type
-
-The app creates one project package with:
-
-- Client quote
-- Payment breakdown
-- Project checklist
-- Deliverables list
-- Client email draft
-
-## Local Saved Projects
-
-Generated projects are saved locally in:
-
-```text
-projects.json
-```
-
-Recent projects appear on the dashboard.
+1. Click `Business Settings`.
+2. Save your business name, payment terms, and services.
+3. Click `New Project`.
+4. Fill in the client and project details.
+5. Click `Generate`.
+6. Copy the quote, email draft, or full package.
 
 ## Optional Claude Or OpenAI Connection
 
@@ -62,57 +44,21 @@ Use:
 SETUP_WINDOWS.bat
 ```
 
-OpenAI needs a remote MCP server URL, so use the local browser app first.
+OpenAI needs a remote MCP server URL, so deploy the project online before connecting OpenAI.
 
-## Test The App
+## Troubleshooting
 
-Double-click:
+If the app does not open, double-click:
 
 ```text
 TEST_APP.bat
 ```
 
-If it says success, the app works.
+If Claude cannot see the tool, use the local app first. The local app is the main reliable version.
 
-## Keep Private
+## Local Files
 
-Do not share your `.env` file or API keys.
+- `brand_profile.json` stores business preferences.
+- `projects.json` stores saved projects.
 
-## Security Check
-
-Before using a fresh download, double-click:
-
-```text
-SECURITY_CHECK.bat
-```
-
-Use this only from the official GitHub repository:
-
-https://github.com/Senseiglobal/creative-studio-mcp
-
-Do not run modified copies from unknown websites.
-
-Read:
-
-- [SECURITY.md](SECURITY.md)
-- [SAFE_DOWNLOAD.md](SAFE_DOWNLOAD.md)
-
-## Project Bin And Exports
-
-Saved projects can be moved to the local bin instead of being lost immediately.
-
-- `deleted_projects.json` stores deleted projects.
-- `exports` stores exported files.
-
-Export formats:
-
-- TXT
-- Markdown
-- HTML
-- JSON
-- CSV
-- Word-compatible DOC
-- PDF
-
-Use the buttons beside each recent project to export or delete it.
-
+Do not share these files if they contain private business information.

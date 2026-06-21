@@ -1,35 +1,46 @@
 ﻿# Quick Start
 
-## Use The App
+## Install
 
-1. Extract the ZIP file.
-2. Open the `creative-studio-mcp` folder.
-3. Double-click `START_APP.bat`.
-4. Use the app in your browser.
+1. Download the project ZIP.
+2. Extract the ZIP.
+3. Open the `creative-studio-mcp` folder.
 
-This works without Claude.
-
-## Test The App
+## Start The App
 
 Double-click:
 
 ```text
-TEST_APP.bat
+START_APP.bat
 ```
 
-If it says success, the app is working.
+## Create Your First Project
+
+1. Open `Business Settings`.
+2. Add your business details and services.
+3. Open `New Project`.
+4. Fill in the project form.
+5. Click `Generate`.
+6. Copy the result you need.
 
 ## Optional Claude Setup
 
 Claude is optional.
 
-If you want Claude to use the tool:
+Double-click:
 
-1. Double-click `SETUP_WINDOWS.bat`.
-2. Fully quit Claude Desktop.
-3. Open Claude Desktop again.
-4. Ask: `Use the Creative Studio MCP tool to list our services.`
+```text
+SETUP_WINDOWS.bat
+```
 
-If Claude fails, use `START_APP.bat`. The local app is the reliable beginner version.
+Then fully quit Claude Desktop and open it again.
 
+## Troubleshooting
 
+If something fails, double-click:
+
+```text
+TEST_APP.bat
+```
+
+If Claude fails, continue using `START_APP.bat`.
