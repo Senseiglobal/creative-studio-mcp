@@ -1,4 +1,4 @@
-import json
+﻿import json
 import socket
 import threading
 import webbrowser
@@ -17,16 +17,796 @@ from business_tools import (
     list_recent_projects,
     list_services,
     parse_services_text,
+    package_to_markdown,
+    package_to_text,
     save_brand_profile,
     save_project,
 )
 
-HTML = '<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <meta name="color-scheme" content="light">\n  <title>Creative Studio MCP</title>\n  <style>\n    :root {\n      --background: #FAFAF7;\n      --surface: #FFFFFF;\n      --text: #111827;\n      --muted: #6B7280;\n      --border: #E5E7EB;\n      --accent: #FF5A1F;\n      --accent-dark: #E04817;\n      --success: #16A34A;\n      --warning: #D97706;\n      --error: #DC2626;\n      --ring: rgba(255, 90, 31, .28);\n      --shadow: 0 14px 36px rgba(17, 24, 39, .08);\n      --radius: 20px;\n      --radius-sm: 14px;\n      --speed: 200ms;\n      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n    }\n    * { box-sizing: border-box; }\n    html { scroll-behavior: smooth; }\n    body {\n      margin: 0;\n      background: var(--background);\n      color: var(--text);\n      line-height: 1.5;\n      text-rendering: optimizeLegibility;\n    }\n    button, input, select, textarea { font: inherit; }\n    button { cursor: pointer; }\n    a { color: inherit; }\n    .skip-link {\n      position: fixed;\n      left: 16px;\n      top: 16px;\n      z-index: 100;\n      transform: translateY(-160%);\n      background: var(--text);\n      color: var(--surface);\n      padding: 12px 16px;\n      border-radius: 999px;\n    }\n    .skip-link:focus { transform: translateY(0); }\n    :focus-visible {\n      outline: 2px solid var(--accent);\n      outline-offset: 3px;\n      box-shadow: 0 0 0 5px var(--ring);\n    }\n    .nav {\n      position: sticky;\n      top: 0;\n      z-index: 50;\n      border-bottom: 1px solid rgba(229, 231, 235, .82);\n      background: rgba(250, 250, 247, .78);\n      backdrop-filter: blur(18px);\n    }\n    .nav-inner {\n      max-width: 1200px;\n      margin: 0 auto;\n      min-height: 72px;\n      padding: 0 24px;\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      gap: 18px;\n    }\n    .brand {\n      display: inline-flex;\n      align-items: center;\n      gap: 12px;\n      text-decoration: none;\n      font-weight: 800;\n    }\n    .logo {\n      width: 40px;\n      height: 40px;\n      border-radius: 12px;\n      display: grid;\n      place-items: center;\n      background: var(--accent);\n      color: white;\n      box-shadow: 0 10px 22px rgba(255, 90, 31, .25);\n    }\n    .nav-links {\n      display: flex;\n      align-items: center;\n      gap: 6px;\n    }\n    .nav-link {\n      min-height: 44px;\n      display: inline-flex;\n      align-items: center;\n      border-radius: 12px;\n      padding: 0 14px;\n      color: var(--muted);\n      text-decoration: none;\n      font-weight: 650;\n      transition: background var(--speed), color var(--speed), transform var(--speed);\n    }\n    .nav-link:hover,\n    .nav-link.active {\n      background: white;\n      color: var(--text);\n      transform: translateY(-1px);\n    }\n    .nav-actions {\n      display: flex;\n      align-items: center;\n      gap: 10px;\n    }\n    .menu-btn {\n      display: none;\n    }\n    .btn {\n      min-height: 44px;\n      display: inline-flex;\n      align-items: center;\n      justify-content: center;\n      gap: 8px;\n      border-radius: 12px;\n      padding: 0 16px;\n      border: 1px solid transparent;\n      font-size: 14px;\n      font-weight: 750;\n      text-decoration: none;\n      transition: transform var(--speed), box-shadow var(--speed), background var(--speed), border-color var(--speed), color var(--speed);\n      user-select: none;\n    }\n    .btn:hover { transform: translateY(-2px); }\n    .btn:active { transform: scale(.98); }\n    .btn.primary {\n      background: var(--accent);\n      color: white;\n      box-shadow: 0 8px 20px rgba(255, 90, 31, .22);\n    }\n    .btn.primary:hover { background: var(--accent-dark); box-shadow: 0 12px 26px rgba(255, 90, 31, .28); }\n    .btn.secondary {\n      background: white;\n      color: var(--text);\n      border-color: var(--border);\n    }\n    .btn.secondary:hover { box-shadow: 0 10px 24px rgba(17, 24, 39, .08); }\n    .btn.ghost {\n      background: transparent;\n      color: var(--muted);\n    }\n    .btn.ghost:hover { background: #F3F4F6; color: var(--text); }\n    .btn.outline {\n      background: transparent;\n      border-color: #D1D5DB;\n      color: var(--text);\n    }\n    .btn.destructive {\n      background: rgba(220, 38, 38, .08);\n      color: var(--error);\n      border-color: rgba(220, 38, 38, .14);\n    }\n    .btn[disabled],\n    .btn.disabled {\n      opacity: .5;\n      pointer-events: none;\n    }\n    .btn.loading::after {\n      content: "";\n      width: 14px;\n      height: 14px;\n      border: 2px solid currentColor;\n      border-top-color: transparent;\n      border-radius: 999px;\n      animation: spin .8s linear infinite;\n    }\n    .page {\n      max-width: 1200px;\n      margin: 0 auto;\n      padding: 48px 24px 80px;\n    }\n    .hero {\n      display: grid;\n      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);\n      gap: 28px;\n      align-items: stretch;\n      padding: 20px 0 32px;\n    }\n    .eyebrow {\n      display: inline-flex;\n      align-items: center;\n      gap: 8px;\n      width: fit-content;\n      min-height: 34px;\n      padding: 0 12px;\n      border-radius: 999px;\n      background: white;\n      border: 1px solid var(--border);\n      color: var(--muted);\n      font-size: 13px;\n      font-weight: 750;\n    }\n    h1 {\n      margin: 18px 0 14px;\n      font-size: clamp(42px, 7vw, 76px);\n      line-height: .94;\n      letter-spacing: -0.03em;\n    }\n    .hero-copy {\n      max-width: 660px;\n      color: var(--muted);\n      font-size: clamp(17px, 2vw, 21px);\n      margin: 0 0 24px;\n    }\n    .hero-actions {\n      display: flex;\n      flex-wrap: wrap;\n      gap: 12px;\n    }\n    .panel,\n    .card {\n      border: 1px solid var(--border);\n      border-radius: var(--radius);\n      background: var(--surface);\n      box-shadow: 0 1px 2px rgba(17, 24, 39, .04);\n    }\n    .panel {\n      padding: 22px;\n    }\n    .card {\n      padding: 22px;\n      transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed);\n    }\n    .card:hover {\n      transform: translateY(-4px);\n      box-shadow: var(--shadow);\n      border-color: #D6D8DD;\n    }\n    .dashboard-preview {\n      display: grid;\n      gap: 16px;\n      min-height: 100%;\n    }\n    .preview-top {\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      gap: 14px;\n    }\n    .status-pill {\n      display: inline-flex;\n      align-items: center;\n      gap: 7px;\n      width: fit-content;\n      min-height: 28px;\n      padding: 0 10px;\n      border-radius: 999px;\n      font-size: 12px;\n      font-weight: 800;\n      border: 1px solid transparent;\n    }\n    .status-pill.connected { color: var(--success); background: rgba(22, 163, 74, .08); border-color: rgba(22, 163, 74, .14); }\n    .status-pill.pending { color: var(--warning); background: rgba(217, 119, 6, .08); border-color: rgba(217, 119, 6, .14); }\n    .status-pill.error { color: var(--error); background: rgba(220, 38, 38, .08); border-color: rgba(220, 38, 38, .14); }\n    .section {\n      margin-top: 42px;\n    }\n    .section-head {\n      display: flex;\n      justify-content: space-between;\n      align-items: end;\n      gap: 18px;\n      margin-bottom: 18px;\n    }\n    h2 {\n      margin: 0;\n      font-size: clamp(26px, 4vw, 40px);\n      letter-spacing: -0.02em;\n    }\n    h3 {\n      margin: 0 0 6px;\n      font-size: 17px;\n      letter-spacing: -0.01em;\n    }\n    p {\n      margin: 0;\n      color: var(--muted);\n    }\n    .grid {\n      display: grid;\n      grid-template-columns: repeat(3, minmax(0, 1fr));\n      gap: 16px;\n    }\n    .grid.four {\n      grid-template-columns: repeat(4, minmax(0, 1fr));\n    }\n    .icon {\n      width: 44px;\n      height: 44px;\n      border-radius: 14px;\n      display: grid;\n      place-items: center;\n      margin-bottom: 18px;\n      background: #FFF4EE;\n      color: var(--accent);\n      font-weight: 900;\n    }\n    .tool-row {\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      gap: 14px;\n      padding: 14px 0;\n      border-bottom: 1px solid var(--border);\n    }\n    .tool-row:last-child { border-bottom: 0; }\n    .activity {\n      display: grid;\n      gap: 12px;\n    }\n    .activity-item {\n      display: grid;\n      grid-template-columns: 12px minmax(0, 1fr);\n      gap: 12px;\n      align-items: start;\n    }\n    .dot {\n      width: 9px;\n      height: 9px;\n      margin-top: 7px;\n      border-radius: 999px;\n      background: var(--accent);\n    }\n    .workspace {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr) 380px;\n      gap: 20px;\n      align-items: start;\n    }\n    form {\n      display: grid;\n      gap: 16px;\n    }\n    .form-grid {\n      display: grid;\n      grid-template-columns: repeat(2, minmax(0, 1fr));\n      gap: 14px;\n    }\n    label {\n      display: grid;\n      gap: 7px;\n      font-weight: 750;\n      color: var(--text);\n    }\n    small {\n      color: var(--muted);\n      font-weight: 500;\n    }\n    input,\n    select,\n    textarea {\n      width: 100%;\n      min-height: 48px;\n      border-radius: 12px;\n      border: 1px solid var(--border);\n      background: white;\n      color: var(--text);\n      padding: 0 14px;\n      transition: border-color var(--speed), box-shadow var(--speed);\n    }\n    textarea {\n      min-height: 116px;\n      padding-top: 12px;\n      resize: vertical;\n    }\n    input:focus,\n    select:focus,\n    textarea:focus {\n      border-color: var(--accent);\n      box-shadow: 0 0 0 5px var(--ring);\n      outline: 0;\n    }\n    .result-panel {\n      display: grid;\n      gap: 14px;\n    }\n    .result-box {\n      border: 1px solid var(--border);\n      border-radius: 16px;\n      background: #FCFCFA;\n      padding: 16px;\n    }\n    pre {\n      margin: 0;\n      white-space: pre-wrap;\n      word-break: break-word;\n      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n      color: #1F2937;\n    }\n    .toast {\n      position: fixed;\n      right: 20px;\n      bottom: 20px;\n      z-index: 80;\n      max-width: min(420px, calc(100vw - 32px));\n      padding: 14px 16px;\n      border-radius: 16px;\n      background: #111827;\n      color: white;\n      box-shadow: var(--shadow);\n      opacity: 0;\n      transform: translateY(10px) scale(.98);\n      transition: opacity var(--speed), transform var(--speed);\n    }\n    .toast.show {\n      opacity: 1;\n      transform: translateY(0) scale(1);\n    }\n    .empty {\n      border: 1px dashed #D1D5DB;\n      border-radius: 18px;\n      padding: 24px;\n      text-align: center;\n      background: #FCFCFA;\n    }\n    .skeleton {\n      height: 14px;\n      border-radius: 999px;\n      background: linear-gradient(90deg, #F3F4F6, #E5E7EB, #F3F4F6);\n      background-size: 200% 100%;\n      animation: shimmer 1.2s linear infinite;\n    }\n    .mobile-menu {\n      display: none;\n      border-top: 1px solid var(--border);\n      padding: 10px 24px 18px;\n      background: rgba(250, 250, 247, .94);\n      animation: drop 180ms ease both;\n    }\n    .mobile-menu.open { display: grid; gap: 8px; }\n    @keyframes spin { to { transform: rotate(360deg); } }\n    @keyframes shimmer { to { background-position: -200% 0; } }\n    @keyframes drop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }\n    .reveal { animation: reveal 220ms ease both; }\n    @keyframes reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }\n    @media (max-width: 980px) {\n      .hero,\n      .workspace {\n        grid-template-columns: 1fr;\n      }\n      .grid,\n      .grid.four {\n        grid-template-columns: repeat(2, minmax(0, 1fr));\n      }\n      .nav-links,\n      .nav-actions .secondary {\n        display: none;\n      }\n      .menu-btn {\n        display: inline-flex;\n      }\n    }\n    @media (max-width: 640px) {\n      .nav-inner {\n        min-height: 64px;\n        padding: 0 16px;\n      }\n      .page {\n        padding: 30px 16px 64px;\n      }\n      .grid,\n      .grid.four,\n      .form-grid {\n        grid-template-columns: 1fr;\n      }\n      .section-head {\n        align-items: start;\n        flex-direction: column;\n      }\n      .hero-actions .btn,\n      .nav-actions .primary {\n        width: 100%;\n      }\n      .nav-actions {\n        width: auto;\n      }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      *,\n      *::before,\n      *::after {\n        animation-duration: .001ms !important;\n        transition-duration: .001ms !important;\n        scroll-behavior: auto !important;\n      }\n    }\n  </style>\n</head>\n<body>\n  <a class="skip-link" href="#main">Skip to content</a>\n  <nav class="nav" aria-label="Primary navigation">\n    <div class="nav-inner">\n      <a class="brand" href="#home" aria-label="Creative Studio MCP home">\n        <span class="logo" aria-hidden="true">CS</span>\n        <span>Creative Studio MCP</span>\n      </a>\n      <div class="nav-links" aria-label="Main links">\n        <a class="nav-link active" href="#docs">Docs</a>\n        <a class="nav-link" href="#tools">Tools</a>\n        <a class="nav-link" href="#pricing">Pricing</a>\n        <a class="nav-link" href="#status">Status</a>\n      </div>\n      <div class="nav-actions">\n        <button class="btn secondary menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu">Menu</button>\n        <button class="btn primary" type="button" data-scroll="#launch">Launch MCP</button>\n      </div>\n    </div>\n    <div class="mobile-menu" id="mobileMenu">\n      <a class="nav-link" href="#docs">Docs</a>\n      <a class="nav-link" href="#tools">Tools</a>\n      <a class="nav-link" href="#pricing">Pricing</a>\n      <a class="nav-link" href="#status">Status</a>\n    </div>\n  </nav>\n\n  <main id="main" class="page">\n    <section class="hero reveal" id="home">\n      <div>\n        <span class="eyebrow">Local first MCP workspace</span>\n        <h1>Connect AI to your tools in minutes.</h1>\n        <p class="hero-copy">A polished MCP workspace for agents, tools, workflows, and context. Start locally, connect Claude when ready, and keep your creative business organized.</p>\n        <div class="hero-actions">\n          <button class="btn primary" type="button" data-scroll="#launch">Launch MCP</button>\n          <a class="btn secondary" href="#docs">View Docs</a>\n        </div>\n      </div>\n      <aside class="panel dashboard-preview" aria-label="MCP status preview">\n        <div class="preview-top">\n          <div>\n            <h2 style="font-size:24px">Workspace status</h2>\n            <p>Local app is ready. Claude is optional.</p>\n          </div>\n          <span class="status-pill connected">Connected</span>\n        </div>\n        <div class="tool-row"><div><strong>Local dashboard</strong><p>Quotes, projects, exports</p></div><span class="status-pill connected">Ready</span></div>\n        <div class="tool-row"><div><strong>Claude MCP</strong><p>Connect from setup guide</p></div><span class="status-pill pending">Pending</span></div>\n        <div class="tool-row"><div><strong>Google Drive</strong><p>Cloud storage option</p></div><span class="status-pill pending">Soon</span></div>\n      </aside>\n    </section>\n\n    <section class="section" id="tools">\n      <div class="section-head">\n        <div>\n          <h2>Tools and integrations</h2>\n          <p>Connect your business workflow one step at a time.</p>\n        </div>\n      </div>\n      <div class="grid">\n        <article class="card"><div class="icon">G</div><h3>Gmail</h3><p>Prepare client emails and follow ups.</p><span class="status-pill pending">Pending</span></article>\n        <article class="card"><div class="icon">C</div><h3>Calendar</h3><p>Plan project milestones and reminders.</p><span class="status-pill pending">Pending</span></article>\n        <article class="card"><div class="icon">D</div><h3>Drive</h3><p>Store exports and client documents.</p><span class="status-pill pending">Soon</span></article>\n        <article class="card"><div class="icon">S</div><h3>Slack</h3><p>Share updates with your team.</p><span class="status-pill pending">Soon</span></article>\n        <article class="card"><div class="icon">GH</div><h3>GitHub</h3><p>Track updates and open source work.</p><span class="status-pill connected">Live</span></article>\n        <article class="card"><div class="icon">N</div><h3>Notion</h3><p>Sync templates and project notes.</p><span class="status-pill pending">Soon</span></article>\n      </div>\n    </section>\n\n    <section class="section workspace" id="launch">\n      <div class="panel">\n        <div class="section-head">\n          <div>\n            <h2>New project package</h2>\n            <p>Generate a quote, payment breakdown, checklist, deliverables, and email draft.</p>\n          </div>\n        </div>\n        <form id="projectForm">\n          <div class="form-grid">\n            <label>Client name\n              <input name="client_name" value="Israel Thomas" autocomplete="name" required>\n              <small>Who is this project for?</small>\n            </label>\n            <label>Service\n              <select name="service" id="projectService"></select>\n              <small>Choose from your saved services.</small>\n            </label>\n            <label>Design fee\n              <input name="design_fee" type="number" min="1" value="3000" required>\n              <small>Use numbers only.</small>\n            </label>\n            <label>Upfront percent\n              <input name="upfront_percent" type="number" min="0" max="100" value="70" required>\n              <small>Example: 70.</small>\n            </label>\n            <label>Project type\n              <input name="project_type" value="Brand Identity Design" required>\n              <small>A short category for the checklist.</small>\n            </label>\n          </div>\n          <div class="hero-actions">\n            <button class="btn primary" type="submit" id="generateBtn">Generate</button>\n            <button class="btn outline" type="button" id="clearBtn">Clear result</button>\n          </div>\n        </form>\n        <div id="projectOut" class="result-panel" aria-live="polite"></div>\n      </div>\n      <aside class="panel result-panel" aria-label="Project package preview">\n        <div class="preview-top">\n          <div>\n            <h2 style="font-size:24px">Preview</h2>\n            <p>Generated package appears here.</p>\n          </div>\n          <button class="btn ghost" type="button" id="copyPreview">Copy</button>\n        </div>\n        <div id="preview" class="empty">No project package yet. Click Generate to create one.</div>\n      </aside>\n    </section>\n\n    <section class="section" id="status">\n      <div class="section-head">\n        <div>\n          <h2>Status and activity</h2>\n          <p>Simple signals for what is working now.</p>\n        </div>\n      </div>\n      <div class="grid">\n        <article class="card"><div class="icon">1</div><h3>Local app</h3><p>Runs without Claude or OpenAI.</p><span class="status-pill connected">Connected</span></article>\n        <article class="card"><div class="icon">2</div><h3>MCP server</h3><p>Preserved for Claude and MCP clients.</p><span class="status-pill connected">Ready</span></article>\n        <article class="card"><div class="icon">3</div><h3>Cloud storage</h3><p>Future Google Drive storage support.</p><span class="status-pill pending">Planned</span></article>\n      </div>\n    </section>\n\n    <section class="section grid" id="docs">\n      <article class="card">\n        <div class="icon">D</div>\n        <h3>Docs</h3>\n        <p>Use the local app first. Connect Claude only when you are ready.</p>\n        <div style="margin-top:16px"><a class="btn secondary" href="QUICK_START.md">Quick Start</a></div>\n      </article>\n      <article class="card">\n        <div class="icon">A</div>\n        <h3>Activity feed</h3>\n        <div class="activity">\n          <div class="activity-item"><span class="dot"></span><p>Dashboard loaded and ready.</p></div>\n          <div class="activity-item"><span class="dot"></span><p>Project generator connected to local business tools.</p></div>\n          <div class="activity-item"><span class="dot"></span><p>Exports available after generation.</p></div>\n        </div>\n      </article>\n      <article class="card" id="pricing">\n        <div class="icon">$</div>\n        <h3>Pricing</h3>\n        <p>Creative Studio MCP is open for contributions and support. No fixed donation amount is required.</p>\n        <div style="margin-top:16px"><a class="btn primary" href="https://github.com/sponsors/Senseiglobal" target="_blank" rel="noreferrer">Support Us</a></div>\n      </article>\n    </section>\n  </main>\n\n  <div class="toast" id="toast" role="status" aria-live="polite"></div>\n\n  <script>\n    const $ = (selector) => document.querySelector(selector);\n    const $$ = (selector) => Array.from(document.querySelectorAll(selector));\n    let lastProject = null;\n    let lastText = "";\n\n    function toast(message) {\n      const box = $("#toast");\n      box.textContent = message;\n      box.classList.add("show");\n      clearTimeout(window.toastTimer);\n      window.toastTimer = setTimeout(() => box.classList.remove("show"), 2600);\n    }\n\n    function escapeHtml(value) {\n      return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");\n    }\n\n    function toText(value) {\n      if (typeof value === "string") return value;\n      if (Array.isArray(value)) return value.map((item, index) => `${index + 1}. ${item}`).join("\\\\n");\n      if (value && typeof value === "object") return Object.entries(value).map(([key, item]) => `${key}: ${item}`).join("\\\\n");\n      return String(value ?? "");\n    }\n\n    async function api(path, payload = {}) {\n      const response = await fetch(path, {\n        method: "POST",\n        headers: { "Content-Type": "application/json" },\n        body: JSON.stringify(payload)\n      });\n      const data = await response.json();\n      if (!response.ok || data.error) throw new Error(data.error || "Request failed");\n      return data.result;\n    }\n\n    function resultSection(title, value) {\n      const text = toText(value);\n      return `<div class="result-box"><div class="preview-top"><h3>${escapeHtml(title)}</h3><button class="btn ghost" type="button" data-copy="${encodeURIComponent(text)}">Copy</button></div><pre>${escapeHtml(text)}</pre></div>`;\n    }\n\n    function renderProject(project) {\n      const pkg = project.generated_package || {};\n      lastProject = project;\n      lastText = [\n        "CLIENT QUOTE", toText(pkg.client_quote), "",\n        "PAYMENT", toText(pkg.payment_breakdown), "",\n        "CHECKLIST", toText(pkg.project_checklist), "",\n        "DELIVERABLES", toText(pkg.deliverables), "",\n        "EMAIL", toText(pkg.client_email)\n      ].join("\\\\n");\n\n      const actions = `<div class="hero-actions"><button class="btn primary" type="button" data-copy="${encodeURIComponent(lastText)}">Copy Full Package</button><button class="btn secondary" type="button" data-export="txt">Export TXT</button><button class="btn secondary" type="button" data-export="md">Export MD</button><button class="btn outline" type="button" id="shareBtn">Share</button></div>`;\n      const html = `${actions}${resultSection("Client Quote", pkg.client_quote)}${resultSection("Payment Breakdown", pkg.payment_breakdown)}${resultSection("Project Checklist", pkg.project_checklist)}${resultSection("Deliverables", pkg.deliverables)}${resultSection("Client Email", pkg.client_email)}`;\n      $("#projectOut").innerHTML = html;\n      $("#preview").className = "result-panel";\n      $("#preview").innerHTML = html;\n      $("#projectOut").scrollIntoView({ behavior: "smooth", block: "start" });\n    }\n\n    function validate(payload) {\n      const fee = Number(payload.design_fee);\n      const upfront = Number(payload.upfront_percent);\n      if (!String(payload.client_name || "").trim()) return "Please enter the client name.";\n      if (!String(payload.service || "").trim()) return "Please choose a service.";\n      if (!String(payload.project_type || "").trim()) return "Please enter the project type.";\n      if (!Number.isFinite(fee) || fee <= 0) return "Please enter a design fee above 0.";\n      if (!Number.isFinite(upfront) || upfront < 0 || upfront > 100) return "Upfront percent must be from 0 to 100.";\n      return "";\n    }\n\n    async function loadServices() {\n      try {\n        const services = await api("/api/services");\n        const select = $("#projectService");\n        select.innerHTML = Object.keys(services).map((name) => `<option>${escapeHtml(name)}</option>`).join("");\n      } catch (error) {\n        $("#projectService").innerHTML = "<option>Brand Identity Design</option>";\n      }\n    }\n\n    $("#projectForm").addEventListener("submit", async (event) => {\n      event.preventDefault();\n      const button = $("#generateBtn");\n      const payload = Object.fromEntries(new FormData(event.currentTarget).entries());\n      const error = validate(payload);\n      if (error) {\n        $("#projectOut").innerHTML = `<div class="result-box" role="alert"><strong>${escapeHtml(error)}</strong></div>`;\n        toast(error);\n        return;\n      }\n      button.classList.add("loading");\n      button.disabled = true;\n      $("#projectOut").innerHTML = `<div class="result-box"><div class="skeleton" style="width:68%"></div><div class="skeleton" style="width:44%; margin-top:10px"></div><p style="margin-top:14px">Generating your package...</p></div>`;\n      try {\n        const project = await api("/api/project", payload);\n        renderProject(project);\n        toast("Project package generated.");\n      } catch (error) {\n        $("#projectOut").innerHTML = `<div class="result-box" role="alert"><strong>Generate failed</strong><p>${escapeHtml(error.message)}</p></div>`;\n        toast("Generate failed. Please check the form.");\n      } finally {\n        button.classList.remove("loading");\n        button.disabled = false;\n      }\n    });\n\n    document.addEventListener("click", async (event) => {\n      const scrollButton = event.target.closest("[data-scroll]");\n      if (scrollButton) {\n        const target = $(scrollButton.dataset.scroll);\n        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });\n      }\n      const copyButton = event.target.closest("[data-copy]");\n      if (copyButton) {\n        await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy));\n        toast("Copied.");\n      }\n      const exportButton = event.target.closest("[data-export]");\n      if (exportButton && lastProject) {\n        const result = await api("/api/export", { project_id: lastProject.id, file_format: exportButton.dataset.export });\n        toast(`Export saved: ${result.file_name || "file"}`);\n      }\n      if (event.target.id === "shareBtn") {\n        if (navigator.share) {\n          await navigator.share({ title: "Project Package", text: lastText });\n        } else {\n          await navigator.clipboard.writeText(lastText);\n          toast("Share text copied.");\n        }\n      }\n    });\n\n    $("#copyPreview").addEventListener("click", async () => {\n      if (!lastText) {\n        toast("Generate a package first.");\n        return;\n      }\n      await navigator.clipboard.writeText(lastText);\n      toast("Preview copied.");\n    });\n\n    $("#clearBtn").addEventListener("click", () => {\n      $("#projectOut").innerHTML = "";\n      $("#preview").className = "empty";\n      $("#preview").textContent = "No project package yet. Click Generate to create one.";\n      lastProject = null;\n      lastText = "";\n    });\n\n    $("#menuBtn").addEventListener("click", () => {\n      const menu = $("#mobileMenu");\n      const open = !menu.classList.contains("open");\n      menu.classList.toggle("open", open);\n      $("#menuBtn").setAttribute("aria-expanded", String(open));\n    });\n\n    const observer = new IntersectionObserver((entries) => {\n      entries.forEach((entry) => {\n        if (entry.isIntersecting) entry.target.classList.add("reveal");\n      });\n    }, { threshold: .08 });\n    $$(".section, .card, .panel").forEach((item) => observer.observe(item));\n\n    loadServices();\n  </script>\n</body>\n</html>'
+HTML = r'''<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Creative Studio MCP</title>
+  <style>
+    :root{--bg:#eef2f0;--surface:#fff;--surface2:#f7faf8;--ink:#101814;--muted:#607066;--line:#d8e1da;--primary:#59d37b;--primary2:#1f883d;--danger:#ba1a1a;--radius:20px;--radius2:14px;--shadow:0 20px 50px rgba(15,23,42,.12);--fast:150ms ease;--med:240ms ease;font-family:Arial,Helvetica,sans-serif}
+    [data-theme=dark]{--bg:#08100c;--surface:#111a15;--surface2:#17221c;--ink:#f5faf6;--muted:#b5c5bb;--line:#29372f;--primary:#7cf29b;--primary2:#8ff4aa;--danger:#ffb4ab;color-scheme:dark}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 10%,rgba(89,211,123,.18),transparent 30rem),var(--bg);color:var(--ink);line-height:1.5}button,input,select,textarea{font:inherit}button{min-height:48px;cursor:pointer}.skip{position:fixed;top:12px;left:12px;z-index:99;transform:translateY(-150%);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:999px}.skip:focus{transform:translateY(0)}:focus-visible{outline:3px solid #4f8cff;outline-offset:3px}.app{display:grid;grid-template-columns:280px minmax(0,1fr)420px;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:rgba(12,22,16,.96);color:#fff;padding:20px;border-right:1px solid rgba(255,255,255,.08)}.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}.mark{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#91f7a9,#1f883d);display:grid;place-items:center;color:#061108;font-weight:900}.nav{display:grid;gap:8px}.nav button{border:0;border-radius:14px;background:transparent;color:rgba(255,255,255,.8);text-align:left;padding:0 14px}.nav button.active,.nav button:hover{background:rgba(124,242,155,.16);color:#91f7a9}.main{padding:24px;min-width:0}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.search{min-height:54px;width:min(620px,100%);border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);padding:0 18px;box-shadow:0 10px 24px rgba(0,0,0,.05)}h1,h2,h3{margin:0;line-height:1.12}h1{font-size:clamp(2rem,4vw,3.2rem)}p{color:var(--muted);margin:6px 0 0}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.btn{border:1px solid var(--line);border-radius:14px;padding:0 16px;background:var(--surface);color:var(--ink);font-weight:800;transition:transform var(--fast),box-shadow var(--fast),background var(--fast)}.btn:hover{box-shadow:var(--shadow);transform:translateY(-1px)}.btn:active{transform:scale(.98)}.primary{background:var(--primary);border-color:transparent;color:#061108}.danger{background:rgba(186,26,26,.12);color:var(--danger)}.ghost{background:transparent}.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin:24px 0}.card,.panel,.preview{background:rgba(255,255,255,.72);background:color-mix(in srgb,var(--surface),transparent 4%);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 30px rgba(0,0,0,.06);backdrop-filter:blur(16px)}.card{min-height:150px;padding:18px;text-align:left;color:var(--ink);transition:transform var(--med),border-color var(--fast),box-shadow var(--fast)}.card:hover{transform:translateY(-4px);border-color:var(--primary);box-shadow:var(--shadow)}.icon{width:44px;height:44px;border-radius:14px;background:rgba(89,211,123,.18);display:grid;place-items:center;margin-bottom:18px;color:var(--primary2);font-weight:900}.panel{padding:20px;margin-top:18px}.section{display:none;animation:reveal var(--med)}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}label{display:grid;gap:8px;font-weight:800}small{color:var(--muted);font-weight:400}input,select,textarea{width:100%;min-height:52px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0 14px}textarea{min-height:120px;padding-top:12px;resize:vertical}.output{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface2)}pre{white-space:pre-wrap;word-break:break-word;background:#07100b;color:#ecfff0;border-radius:14px;padding:16px;font:14px/1.55 Consolas,monospace}.recent{display:grid;gap:10px}.row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface2)}.preview{position:sticky;top:0;height:100vh;padding:22px;overflow:auto;border-radius:0}.toast{position:fixed;right:22px;bottom:22px;z-index:80;background:var(--ink);color:var(--bg);padding:14px 18px;border-radius:16px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:opacity var(--med),transform var(--med)}.toast.show{opacity:1;transform:translateY(0)}.modal{position:fixed;inset:0;z-index:70;display:none;place-items:center;background:rgba(0,0,0,.48);padding:20px}.modal.show{display:grid}.modal-card{max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}.tip{position:relative}.tip span{display:none;position:absolute;z-index:20;top:calc(100% + 8px);left:0;width:260px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);color:var(--ink)}.tip:hover span,.tip:focus-within span{display:block}@keyframes reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:1180px){.app{grid-template-columns:240px minmax(0,1fr)}.preview{position:static;height:auto;border-radius:var(--radius);margin:0 24px 24px}.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.side{position:static;height:auto}.nav{grid-template-columns:repeat(2,1fr)}.main{padding:16px}.top{align-items:stretch;flex-direction:column}.cards,.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.preview{margin:0 16px 16px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+  
+
+/* Creative Studio MCP UI polish: spacing, feedback, tooltips, export messages */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --success: #6ff08e;
+  --warning: #ffd166;
+}
+body {
+  text-rendering: optimizeLegibility;
+}
+.main {
+  padding: clamp(18px, 2.4vw, 34px);
+}
+.top {
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+.search {
+  min-height: 58px;
+  padding: 0 20px;
+}
+h1 {
+  letter-spacing: 0;
+  margin-bottom: var(--space-3);
+}
+h2,
+h3 {
+  letter-spacing: 0;
+}
+.panel {
+  padding: clamp(20px, 2.4vw, 30px);
+  margin-top: var(--space-6);
+}
+#onboard {
+  display: grid;
+  gap: var(--space-4);
+}
+#onboard .toolbar {
+  margin-top: var(--space-2);
+}
+.cards {
+  gap: var(--space-5);
+  margin: var(--space-7) 0 var(--space-6);
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 166px;
+  padding: 22px;
+}
+.card h3,
+.card p {
+  margin: 0;
+}
+.icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.12);
+}
+.toolbar {
+  gap: var(--space-3);
+}
+.btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+.btn[data-busy="true"] {
+  opacity: .72;
+  pointer-events: none;
+}
+.btn[data-busy="true"]::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: cs-spin .8s linear infinite;
+}
+.recent {
+  margin-top: var(--space-4);
+}
+.row {
+  padding: 18px;
+  gap: var(--space-5);
+}
+.row h3,
+.row p {
+  margin: 0;
+}
+.preview {
+  padding: clamp(20px, 2vw, 28px);
+}
+.preview > .toolbar:first-child {
+  margin-bottom: var(--space-5);
+}
+#preview {
+  display: grid;
+  gap: var(--space-5);
+}
+.output {
+  padding: 18px;
+  display: grid;
+  gap: var(--space-4);
+}
+.output > .toolbar {
+  align-items: center;
+}
+pre {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.06);
+  max-height: 52vh;
+  overflow: auto;
+}
+.tip {
+  position: relative;
+}
+.tip span,
+.tooltip-card {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 12px);
+  left: 0;
+  min-width: 240px;
+  max-width: min(320px, 80vw);
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  line-height: 1.45;
+  font-weight: 600;
+}
+.tip:hover span,
+.tip:focus-within span,
+.tip.is-open span {
+  display: block;
+  animation: cs-pop 180ms ease both;
+}
+.toast {
+  right: 24px;
+  bottom: 24px;
+  max-width: min(460px, calc(100vw - 32px));
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--success), transparent 65%);
+  background: color-mix(in srgb, var(--ink), #0d2817 18%);
+  color: var(--bg);
+}
+.toast strong {
+  display: block;
+  color: var(--success);
+  font-size: 14px;
+}
+.toast small {
+  color: color-mix(in srgb, var(--bg), transparent 20%);
+  word-break: break-word;
+}
+.action-confirm {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 82;
+  max-width: min(460px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.action-confirm.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.action-confirm b {
+  display: block;
+  margin-bottom: 4px;
+}
+.action-confirm code {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  white-space: normal;
+  word-break: break-word;
+  font-size: 12px;
+}
+form {
+  display: grid;
+  gap: var(--space-5);
+}
+label {
+  gap: var(--space-2);
+}
+input,
+select,
+textarea {
+  transition: border-color var(--fast), box-shadow var(--fast), background var(--fast);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary), transparent 78%);
+}
+.help-text,
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+}
+.field-error {
+  color: var(--danger);
+  font-weight: 700;
+}
+@keyframes cs-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes cs-pop {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 1180px) {
+  .preview {
+    margin: 0 clamp(16px, 3vw, 24px) 24px;
+  }
+}
+@media (max-width: 760px) {
+  .toolbar {
+    width: 100%;
+  }
+  .btn {
+    flex: 1 1 auto;
+  }
+  .card {
+    min-height: 130px;
+  }
+  .output > .toolbar,
+  .row {
+    align-items: stretch;
+  }
+  .output > .toolbar .btn,
+  .row .btn {
+    width: 100%;
+  }
+  .toast,
+  .action-confirm {
+    left: 16px;
+    right: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn[data-busy="true"]::after {
+    animation: none;
+  }
+}
+
+  
+
+/* Dashboard connection cards and footer info */
+.meta-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4, 16px);
+  margin-top: var(--space-5, 20px);
+}
+.meta-card {
+  min-height: 96px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius2, 14px);
+  background: color-mix(in srgb, var(--surface), transparent 5%);
+}
+.meta-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+.connection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4, 16px);
+  margin-top: var(--space-5, 20px);
+}
+.connection-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 20px);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface), transparent 2%), color-mix(in srgb, var(--surface2), transparent 4%));
+  min-height: 190px;
+  transition: transform var(--med, 240ms ease), border-color var(--fast, 150ms ease), box-shadow var(--fast, 150ms ease);
+}
+.connection-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.connection-card .status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #061108;
+  background: var(--primary);
+}
+.connection-card .status.soft {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface2), var(--primary) 18%);
+  border: 1px solid var(--line);
+}
+.developer-footer {
+  margin-top: var(--space-6, 24px);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius2, 14px);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface), transparent 12%);
+}
+.developer-footer a {
+  color: var(--primary2);
+  font-weight: 800;
+}
+@media (max-width: 980px) {
+  .meta-strip,
+  .connection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+  
+
+/* Generate results repair */
+.generated-results {
+  margin-top: 22px;
+  display: grid;
+  gap: 18px;
+}
+.result-banner {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 55%);
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+}
+.result-banner strong {
+  color: var(--ink);
+}
+.result-banner p {
+  margin: 0;
+}
+.generated-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <aside class="side" aria-label="Sidebar">
+    <div class="brand"><div class="mark">CS</div><div><strong>Creative Studio MCP</strong><p>Creative Workspace</p></div></div>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-view="home">Dashboard</button><button data-view="project">New Project</button><button data-view="settings">Preferences</button><button data-view="quote">Quote</button><button data-view="payment">Payment</button><button data-view="checklist">Checklist</button><button data-view="services">Services</button><button data-view="bin">Bin</button><button data-view="claude">Connect Claude</button><button data-view="storage">Storage</button>
+    </nav>
+  </aside>
+  <main id="main" class="main" tabindex="-1">
+    <div class="top"><input class="search" aria-label="Search projects, clients, services" placeholder="Search projects, clients, services..."><div class="toolbar"><button class="btn ghost tip" id="theme">Theme<span>Switch light, dark, or system mode.</span></button><button class="btn primary" data-view="project">New Project</button></div></div>
+    <section id="home" class="section active"><h1 id="dashboardGreeting">Welcome</h1><p>Create quotes, manage projects, and grow your creative business.</p>
+<div class="meta-strip" aria-label="App information">
+  <div class="meta-card" id="appVersionCard"><strong>App version</strong><p>Creative Studio MCP v1.0.0</p></div>
+  <div class="meta-card"><strong>Developer team</strong><p>Thomas Ogun under Senseiglobal.</p></div>
+  <div class="meta-card"><strong>Contact</strong><p><a href="https://github.com/Senseiglobal/creative-studio-mcp" target="_blank" rel="noreferrer">GitHub repo</a> and <a href="https://github.com/sponsors/Senseiglobal" target="_blank" rel="noreferrer">Support Us</a></p></div>
+</div>
+<div id="onboard" class="panel"><h2>Start here</h2><p>Set your preferences, create your first project, then copy, export, or share the package.</p><div class="toolbar"><button class="btn primary" data-view="project">New Project</button><button class="btn" data-view="settings">Preferences</button><button class="btn ghost" id="dismiss">Dismiss</button></div></div><div class="cards"><button class="card" data-view="project"><div class="icon">+</div><h3>New Project</h3><p>Create a project package</p></button><button class="card" data-view="quote"><div class="icon">Q</div><h3>Quote</h3><p>Generate client quotes</p></button><button class="card" data-view="payment"><div class="icon">$</div><h3>Payment</h3><p>Calculate terms</p></button><button class="card" data-view="checklist"><div class="icon">OK</div><h3>Checklist</h3><p>Create checklists</p></button><button class="card" data-view="services"><div class="icon">S</div><h3>Services</h3><p>Manage services</p></button></div>
+<div class="panel" id="connectionsPanel">
+  <div class="toolbar" style="justify-content:space-between">
+    <div>
+      <h2>Connect tools</h2>
+      <p>Use the app by itself, or connect it to Claude when you are ready.</p>
+    </div>
+  </div>
+  <div class="connection-grid">
+    <article class="connection-card" id="connectClaudeCard">
+      <span class="status">Recommended</span>
+      <h3>Connect Claude</h3>
+      <p>Use Creative Studio MCP inside Claude as an MCP tool. Best for people who want the assistant to call the business tools directly.</p>
+      <button class="btn primary" data-view="claude">Connect Claude</button>
+    </article>
+    <article class="connection-card">
+      <span class="status soft">Optional</span>
+      <h3>Enable more tools</h3>
+      <p>Add more creative business tools later, such as invoices, client records, templates, and analytics.</p>
+      <button class="btn" data-view="services">View Tools</button>
+    </article>
+    <article class="connection-card">
+      <span class="status soft">Coming soon</span>
+      <h3>Connect Google Drive</h3>
+      <p>Store project exports in Google Drive when cloud storage support is added. For now, exports are saved locally.</p>
+      <button class="btn" data-view="storage">Storage Options</button>
+    </article>
+  </div>
+</div>
+<div class="panel"><div class="toolbar" style="justify-content:space-between"><h2>Recent Projects</h2><button class="btn" id="refresh">Refresh</button></div><div id="recent" class="recent" aria-live="polite"></div></div>
+<div class="developer-footer" id="developerFooter">
+  <strong>Creative Studio MCP v1.0.0</strong><br>
+  Built by Thomas Ogun under Senseiglobal. For support, updates, and contributions, use the GitHub repository or the Support Us button.
+</div>
+</section>
+    <section id="project" class="section"><h1>New Project</h1><p>Generate a complete package.</p><div class="panel"><form id="projectForm"><div class="grid"><label>Client name<input name="client_name" value="Israel Thomas" required><small>Who is this for?</small></label><label>Service<select name="service" id="projectService"></select><small>Choose from your services.</small></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required><small>Numbers only.</small></label><label>Upfront percent<input name="upfront_percent" type="number" min="0" max="100" value="70" required><small>Example: 70.</small></label><label>Project type<input name="project_type" value="Brand Identity Design" required><small>Short project category.</small></label></div><button class="btn primary" type="submit">Generate</button></form><div id="projectOut"></div></div></section>
+    <section id="settings" class="section"><h1>Preferences</h1><div class="panel"><form id="settingsForm"><div class="grid"><label>Business name<input name="business_name"></label><label>Your name<input name="owner_name" autocomplete="name" placeholder="Your name"><small>This name is used for your greeting and client signature.</small></label><label>Email<input name="email"></label><label>Phone<input name="phone"></label><label>Website<input name="website"></label><label>Currency<input name="currency"></label></div><label>Payment terms<textarea name="payment_terms"></textarea></label><label>Services<textarea name="services_text"></textarea><small>One per line: Service | Price range</small></label><button class="btn primary" type="submit">Save</button></form></div></section>
+    <section id="quote" class="section"><h1>Quote</h1><div class="panel"><form id="quoteForm"><div class="grid"><label>Client<input name="client_name" value="John Smith"></label><label>Service<select name="service" id="quoteService"></select></label><label>Fee<input name="design_fee" type="number" value="3000"></label></div><button class="btn primary">Generate</button></form><div id="quoteOut"></div></div></section>
+    <section id="payment" class="section"><h1>Payment</h1><div class="panel"><form id="paymentForm"><div class="grid"><label>Total fee<input name="total_fee" type="number" value="5000"></label><label>Upfront percent<input name="upfront_percent" type="number" value="70"></label></div><button class="btn primary">Generate</button></form><div id="paymentOut"></div></div></section>
+    <section id="checklist" class="section"><h1>Checklist</h1><div class="panel"><form id="checklistForm"><label>Project type<input name="project_type" value="Product packaging design"></label><button class="btn primary">Generate</button></form><div id="checklistOut"></div></div></section>
+    <section id="services" class="section"><h1>Services</h1><div class="panel"><button class="btn primary" id="servicesBtn">Generate</button><div id="servicesOut"></div></div></section>
+
+    <section id="claude" class="section"><h1>Connect Claude</h1><p>This is optional. The local dashboard works without Claude.</p><div class="panel"><h2>Beginner steps</h2><div class="recent"><div class="row"><div><h3>Step 1</h3><p>Install and start Creative Studio MCP first.</p></div></div><div class="row"><div><h3>Step 2</h3><p>Use the Claude setup button or guide from this repo to add the MCP server to Claude.</p></div></div><div class="row"><div><h3>Step 3</h3><p>Restart Claude, then ask: Use Creative Studio MCP to list my services.</p></div></div></div><div class="toolbar"><button class="btn primary" data-view="project">Use Local App</button><button class="btn" data-view="settings">Check Preferences</button></div></div></section>
+
+
+    <section id="storage" class="section"><h1>Storage Options</h1><p>Exports are saved safely on this computer today. Cloud storage can be added later.</p><div class="panel"><div class="connection-grid"><article class="connection-card"><span class="status">Available</span><h3>Local exports</h3><p>TXT and MD files are saved in the exports folder inside the app folder.</p><button class="btn primary" data-view="project">Create Export</button></article><article class="connection-card"><span class="status soft">Coming soon</span><h3>Google Drive</h3><p>Future option for saving exports to your Drive account.</p><button class="btn" disabled aria-disabled="true">Coming Soon</button></article><article class="connection-card"><span class="status soft">Coming soon</span><h3>Dropbox or OneDrive</h3><p>Future options for teams that want shared project folders.</p><button class="btn" disabled aria-disabled="true">Coming Soon</button></article></div></div></section>
+
+    <section id="bin" class="section"><h1>Bin</h1><div class="panel"><div class="toolbar"><button class="btn" id="binRefresh">Refresh</button><button class="btn danger" id="binEmpty">Empty Bin</button></div><div id="binList" class="recent"></div></div></section>
+  </main>
+  <aside class="preview" aria-label="Project package preview"><div class="toolbar" style="justify-content:space-between"><h2>Project Package Preview</h2><button class="btn ghost" id="clearPreview">Close</button></div><div id="preview"><p>Your generated package appears here.</p></div></aside>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcome"><div class="modal-card"><h2 id="welcome">Welcome to Creative Studio MCP</h2><p>Create your first project package, export it, or share it. You can skip this guide.</p><div class="toolbar"><button class="btn primary" id="start">Start</button><button class="btn" id="skip">Skip</button></div></div></div>
+<script>
+
+
+// Greeting uses only the saved user name and the device time zone.
+function greetingWord(){
+  const hour = new Date().getHours();
+  if(hour >= 5 && hour < 12) return "Good morning";
+  if(hour >= 12 && hour < 17) return "Good afternoon";
+  if(hour >= 17 && hour < 21) return "Good evening";
+  return "Good night";
+}
+function firstNameFromProfile(profile){
+  const fullName = String((profile && profile.owner_name) || "").trim();
+  if(!fullName) return "";
+  return fullName.split(/\s+/)[0];
+}
+function updateGreetingFromProfile(profile){
+  const heading = document.querySelector("#dashboardGreeting");
+  if(!heading) return;
+  const firstName = firstNameFromProfile(profile);
+  heading.textContent = firstName ? `${greetingWord()}, ${firstName}!` : `${greetingWord()}!`;
+  heading.setAttribute("aria-label", heading.textContent);
+}
+
+let lastProject=null,lastPackageText="";const qs=s=>document.querySelector(s),qsa=s=>document.querySelectorAll(s);const toast=m=>{const t=qs("#toast");t.textContent=m;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)};const api=async(p,d={})=>{const r=await fetch(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});const j=await r.json();if(!r.ok)throw Error(j.error||"Something went wrong");return j.result};const fd=f=>Object.fromEntries(new FormData(f).entries());const esc=s=>String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");const txt=v=>typeof v==="string"?v:Array.isArray(v)?v.map((x,i)=>`${i+1}. ${x}`).join("\n"):Object.entries(v).map(([k,x])=>`${k}: ${x}`).join("\n");function block(title,value){const text=txt(value);return `<div class="output"><div class="toolbar" style="justify-content:space-between"><h3>${title}</h3><button class="btn" data-copy="${encodeURIComponent(text)}">Copy</button></div><pre>${esc(text)}</pre></div>`}function show(view){qsa(".section").forEach(x=>x.classList.remove("active"));qsa(".nav button").forEach(x=>x.classList.remove("active"));qs("#"+view).classList.add("active");qsa(`[data-view="${view}"]`).forEach(b=>b.classList.add("active"));if(view==="bin")loadBin();if(view==="home")loadRecent()}qsa("[data-view]").forEach(b=>b.onclick=()=>show(b.dataset.view));function setTheme(mode){if(mode==="system")localStorage.removeItem("theme");else localStorage.setItem("theme",mode);document.documentElement.dataset.theme=mode==="system"?(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"):mode;toast(`Theme: ${mode}`)}let theme=localStorage.getItem("theme")||"system";setTheme(theme);qs("#theme").onclick=()=>{const next=theme==="system"?"dark":theme==="dark"?"light":"system";theme=next;setTheme(next)};async function loadServices(){const s=await api("/api/services");["projectService","quoteService"].forEach(id=>{qs("#"+id).innerHTML=Object.keys(s).map(x=>`<option>${esc(x)}</option>`).join("")})}async function loadProfile(){const p=await api("/api/profile");const f=qs("#settingsForm");Object.entries(p).forEach(([k,v])=>{if(f.elements[k]&&k!=="services")f.elements[k].value=v||""});f.elements.services_text.value=Object.entries(p.services||{}).map(([k,v])=>`${k} | ${v}`).join("\n");updateGreetingFromProfile(p)}function renderPackage(project){lastProject=project;const p=project.generated_package;lastPackageText=["CLIENT QUOTE",txt(p.client_quote),"","PAYMENT",txt(p.payment_breakdown),"","CHECKLIST",txt(p.project_checklist),"","DELIVERABLES",txt(p.deliverables),"","EMAIL",txt(p.client_email)].join("\n");const actions=`<div class="toolbar"><button class="btn primary" data-copy="${encodeURIComponent(lastPackageText)}">Copy</button><button class="btn" data-export="txt">Export TXT</button><button class="btn" data-export="md">Export MD</button><button class="btn" id="shareBtn">Share</button></div>`;qs("#preview").innerHTML=actions+block("Client Quote",p.client_quote)+block("Payment",p.payment_breakdown)+block("Checklist",p.project_checklist)+block("Deliverables",p.deliverables)+block("Email",p.client_email);qs("#projectOut").innerHTML=qs("#preview").innerHTML}async function loadRecent(){const r=await api("/api/recent",{limit:8});qs("#recent").innerHTML=r.length?r.map(p=>`<div class="row"><div><h3>${esc(p.client_name)}</h3><p>${esc(p.service)} at $${Number(p.design_fee).toLocaleString()}</p></div><div class="toolbar"><button class="btn" data-export-id="${p.id}" data-format="pdf">Export</button><button class="btn danger" data-delete="${p.id}">Delete</button></div></div>`).join(""):`<div class="output">No saved projects yet.</div>`}async function loadBin(){const r=await api("/api/bin",{limit:20});qs("#binList").innerHTML=r.length?r.map(p=>`<div class="row"><div><h3>${esc(p.client_name)}</h3><p>${esc(p.service)}</p></div><button class="btn" data-restore="${p.id}">Restore</button></div>`).join(""):`<div class="output">Bin is empty.</div>`}document.addEventListener("click",async e=>{const c=e.target.closest("[data-copy]");if(c){await navigator.clipboard.writeText(decodeURIComponent(c.dataset.copy));toast("Copied");return}const ex=e.target.closest("[data-export]");if(ex&&lastProject){const r=await api("/api/export",{project_id:lastProject.id,file_format:ex.dataset.export});toast(`Exported ${r.file_name}`);return}const exid=e.target.closest("[data-export-id]");if(exid){const r=await api("/api/export",{project_id:exid.dataset.exportId,file_format:exid.dataset.format});toast(`Exported ${r.file_name}`);return}const del=e.target.closest("[data-delete]");if(del){await api("/api/delete",{project_id:del.dataset.delete});toast("Moved to bin");loadRecent();return}const res=e.target.closest("[data-restore]");if(res){await api("/api/restore",{project_id:res.dataset.restore});toast("Restored");loadBin();loadRecent();return}});qs("#projectForm").onsubmit=async e=>{e.preventDefault();renderPackage(await api("/api/project",fd(e.target)));toast("Project generated");loadRecent()};qs("#quoteForm").onsubmit=async e=>{e.preventDefault();qs("#quoteOut").innerHTML=block("Quote",await api("/api/quote",fd(e.target)))};qs("#paymentForm").onsubmit=async e=>{e.preventDefault();qs("#paymentOut").innerHTML=block("Payment",await api("/api/payment",fd(e.target)))};qs("#checklistForm").onsubmit=async e=>{e.preventDefault();qs("#checklistOut").innerHTML=block("Checklist",await api("/api/checklist",fd(e.target)))};qs("#settingsForm").onsubmit=async e=>{e.preventDefault();const data=fd(e.target);await api("/api/save-profile",data);updateGreetingFromProfile(data);toast("Preferences saved");loadServices()};qs("#servicesBtn").onclick=async()=>qs("#servicesOut").innerHTML=block("Services",await api("/api/services"));qs("#refresh").onclick=loadRecent;qs("#binRefresh").onclick=loadBin;qs("#binEmpty").onclick=async()=>{await api("/api/empty-bin");toast("Bin emptied");loadBin()};qs("#clearPreview").onclick=()=>qs("#preview").innerHTML="<p>Your generated package appears here.</p>";document.addEventListener("click",async e=>{if(e.target.id==="shareBtn"){if(navigator.share)await navigator.share({title:"Project Package",text:lastPackageText});else{await navigator.clipboard.writeText(lastPackageText);toast("Share text copied")}}});if(!localStorage.getItem("seenOnboarding"))qs("#modal").classList.add("show");qs("#skip").onclick=()=>{localStorage.setItem("seenOnboarding","1");qs("#modal").classList.remove("show")};qs("#start").onclick=()=>{localStorage.setItem("seenOnboarding","1");qs("#modal").classList.remove("show");show("project")};loadServices();loadProfile();loadRecent();
+
+
+// Creative Studio MCP UI polish: better feedback, export path notice, friendlier actions
+(function () {
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+  function ensureConfirmBox() {
+    let box = $("#actionConfirm");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "actionConfirm";
+      box.className = "action-confirm";
+      box.setAttribute("role", "status");
+      box.setAttribute("aria-live", "polite");
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  window.showActionConfirm = function (title, detail, path) {
+    const box = ensureConfirmBox();
+    box.innerHTML = `<b>${title}</b><span>${detail || "Done."}</span>${path ? `<code>${path}</code>` : ""}`;
+    box.classList.add("show");
+    clearTimeout(window.__csConfirmTimer);
+    window.__csConfirmTimer = setTimeout(() => box.classList.remove("show"), 4600);
+  };
+
+  window.showSoftToast = function (title, detail) {
+    const toastBox = $("#toast");
+    if (!toastBox) return;
+    toastBox.innerHTML = `<strong>${title}</strong>${detail ? `<small>${detail}</small>` : ""}`;
+    toastBox.classList.add("show");
+    clearTimeout(window.__csToastTimer);
+    window.__csToastTimer = setTimeout(() => toastBox.classList.remove("show"), 2600);
+  };
+
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async function (resource, options) {
+    const activeButton = document.activeElement && document.activeElement.tagName === "BUTTON" ? document.activeElement : null;
+    if (activeButton) activeButton.dataset.busy = "true";
+    try {
+      const response = await originalFetch(resource, options);
+      return response;
+    } finally {
+      if (activeButton) setTimeout(() => { delete activeButton.dataset.busy; }, 180);
+    }
+  };
+
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest("button");
+    if (!button || !button.animate) return;
+    button.animate(
+      [{ transform: "scale(1)" }, { transform: "scale(.97)" }, { transform: "scale(1)" }],
+      { duration: 170, easing: "ease-out" }
+    );
+  });
+
+  document.addEventListener("click", function (event) {
+    const tipButton = event.target.closest(".tip");
+    $$(".tip.is-open").forEach((tip) => {
+      if (tip !== tipButton) tip.classList.remove("is-open");
+    });
+    if (tipButton) tipButton.classList.toggle("is-open");
+  });
+
+  const previousToast = window.toast;
+  window.toast = function (message) {
+    window.showSoftToast("Done", message);
+    if (typeof previousToast === "function") {
+      try { previousToast(message); } catch (error) {}
+    }
+  };
+
+  const previousApi = window.api;
+  if (typeof previousApi === "function") {
+    window.api = async function (path, data) {
+      const result = await previousApi(path, data);
+      if (path === "/api/export" && result) {
+        const format = (result.format || (data && data.file_format) || "file").toUpperCase();
+        const fileName = result.file_name || "your export file";
+        const savedPath = result.path || result.file_path || fileName;
+        window.showSoftToast(`Exported ${format}`, `Saved as ${fileName}`);
+        window.showActionConfirm("Export saved", "Your file is ready in the exports folder.", savedPath);
+      }
+      if (path === "/api/delete") {
+        window.showActionConfirm("Moved to bin", "You can restore it from the Bin section.");
+      }
+      if (path === "/api/restore") {
+        window.showActionConfirm("Restored", "The project is back in Recent Projects.");
+      }
+      if (path === "/api/save-profile") {
+        window.showActionConfirm("Preferences saved", "Your business details will be used in new packages.");
+      }
+      return result;
+    };
+  }
+
+  function improvePreviewLabels() {
+    const preview = $("#preview");
+    if (!preview || !window.MutationObserver) return;
+    const observer = new MutationObserver(() => {
+      $$("#preview .btn[data-export='txt']").forEach((button) => button.textContent = "Export TXT");
+      $$("#preview .btn[data-export='md']").forEach((button) => button.textContent = "Export MD");
+      $$("#preview #shareBtn").forEach((button) => button.textContent = "Share");
+      $$("#preview .output h3").forEach((heading) => heading.setAttribute("tabindex", "0"));
+    });
+    observer.observe(preview, { childList: true, subtree: true });
+  }
+
+  improvePreviewLabels();
+})();
+
+
+
+// Generate results repair: capture the New Project form and always show the package.
+(function () {
+  const $ = (selector) => document.querySelector(selector);
+
+  function htmlEscape(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function asText(value) {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.map((item, index) => `${index + 1}. ${item}`).join("\n");
+    if (value && typeof value === "object") {
+      return Object.entries(value).map(([key, item]) => `${key}: ${item}`).join("\n");
+    }
+    return String(value ?? "");
+  }
+
+  function notifyUser(title, detail) {
+    if (window.showSoftToast) {
+      window.showSoftToast(title, detail);
+      return;
+    }
+    const toast = $("#toast");
+    if (!toast) return;
+    toast.textContent = detail ? `${title}: ${detail}` : title;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2600);
+  }
+
+  async function apiPost(path, payload) {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload || {})
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch (error) {
+      throw new Error("The app did not return a readable response.");
+    }
+    if (!response.ok || data.error) {
+      throw new Error(data.error || "The project could not be generated.");
+    }
+    return data.result;
+  }
+
+  function section(title, value) {
+    const text = asText(value);
+    return `<section class="output" aria-label="${htmlEscape(title)}">
+      <div class="toolbar" style="justify-content:space-between">
+        <h3>${htmlEscape(title)}</h3>
+        <button class="btn" type="button" data-copy="${encodeURIComponent(text)}">Copy</button>
+      </div>
+      <pre>${htmlEscape(text)}</pre>
+    </section>`;
+  }
+
+  function renderGeneratedProject(project) {
+    const pkg = project.generated_package || {};
+    const packageText = [
+      "CLIENT QUOTE", asText(pkg.client_quote), "",
+      "PAYMENT", asText(pkg.payment_breakdown), "",
+      "CHECKLIST", asText(pkg.project_checklist), "",
+      "DELIVERABLES", asText(pkg.deliverables), "",
+      "EMAIL", asText(pkg.client_email)
+    ].join("\n");
+
+    window.lastProject = project;
+    window.lastPackageText = packageText;
+
+    const actions = `<div class="generated-actions">
+      <button class="btn primary" type="button" data-copy="${encodeURIComponent(packageText)}">Copy Full Package</button>
+      <button class="btn" type="button" data-export="txt">Export TXT</button>
+      <button class="btn" type="button" data-export="md">Export MD</button>
+      <button class="btn" type="button" id="shareBtn">Share</button>
+    </div>`;
+
+    const html = `<div class="generated-results">
+      <div class="result-banner" role="status" aria-live="polite">
+        <strong>Project package generated</strong>
+        <p>Review the sections below, then copy, export, or share.</p>
+      </div>
+      ${actions}
+      ${section("Client Quote", pkg.client_quote)}
+      ${section("Payment Breakdown", pkg.payment_breakdown)}
+      ${section("Project Checklist", pkg.project_checklist)}
+      ${section("Deliverables", pkg.deliverables)}
+      ${section("Client Email", pkg.client_email)}
+    </div>`;
+
+    const projectOut = $("#projectOut");
+    const preview = $("#preview");
+    if (projectOut) {
+      projectOut.innerHTML = html;
+      projectOut.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    if (preview) preview.innerHTML = html;
+
+    const app = $(".app");
+    const expand = $("#previewExpand");
+    if (app) app.classList.remove("preview-collapsed");
+    if (expand) expand.classList.remove("show");
+  }
+
+  function validate(payload) {
+    const fee = Number(payload.design_fee);
+    const upfront = Number(payload.upfront_percent);
+    if (!String(payload.client_name || "").trim()) return "Please enter the client name.";
+    if (!String(payload.service || "").trim()) return "Please choose a service.";
+    if (!Number.isFinite(fee) || fee <= 0) return "Please enter a design fee above 0.";
+    if (!Number.isFinite(upfront) || upfront < 0 || upfront > 100) return "Upfront percent must be from 0 to 100.";
+    if (!String(payload.project_type || "").trim()) return "Please enter the project type.";
+    return "";
+  }
+
+  const form = $("#projectForm");
+  if (!form || form.dataset.resultsRepairInstalled === "true") return;
+  form.dataset.resultsRepairInstalled = "true";
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+
+    const submit = form.querySelector("button[type='submit']");
+    const output = $("#projectOut");
+    const payload = Object.fromEntries(new FormData(form).entries());
+    const error = validate(payload);
+
+    if (error) {
+      if (output) output.innerHTML = `<div class="form-message error">${htmlEscape(error)}</div>`;
+      notifyUser("Please check the form", error);
+      return false;
+    }
+
+    try {
+      if (submit) {
+        submit.dataset.busy = "true";
+        submit.disabled = true;
+      }
+      if (output) {
+        output.innerHTML = `<div class="result-banner" role="status"><strong>Generating package...</strong><p>Please wait a moment.</p></div>`;
+      }
+      const project = await apiPost("/api/project", payload);
+      renderGeneratedProject(project);
+      notifyUser("Project generated", "Your results are now shown below and in the preview.");
+      if (window.showActionConfirm) {
+        window.showActionConfirm("Results ready", "Your project package is visible on the screen.");
+      }
+      if (typeof window.loadRecent === "function") window.loadRecent();
+      return false;
+    } catch (err) {
+      const message = err && err.message ? err.message : "The project could not be generated.";
+      if (output) output.innerHTML = `<div class="form-message error">${htmlEscape(message)}</div>`;
+      notifyUser("Generate failed", message);
+      return false;
+    } finally {
+      if (submit) {
+        delete submit.dataset.busy;
+        submit.disabled = false;
+      }
+    }
+  }, true);
+})();
+
+</script>
+</body></html>'''
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
-
     def send_text(self, status, content, content_type="application/json"):
         body = content.encode("utf-8")
         self.send_response(status)
@@ -34,22 +814,15 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
-
-    def read_json(self):
-        length = int(self.headers.get("Content-Length", "0"))
-        if not length:
-            return {}
-        return json.loads(self.rfile.read(length).decode("utf-8"))
-
     def do_GET(self):
         if self.path in ("/", "/index.html"):
             self.send_text(200, HTML, "text/html")
-            return
-        self.send_text(404, "Not found", "text/plain")
-
+        else:
+            self.send_text(404, "Not found", "text/plain")
     def do_POST(self):
         try:
-            payload = self.read_json()
+            length = int(self.headers.get("Content-Length", "0"))
+            payload = json.loads(self.rfile.read(length).decode("utf-8") if length else "{}")
             if self.path == "/api/profile":
                 result = get_brand_profile()
             elif self.path == "/api/save-profile":
@@ -64,27 +837,16 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/api/checklist":
                 result = generate_project_checklist(payload.get("project_type", ""))
             elif self.path == "/api/project":
-                package = create_project_package(
-                    payload.get("client_name", ""),
-                    payload.get("service", ""),
-                    payload.get("design_fee", 0),
-                    payload.get("upfront_percent", 70),
-                    payload.get("project_type", ""),
-                )
-                result = save_project(
-                    payload.get("client_name", ""),
-                    payload.get("service", ""),
-                    payload.get("design_fee", 0),
-                    payload.get("upfront_percent", 70),
-                    payload.get("project_type", ""),
-                    package,
-                )
+                package = create_project_package(payload.get("client_name", ""), payload.get("service", ""), payload.get("design_fee", 0), payload.get("upfront_percent", 70), payload.get("project_type", ""))
+                result = save_project(payload.get("client_name", ""), payload.get("service", ""), payload.get("design_fee", 0), payload.get("upfront_percent", 70), payload.get("project_type", ""), package)
             elif self.path == "/api/recent":
                 result = list_recent_projects(payload.get("limit", 8))
             elif self.path == "/api/bin":
                 result = list_deleted_projects(payload.get("limit", 20))
             elif self.path == "/api/delete":
                 result = delete_project(payload.get("project_id", ""))
+            elif self.path == "/api/restore":
+                result = restore_project(payload.get("project_id", ""))
             elif self.path == "/api/empty-bin":
                 result = empty_project_bin()
             elif self.path == "/api/export":
@@ -96,7 +858,7 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             self.send_text(400, json.dumps({"error": str(exc)}))
 
-def find_port(start=8765, end=8795):
+def find_port(start=8765, end=8790):
     for port in range(start, end + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
