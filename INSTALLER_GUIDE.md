@@ -1,4 +1,4 @@
-Creative Studio MCP Installer Guide
+﻿Creative Studio MCP Installer Guide
 
 This guide explains the beginner installer files included with Creative Studio MCP.
 
@@ -9,6 +9,7 @@ Installer Files
 - Windows start page launcher: START_WINDOWS.bat
 - Windows: install.bat
 - Windows setup check: CHECK_INSTALL.bat
+- Windows Claude connector: CONNECT_CLAUDE.bat
 - Mac and Linux: install.sh
 
 What The Installer Does
@@ -64,6 +65,20 @@ Windows Setup
 3. Open the creative-studio-mcp folder.
 4. Double-click START_WINDOWS.bat.
 5. Follow the three short steps on the page.
+
+The short Windows path is:
+
+1. Double-click install.bat.
+2. Double-click CHECK_INSTALL.bat.
+3. Double-click CONNECT_CLAUDE.bat.
+
+After that, fully close Claude Desktop and open it again.
+
+Ask Claude:
+
+```text
+What services do we offer?
+```
 
 Mac and Linux Setup
 
@@ -132,3 +147,4 @@ Check that you are using the latest project files from GitHub.
 Important Safety Note
 
 Do not share your .env file publicly. It may contain private keys or local configuration.
+

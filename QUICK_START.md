@@ -1,63 +1,46 @@
-# Quick Start After Installation
+﻿# Quick Start
 
-This guide is for people who already ran `install.bat`.
+Use this page after you extract the ZIP file.
 
-If you have not installed yet, double-click `START_WINDOWS.bat` on Windows or open `START_HERE.html`.
+Do not run setup files from inside the ZIP preview or a temporary folder.
 
-If you downloaded a ZIP file, extract it first. Do not run setup files from inside the ZIP preview or a temporary folder.
+## The 3 Click Setup On Windows
 
-## What You Should See
+Open the `creative-studio-mcp` folder.
 
-After installation, the installer should show:
+Then double-click these files in this order:
 
-```text
-Installation complete
-Setup check passed
-```
+1. `install.bat`
+2. `CHECK_INSTALL.bat`
+3. `CONNECT_CLAUDE.bat`
 
-If you saw that, the tool is installed.
+After step 3:
 
-You do not need to type `.\.venv\Scripts\python.exe server.py` in PowerShell.
+1. Fully close Claude Desktop.
+2. Open Claude Desktop again.
+3. Ask Claude: `What services do we offer?`
 
-You do not need to open `Activate.ps1`.
+That is the full beginner setup.
 
-## Step 1: Confirm The Tool Is Installed
+## What Not To Do
 
-On Windows, double-click:
+Do not type `.\.venv\Scripts\python.exe server.py` in PowerShell.
 
-```text
-CHECK_INSTALL.bat
-```
+Do not open `Activate.ps1`.
 
-If everything is fine, you will see:
+Do not edit Claude settings by hand unless you are technical.
 
-```text
-Success. Creative Studio MCP is installed correctly.
-```
+## If You Use OpenAI Or ChatGPT
 
-## Step 2: Connect The Tool To Claude Desktop
+OpenAI works differently from Claude Desktop.
 
-Creative Studio MCP works best when connected to Claude Desktop.
+Claude Desktop can run this tool directly from your computer.
 
-1. Open Claude Desktop.
-2. Open Claude Desktop settings.
-3. Find the developer or tools configuration area.
-4. Add Creative Studio MCP as a local MCP server.
-5. Use the project file:
+OpenAI API needs a remote MCP server URL, so this project must be deployed online first.
 
-```text
-server.py
-```
+For the simple explanation, read `OPENAI_SETUP.md`.
 
-If Claude asks for the folder, use the folder where this project is saved.
-
-Example:
-
-```text
-C:\Users\User\creative-studio-mcp
-```
-
-## Step 3: Use It
+## Try It In Claude
 
 After connection, ask Claude:
 
@@ -95,6 +78,12 @@ Close PowerShell and double-click:
 CHECK_INSTALL.bat
 ```
 
+If the check passes, double-click:
+
+```text
+CONNECT_CLAUDE.bat
+```
+
 If the check fails, double-click:
 
 ```text
@@ -118,7 +107,7 @@ creative-studio-mcp
 Then double-click:
 
 ```text
-START_HERE.html
+START_WINDOWS.bat
 ```
 
 ## What This Tool Can Do

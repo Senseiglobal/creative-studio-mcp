@@ -1,4 +1,4 @@
-# Welcome to Creative Studio MCP
+﻿# Welcome to Creative Studio MCP
 
 <p>
   <a href="https://github.com/sponsors/Senseiglobal">
@@ -26,6 +26,10 @@ Windows launcher: [START_WINDOWS.bat](START_WINDOWS.bat)
 
 Windows setup check: [CHECK_INSTALL.bat](CHECK_INSTALL.bat)
 
+Claude connector: [CONNECT_CLAUDE.bat](CONNECT_CLAUDE.bat)
+
+OpenAI setup note: [OPENAI_SETUP.md](OPENAI_SETUP.md)
+
 Read the roadmap: [ROADMAP.md](ROADMAP.md)
 
 Share feedback: [FEEDBACK.md](FEEDBACK.md)
@@ -34,6 +38,24 @@ Installer guide: [INSTALLER_GUIDE.md](INSTALLER_GUIDE.md)
 
 Join the community: https://github.com/Senseiglobal/creative-studio-mcp/discussions
 
+
+## Easiest Setup For Windows
+
+Download the project, extract the ZIP file, then open the `creative-studio-mcp` folder.
+
+Double-click these files in order:
+
+1. `install.bat`
+2. `CHECK_INSTALL.bat`
+3. `CONNECT_CLAUDE.bat`
+
+Then fully close Claude Desktop, open it again, and ask:
+
+```text
+What services do we offer?
+```
+
+For OpenAI or ChatGPT, read [OPENAI_SETUP.md](OPENAI_SETUP.md). OpenAI needs a remote MCP server URL, so Claude Desktop is the easiest beginner path right now.
 ## What Is This?
 
 **Creative Studio MCP** is a smart business assistant that helps creative professionals automate everyday work.
@@ -52,49 +74,49 @@ Instead of typing the same information over and over, this tool does it for you 
 
 This tool is designed for creative professionals and small businesses:
 
-✔ **Graphic Designers** to Generate quotes and project plans instantly
+âœ” **Graphic Designers** to Generate quotes and project plans instantly
 
-✔ **Branding Agencies** to Automate quote creation and client communications
+âœ” **Branding Agencies** to Automate quote creation and client communications
 
-✔ **Freelance Creatives** to Reduce time spent on admin work
+âœ” **Freelance Creatives** to Reduce time spent on admin work
 
-✔ **Marketing Teams** to Standardize pricing and proposals
+âœ” **Marketing Teams** to Standardize pricing and proposals
 
-✔ **Print Shops** to Calculate costs and payment terms automatically
+âœ” **Print Shops** to Calculate costs and payment terms automatically
 
-✔ **Design Studios** to Keep projects organized and consistent
+âœ” **Design Studios** to Keep projects organized and consistent
 
-✔ **Virtual Assistants** to Help clients with quote automation
+âœ” **Virtual Assistants** to Help clients with quote automation
 
-✔ **Small Business Owners** to Save hours every week on repetitive tasks
+âœ” **Small Business Owners** to Save hours every week on repetitive tasks
 
-✔ **Students** to Learn how AI automation works
+âœ” **Students** to Learn how AI automation works
 
 ---
 
 ## How This Helps Your Business
 
-### ⏱️ Save Time
+### â±ï¸ Save Time
 
 Stop spending 15+ minutes creating each quote. Let AI do it in seconds.
 
-### 💰 Make More Money
+### ðŸ’° Make More Money
 
 Respond to client inquiries faster. Close more deals. Handle more projects.
 
-### 📋 Stay Organized
+### ðŸ“‹ Stay Organized
 
 Every project follows the same checklist. Nothing gets forgotten.
 
-### 🎯 Be Consistent
+### ðŸŽ¯ Be Consistent
 
 Your pricing, payment terms, and process are always the same - no mistakes.
 
-### 📱 Work Anywhere
+### ðŸ“± Work Anywhere
 
 Use this tool with ChatGPT on your phone, laptop, or tablet.
 
-### 🤖 Work Smarter, Not Harder
+### ðŸ¤– Work Smarter, Not Harder
 
 Let AI handle the repetitive work so you can focus on creative work.
 
@@ -656,3 +678,4 @@ Go to the **5-Minute Setup** section above and follow the steps. You'll be done 
 **Last updated:** June 19, 2026
 
 **Made for creative professionals who want to work smarter, not harder.**
+

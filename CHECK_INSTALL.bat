@@ -86,8 +86,9 @@ echo.
 echo Success. Creative Studio MCP is installed correctly.
 echo.
 echo Next:
-echo 1. Open QUICK_START.md
-echo 2. Follow the connection steps for Claude Desktop
-echo 3. Start asking for quotes, payment breakdowns, and checklists
+echo 1. Double-click CONNECT_CLAUDE.bat
+echo 2. Fully close Claude Desktop, then open it again
+echo 3. Ask Claude: What services do we offer?
 echo.
 pause
+
