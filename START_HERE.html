@@ -3,415 +3,50 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Start Here - Creative Studio MCP</title>
+  <title>Creative Studio MCP Setup</title>
   <style>
-    :root {
-      --bg: #f7f8f5;
-      --ink: #172018;
-      --muted: #5c675f;
-      --line: #dce3dd;
-      --panel: #ffffff;
-      --green: #1f883d;
-      --green-dark: #155f2b;
-      --gold: #d99a22;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.45;
-    }
-
-    .wrap {
-      width: min(1060px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 34px 0 48px;
-    }
-
-    .top,
-    .card,
-    .choice,
-    .note {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-
-    .top {
-      display: grid;
-      gap: 16px;
-      padding: 26px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .mark {
-      width: 52px;
-      height: 52px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      background: var(--green);
-      font-size: 28px;
-      font-weight: 700;
-      flex: 0 0 auto;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 34px;
-      letter-spacing: 0;
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 23px;
-      letter-spacing: 0;
-    }
-
-    p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .lead {
-      max-width: 760px;
-      font-size: 18px;
-    }
-
-    .quick {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    a,
-    button {
-      font: inherit;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 16px;
-      border-radius: 6px;
-      border: 1px solid var(--green);
-      background: var(--green);
-      color: #fff;
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .alert {
-      padding: 14px 16px;
-      background: #fff8e6;
-      border: 1px solid #f1d28a;
-      border-left: 5px solid var(--gold);
-      border-radius: 8px;
-      color: var(--ink);
-    }
-
-    .btn:hover {
-      background: var(--green-dark);
-    }
-
-    .btn.secondary {
-      background: #fff;
-      color: var(--green-dark);
-      border-color: var(--line);
-    }
-
-    .steps,
-    .help {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 18px;
-    }
-
-    .card {
-      padding: 22px;
-      min-height: 270px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .num {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #e9f6ed;
-      color: var(--green-dark);
-      font-weight: 700;
-      font-size: 22px;
-    }
-
-    .mini {
-      margin-top: auto;
-      padding: 12px;
-      border-radius: 6px;
-      background: #f2f5f2;
-      color: var(--ink);
-      font-size: 15px;
-    }
-
-    .choice {
-      margin-top: 18px;
-      padding: 22px;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 14px 0;
-    }
-
-    .tab {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 6px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .tab.active {
-      border-color: var(--green);
-      color: #fff;
-      background: var(--green);
-    }
-
-    .panel {
-      display: none;
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
-    }
-
-    .panel.active {
-      display: block;
-    }
-
-    .command {
-      display: flex;
-      gap: 10px;
-      align-items: stretch;
-      margin-top: 12px;
-    }
-
-    code {
-      flex: 1;
-      display: block;
-      padding: 14px;
-      border-radius: 6px;
-      background: #111827;
-      color: #f9fafb;
-      overflow-x: auto;
-      font-family: Consolas, Monaco, monospace;
-      font-size: 15px;
-    }
-
-    .copy {
-      min-width: 84px;
-      border-radius: 6px;
-      border: 1px solid var(--green);
-      background: var(--green);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .note {
-      padding: 16px;
-      border-left: 5px solid var(--gold);
-    }
-
-    .note strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .status {
-      min-height: 24px;
-      margin-top: 10px;
-      color: var(--green-dark);
-      font-weight: 700;
-    }
-
-    @media (max-width: 820px) {
-      h1 {
-        font-size: 28px;
-      }
-
-      .steps,
-      .help {
-        grid-template-columns: 1fr;
-      }
-
-      .command {
-        flex-direction: column;
-      }
-
-      .copy {
-        min-height: 42px;
-      }
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f7f8f5; color: #172018; }
+    main { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 36px 0; }
+    section { background: #fff; border: 1px solid #dce3dd; border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card { background: #f2f5f2; border-radius: 8px; padding: 16px; }
+    code { display: block; background: #111827; color: #fff; padding: 14px; border-radius: 6px; overflow-x: auto; }
+    @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="top">
-      <div class="brand">
-        <div class="mark">CS</div>
-        <div>
-          <h1>Creative Studio MCP</h1>
-          <p class="lead">A simple start page for people who want the tool installed, checked, and ready to connect without long technical instructions.</p>
-        </div>
+  <main>
+    <section>
+      <h1>Creative Studio MCP Setup</h1>
+      <p>Extract the ZIP file first. Then open the creative-studio-mcp folder.</p>
+    </section>
+
+    <section>
+      <h2>One File Setup</h2>
+      <code>SETUP_WINDOWS.bat</code>
+      <p>Double-click this file. It installs the tool and connects Claude Desktop.</p>
+    </section>
+
+    <section class="steps">
+      <div class="card">
+        <h2>1. Install</h2>
+        <p>Double-click SETUP_WINDOWS.bat.</p>
       </div>
-      <div class="quick">
-        <button class="btn" type="button" data-scroll="windows">Show me what to click</button>
-        <a class="btn secondary" href="QUICK_START.md">After install guide</a>
+      <div class="card">
+        <h2>2. Restart Claude</h2>
+        <p>Fully quit Claude Desktop and open it again.</p>
       </div>
-      <div class="alert">
-        First extract the ZIP file. Do not run this page from inside the ZIP preview or a temporary folder.
+      <div class="card">
+        <h2>3. Test</h2>
+        <p>Ask Claude to use the Creative Studio MCP tool to list services.</p>
       </div>
     </section>
 
-    <section class="steps" aria-label="Three setup steps">
-      <article class="card">
-        <div class="num">1</div>
-        <h2>Install</h2>
-        <p>Open the project folder and double-click <strong>install.bat</strong> on Windows.</p>
-        <div class="mini">Wait until you see Installation complete.</div>
-      </article>
-      <article class="card">
-        <div class="num">2</div>
-        <h2>Confirm</h2>
-        <p>Double-click <strong>CHECK_INSTALL.bat</strong> to confirm the tool is installed correctly.</p>
-        <div class="mini">If it says Success, the setup is fine.</div>
-      </article>
-      <article class="card">
-        <div class="num">3</div>
-        <h2>Connect</h2>
-        <p>Double-click <strong>CONNECT_CLAUDE.bat</strong>, restart Claude Desktop, then ask a test question.</p>
-        <div class="mini">No manual Claude settings needed on Windows.</div>
-      </article>
-    </section>
-
-    <section class="choice" id="windows-actions">
-      <h2>Windows Users: Do This</h2>
-      <p>This is the easiest path. No typing. No activation. Just double-click the files in order.</p>
-
-      <div class="tabs" role="tablist" aria-label="Computer options">
-        <button class="tab active" type="button" data-tab="windows">Windows</button>
-        <button class="tab" type="button" data-tab="mac">Mac</button>
-        <button class="tab" type="button" data-tab="linux">Linux</button>
-      </div>
-
-      <div id="windows" class="panel active">
-        <p><strong>Before you begin:</strong> right-click the downloaded ZIP file and choose <strong>Extract All</strong>. Open the extracted folder before double-clicking anything.</p>
-        <br>
-        <p><strong>1. Install:</strong> double-click <strong>install.bat</strong>.</p>
-        <p><strong>2. Check:</strong> double-click <strong>CHECK_INSTALL.bat</strong>.</p>
-        <p><strong>3. Connect:</strong> double-click <strong>CONNECT_CLAUDE.bat</strong>.</p>
-        <p><strong>4. Restart Claude:</strong> fully close Claude Desktop, then open it again.</p>
-        <p><strong>5. Test:</strong> ask Claude, <strong>What services do we offer?</strong></p>
-        <br>
-        <p>If someone asks you to use PowerShell, run this from inside the project folder:</p>
-        <div class="command">
-          <code>.\install.bat</code>
-          <button class="copy" type="button" data-copy=".\install.bat">Copy</button>
-        </div>
-      </div>
-
-      <div id="mac" class="panel">
-        <p>Open Terminal inside the project folder and run this:</p>
-        <div class="command">
-          <code>bash install.sh</code>
-          <button class="copy" type="button" data-copy="bash install.sh">Copy</button>
-        </div>
-      </div>
-
-      <div id="linux" class="panel">
-        <p>Open Terminal inside the project folder and run this:</p>
-        <div class="command">
-          <code>bash install.sh</code>
-          <button class="copy" type="button" data-copy="bash install.sh">Copy</button>
-        </div>
-      </div>
-
-      <div class="status" id="status" aria-live="polite"></div>
-    </section>
-
-    <section class="help" aria-label="Helpful notes">
-      <div class="note">
-        <strong>No activation step</strong>
-        Do not open Activate.ps1. The installer and checker handle this safely.
-      </div>
-      <div class="note">
-        <strong>Keep .env private</strong>
-        Do not upload your API key or share screenshots that show it.
-      </div>
-      <div class="note">
-        <strong>Need help?</strong>
-        Use GitHub Discussions from the repository page.
-      </div>
+    <section>
+      <h2>If Claude Cannot See It</h2>
+      <p>Double-click CONNECT_CLAUDE.bat, then fully quit and reopen Claude Desktop.</p>
     </section>
   </main>
-
-  <script>
-    const tabs = document.querySelectorAll(".tab");
-    const panels = document.querySelectorAll(".panel");
-    const status = document.getElementById("status");
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((item) => item.classList.remove("active"));
-        panels.forEach((panel) => panel.classList.remove("active"));
-        tab.classList.add("active");
-        document.getElementById(tab.dataset.tab).classList.add("active");
-        status.textContent = "";
-      });
-    });
-
-    document.querySelectorAll("[data-copy]").forEach((button) => {
-      button.addEventListener("click", async () => {
-        const text = button.dataset.copy;
-        try {
-          await navigator.clipboard.writeText(text);
-          status.textContent = "Copied. Paste it into your terminal.";
-        } catch (error) {
-          status.textContent = "Copy failed. Select the command and copy it manually.";
-        }
-      });
-    });
-
-    document.querySelectorAll("[data-scroll]").forEach((button) => {
-      button.addEventListener("click", () => {
-        document.getElementById("windows-actions").scrollIntoView({ behavior: "smooth" });
-        status.textContent = "Extract the ZIP first, then double-click the file in the extracted folder.";
-      });
-    });
-  </script>
 </body>
 </html>
-

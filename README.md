@@ -8,105 +8,52 @@
 
 Creative Studio MCP helps creative professionals create quotes, payment breakdowns, service lists, and project checklists with an AI assistant.
 
-It is made for designers, agencies, freelancers, print shops, virtual assistants, and small business owners.
-
 Developer: Thomas Ogun  
 Organization: Senseiglobal  
 Repository: https://github.com/Senseiglobal/creative-studio-mcp
 
-## Quick Windows Setup
+## Easiest Windows Setup
 
-Download the project, extract the ZIP file, then open the `creative-studio-mcp` folder.
+Download the ZIP file, extract it, then open the `creative-studio-mcp` folder.
 
-Double-click these files in order:
-
-1. `install.bat`
-2. `CHECK_INSTALL.bat`
-3. `CONNECT_CLAUDE.bat`
-
-Then fully close Claude Desktop, open it again, and ask:
+Double-click:
 
 ```text
-What services do we offer?
+SETUP_WINDOWS.bat
 ```
 
-## What This Tool Does
+After setup:
 
-- Lists your creative services
+1. Fully quit Claude Desktop.
+2. Open Claude Desktop again.
+3. Start a new chat.
+4. Ask: `Use the Creative Studio MCP tool to list our services.`
+
+## What It Does
+
+- Lists creative services
 - Creates client quotes
-- Calculates upfront and balance payments
+- Calculates payment breakdowns
 - Builds project checklists
-- Keeps pricing and workflow consistent
 
-## Best Beginner Option
+## If Claude Cannot See The Tool
 
-Use Claude Desktop first.
+Double-click:
 
-Claude Desktop can run this local MCP tool from your computer.
+```text
+CONNECT_CLAUDE.bat
+```
 
-OpenAI and ChatGPT need a remote MCP server URL, so they are better for a later deployment step.
+Then fully quit Claude Desktop and open it again.
+
+## OpenAI And ChatGPT
+
+Claude Desktop is the easiest local setup.
+
+OpenAI needs a remote MCP server URL, so it needs deployment first.
 
 Read: [OPENAI_SETUP.md](OPENAI_SETUP.md)
 
-## Files To Use
-
-- [START_HERE.html](START_HERE.html): visual start page
-- [START_WINDOWS.bat](START_WINDOWS.bat): opens the start page
-- [install.bat](install.bat): installs the tool
-- [CHECK_INSTALL.bat](CHECK_INSTALL.bat): checks the install
-- [CONNECT_CLAUDE.bat](CONNECT_CLAUDE.bat): connects Claude Desktop
-- [REPAIR_CLAUDE.bat](REPAIR_CLAUDE.bat): fixes Claude if it cannot see the tool
-- [QUICK_START.md](QUICK_START.md): short setup guide
-- [FIRST_CLAUDE_PROMPT.txt](FIRST_CLAUDE_PROMPT.txt): first prompt to test Claude
-
-
-## First Claude Test
-
-After setup, start a new Claude Desktop chat and paste:
-
-```text
-Use the Creative Studio MCP tool to list our services.
-
-If you can see the tool, show the service list.
-
-If you cannot see the tool, tell me that Creative Studio MCP is not connected yet.
-```
-
-If Claude says it has no business information, the tool is not connected yet. Run `CHECK_INSTALL.bat`, then `CONNECT_CLAUDE.bat`, then restart Claude Desktop.
-## Example Questions
-
-Ask Claude:
-
-```text
-What services do we offer?
-```
-
-```text
-Create a quote for John Smith for Brand Identity Design at $3,000.
-```
-
-```text
-Calculate the payment breakdown for a $5,000 project.
-```
-
-```text
-Generate a checklist for product packaging design.
-```
-
 ## Keep Private
 
-Do not share your `.env` file.
-
-Do not share screenshots that show your API key.
-
-## Support
-
-Support this project through GitHub Sponsors:
-
-https://github.com/sponsors/Senseiglobal
-
-Join the community:
-
-https://github.com/Senseiglobal/creative-studio-mcp/discussions
-
-
+Do not share your `.env` file or API keys.

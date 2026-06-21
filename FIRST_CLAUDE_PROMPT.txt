@@ -1,5 +1,1 @@
 ﻿Use the Creative Studio MCP tool to list our services.
-
-If you can see the tool, show the service list.
-
-If you cannot see the tool, tell me that Creative Studio MCP is not connected yet.

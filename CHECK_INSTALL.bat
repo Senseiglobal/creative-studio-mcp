@@ -5,66 +5,22 @@ title Creative Studio MCP Check
 
 echo.
 echo ============================================
-echo Creative Studio MCP - Setup Check
+echo Creative Studio MCP
+echo Setup check
 echo ============================================
 echo.
 
 pushd "%~dp0" >nul 2>nul
 if errorlevel 1 (
-    echo ERROR: Could not open the folder where CHECK_INSTALL.bat is located.
-    echo.
-    echo Put CHECK_INSTALL.bat inside the creative-studio-mcp folder and try again.
+    echo Could not open the project folder.
     echo.
     pause
     exit /b 1
 )
-
-set "PROJECT_DIR="
-
-if exist "requirements.txt" (
-    set "PROJECT_DIR=."
-    goto project_found
-)
-
-if exist "..\requirements.txt" (
-    set "PROJECT_DIR=.."
-    goto project_found
-)
-
-for /d %%D in (*) do (
-    if not defined PROJECT_DIR (
-        if exist "%%D\requirements.txt" (
-            set "PROJECT_DIR=%%D"
-        )
-    )
-)
-
-if not defined PROJECT_DIR (
-    echo ERROR: Could not find the project folder.
-    echo.
-    echo Open the creative-studio-mcp folder and double-click CHECK_INSTALL.bat from there.
-    echo.
-    pause
-    exit /b 1
-)
-
-:project_found
-pushd "%PROJECT_DIR%" >nul 2>nul
-if errorlevel 1 (
-    echo ERROR: Could not open the project folder.
-    echo.
-    pause
-    exit /b 1
-)
-
-echo Project folder:
-echo %CD%
-echo.
 
 if not exist ".\.venv\Scripts\python.exe" (
-    echo Setup is not complete yet.
-    echo.
-    echo Please double-click install.bat first.
+    echo Setup is not complete.
+    echo Double-click SETUP_WINDOWS.bat first.
     echo.
     pause
     exit /b 1
@@ -73,22 +29,19 @@ if not exist ".\.venv\Scripts\python.exe" (
 echo Checking the tool...
 call ".\.venv\Scripts\python.exe" -c "import server"
 if errorlevel 1 (
-    echo.
-    echo The setup check failed.
-    echo.
-    echo Please run install.bat again. If the error continues, ask for help in GitHub Discussions.
+    echo The tool could not load.
+    echo Double-click SETUP_WINDOWS.bat again.
     echo.
     pause
     exit /b 1
 )
 
 echo.
-echo Success. Creative Studio MCP is installed correctly.
+echo Success. The tool is installed.
 echo.
-echo Next:
+echo If Claude still cannot see it:
 echo 1. Double-click CONNECT_CLAUDE.bat
-echo 2. Fully close Claude Desktop, then open it again
-echo 3. Ask Claude: What services do we offer?
+echo 2. Fully quit Claude Desktop
+echo 3. Open Claude Desktop again
 echo.
 pause
-

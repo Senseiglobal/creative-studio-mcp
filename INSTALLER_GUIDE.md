@@ -1,43 +1,18 @@
 ﻿# Installer Guide
 
-This guide is for beginners.
-
-## Windows Setup
-
-1. Download the project ZIP from GitHub.
-2. Right-click the ZIP file.
-3. Click `Extract All`.
-4. Open the extracted `creative-studio-mcp` folder.
-5. Double-click `install.bat`.
-6. Double-click `CHECK_INSTALL.bat`.
-7. Double-click `CONNECT_CLAUDE.bat`.
-8. Restart Claude Desktop.
-
-Then ask Claude:
+Use one file:
 
 ```text
-What services do we offer?
+SETUP_WINDOWS.bat
 ```
 
-## Important
+It does four things:
 
-Do not run files from inside the ZIP preview.
+1. Sets up Python for this project.
+2. Installs the required files.
+3. Checks that the tool loads.
+4. Connects Claude Desktop.
 
-Do not run `Activate.ps1`.
+After it finishes, fully quit Claude Desktop and open it again.
 
-Do not type commands unless you are technical.
-
-## What Each File Does
-
-- `install.bat`: installs the tool
-- `CHECK_INSTALL.bat`: checks that it works
-- `CONNECT_CLAUDE.bat`: connects Claude Desktop
-- `START_WINDOWS.bat`: opens the visual start page
-
-## OpenAI
-
-OpenAI needs a remote MCP server URL.
-
-This local setup is mainly for Claude Desktop.
-
-Read `OPENAI_SETUP.md` for details.
+If Claude cannot see the tool, double-click `CONNECT_CLAUDE.bat`.
