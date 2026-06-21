@@ -6,53 +6,64 @@
   </a>
 </p>
 
-Creative Studio MCP helps creative professionals create quotes, payment breakdowns, service lists, and project checklists with an AI assistant.
+Creative Studio MCP helps creative professionals create quotes, payment breakdowns, service lists, and project checklists.
 
 Developer: Thomas Ogun  
 Organization: Senseiglobal  
 Repository: https://github.com/Senseiglobal/creative-studio-mcp
 
-## Easiest Windows Setup
+## Easiest Way To Use It
 
 Download the ZIP file, extract it, then open the `creative-studio-mcp` folder.
 
 Double-click:
 
 ```text
-SETUP_WINDOWS.bat
+START_APP.bat
 ```
 
-After setup:
+Your browser will open the app.
 
-1. Fully quit Claude Desktop.
-2. Open Claude Desktop again.
-3. Start a new chat.
-4. Ask: `Use the Creative Studio MCP tool to list our services.`
-
-## What It Does
+## What The App Does
 
 - Lists creative services
 - Creates client quotes
 - Calculates payment breakdowns
 - Builds project checklists
 
-## If Claude Cannot See The Tool
+## Test The App
 
 Double-click:
+
+```text
+TEST_APP.bat
+```
+
+If it says success, the app is ready.
+
+## Claude Desktop
+
+Claude Desktop is optional.
+
+If you want Claude to use the tool, double-click:
+
+```text
+SETUP_WINDOWS.bat
+```
+
+Then fully quit Claude Desktop and open it again.
+
+If Claude still cannot see the tool, double-click:
 
 ```text
 CONNECT_CLAUDE.bat
 ```
 
-Then fully quit Claude Desktop and open it again.
-
 ## OpenAI And ChatGPT
-
-Claude Desktop is the easiest local setup.
 
 OpenAI needs a remote MCP server URL, so it needs deployment first.
 
-Read: [OPENAI_SETUP.md](OPENAI_SETUP.md)
+Use the local browser app first.
 
 ## Keep Private
 

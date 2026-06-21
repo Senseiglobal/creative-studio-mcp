@@ -15,7 +15,7 @@ if exist "START_HERE.html" (
 )
 
 echo.
-echo For easiest setup, double-click:
-echo SETUP_WINDOWS.bat
+echo Main app:
+echo START_APP.bat
 echo.
 pause

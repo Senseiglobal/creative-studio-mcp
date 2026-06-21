@@ -1,35 +1,39 @@
 ﻿# Quick Start
 
-## Windows
+## Best Option
+
+Use the local browser app first.
 
 1. Extract the ZIP file.
 2. Open the `creative-studio-mcp` folder.
-3. Double-click `SETUP_WINDOWS.bat`.
-4. Fully quit Claude Desktop.
-5. Open Claude Desktop again.
+3. Double-click `START_APP.bat`.
+4. Use the app in your browser.
 
-Then ask:
+This works without Claude.
+
+## Test It
+
+Double-click:
 
 ```text
-Use the Creative Studio MCP tool to list our services.
+TEST_APP.bat
 ```
 
-## If Claude Still Says It Has No Information
+If it says success, the app is working.
 
-Claude is not connected yet.
+## Claude
 
-Do this:
+Claude is optional.
 
-1. Double-click `CONNECT_CLAUDE.bat`.
+If you want Claude to use the tool:
+
+1. Double-click `SETUP_WINDOWS.bat`.
 2. Fully quit Claude Desktop.
 3. Open Claude Desktop again.
-4. Start a new chat.
-5. Paste the prompt from `FIRST_CLAUDE_PROMPT.txt`.
+4. Ask: `Use the Creative Studio MCP tool to list our services.`
 
-## Do Not Do This
+## If Claude Fails
 
-Do not run `Activate.ps1`.
+Use `START_APP.bat`.
 
-Do not run files from inside the ZIP preview.
-
-Do not type `.venv` commands manually.
+The local app is the reliable beginner version.

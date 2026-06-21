@@ -1,18 +1,33 @@
 ﻿# Installer Guide
 
-Use one file:
+## Main App
+
+Use this file:
+
+```text
+START_APP.bat
+```
+
+It opens the tool in your browser.
+
+## Claude Setup
+
+Claude is optional.
+
+Use this file only if you want Claude Desktop to connect:
 
 ```text
 SETUP_WINDOWS.bat
 ```
 
-It does four things:
+Then fully quit Claude Desktop and open it again.
 
-1. Sets up Python for this project.
-2. Installs the required files.
-3. Checks that the tool loads.
-4. Connects Claude Desktop.
+## Test
 
-After it finishes, fully quit Claude Desktop and open it again.
+Use:
 
-If Claude cannot see the tool, double-click `CONNECT_CLAUDE.bat`.
+```text
+TEST_APP.bat
+```
+
+If it says success, the business tools are working.

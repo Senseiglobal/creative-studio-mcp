@@ -9,43 +9,29 @@
     main { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 36px 0; }
     section { background: #fff; border: 1px solid #dce3dd; border-radius: 8px; padding: 24px; margin-bottom: 16px; }
     h1, h2 { margin-top: 0; }
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .card { background: #f2f5f2; border-radius: 8px; padding: 16px; }
     code { display: block; background: #111827; color: #fff; padding: 14px; border-radius: 6px; overflow-x: auto; }
-    @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <main>
     <section>
-      <h1>Creative Studio MCP Setup</h1>
+      <h1>Creative Studio MCP</h1>
       <p>Extract the ZIP file first. Then open the creative-studio-mcp folder.</p>
     </section>
-
     <section>
-      <h2>One File Setup</h2>
+      <h2>Use The App</h2>
+      <code>START_APP.bat</code>
+      <p>Double-click this file. Your browser will open the tool.</p>
+    </section>
+    <section>
+      <h2>Test The App</h2>
+      <code>TEST_APP.bat</code>
+      <p>If it says success, the tool works.</p>
+    </section>
+    <section>
+      <h2>Claude Is Optional</h2>
       <code>SETUP_WINDOWS.bat</code>
-      <p>Double-click this file. It installs the tool and connects Claude Desktop.</p>
-    </section>
-
-    <section class="steps">
-      <div class="card">
-        <h2>1. Install</h2>
-        <p>Double-click SETUP_WINDOWS.bat.</p>
-      </div>
-      <div class="card">
-        <h2>2. Restart Claude</h2>
-        <p>Fully quit Claude Desktop and open it again.</p>
-      </div>
-      <div class="card">
-        <h2>3. Test</h2>
-        <p>Ask Claude to use the Creative Studio MCP tool to list services.</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>If Claude Cannot See It</h2>
-      <p>Double-click CONNECT_CLAUDE.bat, then fully quit and reopen Claude Desktop.</p>
+      <p>Use this only if you want Claude Desktop to connect.</p>
     </section>
   </main>
 </body>
