@@ -34,6 +34,287 @@ HTML = r'''<!doctype html>
     :root{--bg:#eef2f0;--surface:#fff;--surface2:#f7faf8;--ink:#101814;--muted:#607066;--line:#d8e1da;--primary:#59d37b;--primary2:#1f883d;--danger:#ba1a1a;--radius:20px;--radius2:14px;--shadow:0 20px 50px rgba(15,23,42,.12);--fast:150ms ease;--med:240ms ease;font-family:Arial,Helvetica,sans-serif}
     [data-theme=dark]{--bg:#08100c;--surface:#111a15;--surface2:#17221c;--ink:#f5faf6;--muted:#b5c5bb;--line:#29372f;--primary:#7cf29b;--primary2:#8ff4aa;--danger:#ffb4ab;color-scheme:dark}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 10%,rgba(89,211,123,.18),transparent 30rem),var(--bg);color:var(--ink);line-height:1.5}button,input,select,textarea{font:inherit}button{min-height:48px;cursor:pointer}.skip{position:fixed;top:12px;left:12px;z-index:99;transform:translateY(-150%);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:999px}.skip:focus{transform:translateY(0)}:focus-visible{outline:3px solid #4f8cff;outline-offset:3px}.app{display:grid;grid-template-columns:280px minmax(0,1fr)420px;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:rgba(12,22,16,.96);color:#fff;padding:20px;border-right:1px solid rgba(255,255,255,.08)}.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}.mark{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#91f7a9,#1f883d);display:grid;place-items:center;color:#061108;font-weight:900}.nav{display:grid;gap:8px}.nav button{border:0;border-radius:14px;background:transparent;color:rgba(255,255,255,.8);text-align:left;padding:0 14px}.nav button.active,.nav button:hover{background:rgba(124,242,155,.16);color:#91f7a9}.main{padding:24px;min-width:0}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.search{min-height:54px;width:min(620px,100%);border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);padding:0 18px;box-shadow:0 10px 24px rgba(0,0,0,.05)}h1,h2,h3{margin:0;line-height:1.12}h1{font-size:clamp(2rem,4vw,3.2rem)}p{color:var(--muted);margin:6px 0 0}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.btn{border:1px solid var(--line);border-radius:14px;padding:0 16px;background:var(--surface);color:var(--ink);font-weight:800;transition:transform var(--fast),box-shadow var(--fast),background var(--fast)}.btn:hover{box-shadow:var(--shadow);transform:translateY(-1px)}.btn:active{transform:scale(.98)}.primary{background:var(--primary);border-color:transparent;color:#061108}.danger{background:rgba(186,26,26,.12);color:var(--danger)}.ghost{background:transparent}.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin:24px 0}.card,.panel,.preview{background:rgba(255,255,255,.72);background:color-mix(in srgb,var(--surface),transparent 4%);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 30px rgba(0,0,0,.06);backdrop-filter:blur(16px)}.card{min-height:150px;padding:18px;text-align:left;color:var(--ink);transition:transform var(--med),border-color var(--fast),box-shadow var(--fast)}.card:hover{transform:translateY(-4px);border-color:var(--primary);box-shadow:var(--shadow)}.icon{width:44px;height:44px;border-radius:14px;background:rgba(89,211,123,.18);display:grid;place-items:center;margin-bottom:18px;color:var(--primary2);font-weight:900}.panel{padding:20px;margin-top:18px}.section{display:none;animation:reveal var(--med)}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}label{display:grid;gap:8px;font-weight:800}small{color:var(--muted);font-weight:400}input,select,textarea{width:100%;min-height:52px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0 14px}textarea{min-height:120px;padding-top:12px;resize:vertical}.output{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface2)}pre{white-space:pre-wrap;word-break:break-word;background:#07100b;color:#ecfff0;border-radius:14px;padding:16px;font:14px/1.55 Consolas,monospace}.recent{display:grid;gap:10px}.row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface2)}.preview{position:sticky;top:0;height:100vh;padding:22px;overflow:auto;border-radius:0}.toast{position:fixed;right:22px;bottom:22px;z-index:80;background:var(--ink);color:var(--bg);padding:14px 18px;border-radius:16px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:opacity var(--med),transform var(--med)}.toast.show{opacity:1;transform:translateY(0)}.modal{position:fixed;inset:0;z-index:70;display:none;place-items:center;background:rgba(0,0,0,.48);padding:20px}.modal.show{display:grid}.modal-card{max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}.tip{position:relative}.tip span{display:none;position:absolute;z-index:20;top:calc(100% + 8px);left:0;width:260px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);color:var(--ink)}.tip:hover span,.tip:focus-within span{display:block}@keyframes reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:1180px){.app{grid-template-columns:240px minmax(0,1fr)}.preview{position:static;height:auto;border-radius:var(--radius);margin:0 24px 24px}.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.side{position:static;height:auto}.nav{grid-template-columns:repeat(2,1fr)}.main{padding:16px}.top{align-items:stretch;flex-direction:column}.cards,.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.preview{margin:0 16px 16px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+  
+
+/* Creative Studio MCP UI polish: spacing, feedback, tooltips, export messages */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --success: #6ff08e;
+  --warning: #ffd166;
+}
+body {
+  text-rendering: optimizeLegibility;
+}
+.main {
+  padding: clamp(18px, 2.4vw, 34px);
+}
+.top {
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+.search {
+  min-height: 58px;
+  padding: 0 20px;
+}
+h1 {
+  letter-spacing: 0;
+  margin-bottom: var(--space-3);
+}
+h2,
+h3 {
+  letter-spacing: 0;
+}
+.panel {
+  padding: clamp(20px, 2.4vw, 30px);
+  margin-top: var(--space-6);
+}
+#onboard {
+  display: grid;
+  gap: var(--space-4);
+}
+#onboard .toolbar {
+  margin-top: var(--space-2);
+}
+.cards {
+  gap: var(--space-5);
+  margin: var(--space-7) 0 var(--space-6);
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 166px;
+  padding: 22px;
+}
+.card h3,
+.card p {
+  margin: 0;
+}
+.icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.12);
+}
+.toolbar {
+  gap: var(--space-3);
+}
+.btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+.btn[data-busy="true"] {
+  opacity: .72;
+  pointer-events: none;
+}
+.btn[data-busy="true"]::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: cs-spin .8s linear infinite;
+}
+.recent {
+  margin-top: var(--space-4);
+}
+.row {
+  padding: 18px;
+  gap: var(--space-5);
+}
+.row h3,
+.row p {
+  margin: 0;
+}
+.preview {
+  padding: clamp(20px, 2vw, 28px);
+}
+.preview > .toolbar:first-child {
+  margin-bottom: var(--space-5);
+}
+#preview {
+  display: grid;
+  gap: var(--space-5);
+}
+.output {
+  padding: 18px;
+  display: grid;
+  gap: var(--space-4);
+}
+.output > .toolbar {
+  align-items: center;
+}
+pre {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.06);
+  max-height: 52vh;
+  overflow: auto;
+}
+.tip {
+  position: relative;
+}
+.tip span,
+.tooltip-card {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 12px);
+  left: 0;
+  min-width: 240px;
+  max-width: min(320px, 80vw);
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  line-height: 1.45;
+  font-weight: 600;
+}
+.tip:hover span,
+.tip:focus-within span,
+.tip.is-open span {
+  display: block;
+  animation: cs-pop 180ms ease both;
+}
+.toast {
+  right: 24px;
+  bottom: 24px;
+  max-width: min(460px, calc(100vw - 32px));
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--success), transparent 65%);
+  background: color-mix(in srgb, var(--ink), #0d2817 18%);
+  color: var(--bg);
+}
+.toast strong {
+  display: block;
+  color: var(--success);
+  font-size: 14px;
+}
+.toast small {
+  color: color-mix(in srgb, var(--bg), transparent 20%);
+  word-break: break-word;
+}
+.action-confirm {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 82;
+  max-width: min(460px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.action-confirm.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.action-confirm b {
+  display: block;
+  margin-bottom: 4px;
+}
+.action-confirm code {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  white-space: normal;
+  word-break: break-word;
+  font-size: 12px;
+}
+form {
+  display: grid;
+  gap: var(--space-5);
+}
+label {
+  gap: var(--space-2);
+}
+input,
+select,
+textarea {
+  transition: border-color var(--fast), box-shadow var(--fast), background var(--fast);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary), transparent 78%);
+}
+.help-text,
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+}
+.field-error {
+  color: var(--danger);
+  font-weight: 700;
+}
+@keyframes cs-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes cs-pop {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 1180px) {
+  .preview {
+    margin: 0 clamp(16px, 3vw, 24px) 24px;
+  }
+}
+@media (max-width: 760px) {
+  .toolbar {
+    width: 100%;
+  }
+  .btn {
+    flex: 1 1 auto;
+  }
+  .card {
+    min-height: 130px;
+  }
+  .output > .toolbar,
+  .row {
+    align-items: stretch;
+  }
+  .output > .toolbar .btn,
+  .row .btn {
+    width: 100%;
+  }
+  .toast,
+  .action-confirm {
+    left: 16px;
+    right: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn[data-busy="true"]::after {
+    animation: none;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -62,6 +343,119 @@ HTML = r'''<!doctype html>
 <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcome"><div class="modal-card"><h2 id="welcome">Welcome to Creative Studio MCP</h2><p>Create your first project package, export it, or share it. You can skip this guide.</p><div class="toolbar"><button class="btn primary" id="start">Start</button><button class="btn" id="skip">Skip</button></div></div></div>
 <script>
 let lastProject=null,lastPackageText="";const qs=s=>document.querySelector(s),qsa=s=>document.querySelectorAll(s);const toast=m=>{const t=qs("#toast");t.textContent=m;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)};const api=async(p,d={})=>{const r=await fetch(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});const j=await r.json();if(!r.ok)throw Error(j.error||"Something went wrong");return j.result};const fd=f=>Object.fromEntries(new FormData(f).entries());const esc=s=>String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");const txt=v=>typeof v==="string"?v:Array.isArray(v)?v.map((x,i)=>`${i+1}. ${x}`).join("\n"):Object.entries(v).map(([k,x])=>`${k}: ${x}`).join("\n");function block(title,value){const text=txt(value);return `<div class="output"><div class="toolbar" style="justify-content:space-between"><h3>${title}</h3><button class="btn" data-copy="${encodeURIComponent(text)}">Copy</button></div><pre>${esc(text)}</pre></div>`}function show(view){qsa(".section").forEach(x=>x.classList.remove("active"));qsa(".nav button").forEach(x=>x.classList.remove("active"));qs("#"+view).classList.add("active");qsa(`[data-view="${view}"]`).forEach(b=>b.classList.add("active"));if(view==="bin")loadBin();if(view==="home")loadRecent()}qsa("[data-view]").forEach(b=>b.onclick=()=>show(b.dataset.view));function setTheme(mode){if(mode==="system")localStorage.removeItem("theme");else localStorage.setItem("theme",mode);document.documentElement.dataset.theme=mode==="system"?(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"):mode;toast(`Theme: ${mode}`)}let theme=localStorage.getItem("theme")||"system";setTheme(theme);qs("#theme").onclick=()=>{const next=theme==="system"?"dark":theme==="dark"?"light":"system";theme=next;setTheme(next)};async function loadServices(){const s=await api("/api/services");["projectService","quoteService"].forEach(id=>{qs("#"+id).innerHTML=Object.keys(s).map(x=>`<option>${esc(x)}</option>`).join("")})}async function loadProfile(){const p=await api("/api/profile");const f=qs("#settingsForm");Object.entries(p).forEach(([k,v])=>{if(f.elements[k]&&k!=="services")f.elements[k].value=v||""});f.elements.services_text.value=Object.entries(p.services||{}).map(([k,v])=>`${k} | ${v}`).join("\n")}function renderPackage(project){lastProject=project;const p=project.generated_package;lastPackageText=["CLIENT QUOTE",txt(p.client_quote),"","PAYMENT",txt(p.payment_breakdown),"","CHECKLIST",txt(p.project_checklist),"","DELIVERABLES",txt(p.deliverables),"","EMAIL",txt(p.client_email)].join("\n");const actions=`<div class="toolbar"><button class="btn primary" data-copy="${encodeURIComponent(lastPackageText)}">Copy</button><button class="btn" data-export="txt">Export TXT</button><button class="btn" data-export="md">Export MD</button><button class="btn" id="shareBtn">Share</button></div>`;qs("#preview").innerHTML=actions+block("Client Quote",p.client_quote)+block("Payment",p.payment_breakdown)+block("Checklist",p.project_checklist)+block("Deliverables",p.deliverables)+block("Email",p.client_email);qs("#projectOut").innerHTML=qs("#preview").innerHTML}async function loadRecent(){const r=await api("/api/recent",{limit:8});qs("#recent").innerHTML=r.length?r.map(p=>`<div class="row"><div><h3>${esc(p.client_name)}</h3><p>${esc(p.service)} at $${Number(p.design_fee).toLocaleString()}</p></div><div class="toolbar"><button class="btn" data-export-id="${p.id}" data-format="pdf">Export</button><button class="btn danger" data-delete="${p.id}">Delete</button></div></div>`).join(""):`<div class="output">No saved projects yet.</div>`}async function loadBin(){const r=await api("/api/bin",{limit:20});qs("#binList").innerHTML=r.length?r.map(p=>`<div class="row"><div><h3>${esc(p.client_name)}</h3><p>${esc(p.service)}</p></div><button class="btn" data-restore="${p.id}">Restore</button></div>`).join(""):`<div class="output">Bin is empty.</div>`}document.addEventListener("click",async e=>{const c=e.target.closest("[data-copy]");if(c){await navigator.clipboard.writeText(decodeURIComponent(c.dataset.copy));toast("Copied");return}const ex=e.target.closest("[data-export]");if(ex&&lastProject){const r=await api("/api/export",{project_id:lastProject.id,file_format:ex.dataset.export});toast(`Exported ${r.file_name}`);return}const exid=e.target.closest("[data-export-id]");if(exid){const r=await api("/api/export",{project_id:exid.dataset.exportId,file_format:exid.dataset.format});toast(`Exported ${r.file_name}`);return}const del=e.target.closest("[data-delete]");if(del){await api("/api/delete",{project_id:del.dataset.delete});toast("Moved to bin");loadRecent();return}const res=e.target.closest("[data-restore]");if(res){await api("/api/restore",{project_id:res.dataset.restore});toast("Restored");loadBin();loadRecent();return}});qs("#projectForm").onsubmit=async e=>{e.preventDefault();renderPackage(await api("/api/project",fd(e.target)));toast("Project generated");loadRecent()};qs("#quoteForm").onsubmit=async e=>{e.preventDefault();qs("#quoteOut").innerHTML=block("Quote",await api("/api/quote",fd(e.target)))};qs("#paymentForm").onsubmit=async e=>{e.preventDefault();qs("#paymentOut").innerHTML=block("Payment",await api("/api/payment",fd(e.target)))};qs("#checklistForm").onsubmit=async e=>{e.preventDefault();qs("#checklistOut").innerHTML=block("Checklist",await api("/api/checklist",fd(e.target)))};qs("#settingsForm").onsubmit=async e=>{e.preventDefault();await api("/api/save-profile",fd(e.target));toast("Preferences saved");loadServices()};qs("#servicesBtn").onclick=async()=>qs("#servicesOut").innerHTML=block("Services",await api("/api/services"));qs("#refresh").onclick=loadRecent;qs("#binRefresh").onclick=loadBin;qs("#binEmpty").onclick=async()=>{await api("/api/empty-bin");toast("Bin emptied");loadBin()};qs("#clearPreview").onclick=()=>qs("#preview").innerHTML="<p>Your generated package appears here.</p>";document.addEventListener("click",async e=>{if(e.target.id==="shareBtn"){if(navigator.share)await navigator.share({title:"Project Package",text:lastPackageText});else{await navigator.clipboard.writeText(lastPackageText);toast("Share text copied")}}});if(!localStorage.getItem("seenOnboarding"))qs("#modal").classList.add("show");qs("#skip").onclick=()=>{localStorage.setItem("seenOnboarding","1");qs("#modal").classList.remove("show")};qs("#start").onclick=()=>{localStorage.setItem("seenOnboarding","1");qs("#modal").classList.remove("show");show("project")};loadServices();loadProfile();loadRecent();
+
+
+// Creative Studio MCP UI polish: better feedback, export path notice, friendlier actions
+(function () {
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+  function ensureConfirmBox() {
+    let box = $("#actionConfirm");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "actionConfirm";
+      box.className = "action-confirm";
+      box.setAttribute("role", "status");
+      box.setAttribute("aria-live", "polite");
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  window.showActionConfirm = function (title, detail, path) {
+    const box = ensureConfirmBox();
+    box.innerHTML = `<b>${title}</b><span>${detail || "Done."}</span>${path ? `<code>${path}</code>` : ""}`;
+    box.classList.add("show");
+    clearTimeout(window.__csConfirmTimer);
+    window.__csConfirmTimer = setTimeout(() => box.classList.remove("show"), 4600);
+  };
+
+  window.showSoftToast = function (title, detail) {
+    const toastBox = $("#toast");
+    if (!toastBox) return;
+    toastBox.innerHTML = `<strong>${title}</strong>${detail ? `<small>${detail}</small>` : ""}`;
+    toastBox.classList.add("show");
+    clearTimeout(window.__csToastTimer);
+    window.__csToastTimer = setTimeout(() => toastBox.classList.remove("show"), 2600);
+  };
+
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async function (resource, options) {
+    const activeButton = document.activeElement && document.activeElement.tagName === "BUTTON" ? document.activeElement : null;
+    if (activeButton) activeButton.dataset.busy = "true";
+    try {
+      const response = await originalFetch(resource, options);
+      return response;
+    } finally {
+      if (activeButton) setTimeout(() => { delete activeButton.dataset.busy; }, 180);
+    }
+  };
+
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest("button");
+    if (!button || !button.animate) return;
+    button.animate(
+      [{ transform: "scale(1)" }, { transform: "scale(.97)" }, { transform: "scale(1)" }],
+      { duration: 170, easing: "ease-out" }
+    );
+  });
+
+  document.addEventListener("click", function (event) {
+    const tipButton = event.target.closest(".tip");
+    $$(".tip.is-open").forEach((tip) => {
+      if (tip !== tipButton) tip.classList.remove("is-open");
+    });
+    if (tipButton) tipButton.classList.toggle("is-open");
+  });
+
+  const previousToast = window.toast;
+  window.toast = function (message) {
+    window.showSoftToast("Done", message);
+    if (typeof previousToast === "function") {
+      try { previousToast(message); } catch (error) {}
+    }
+  };
+
+  const previousApi = window.api;
+  if (typeof previousApi === "function") {
+    window.api = async function (path, data) {
+      const result = await previousApi(path, data);
+      if (path === "/api/export" && result) {
+        const format = (result.format || (data && data.file_format) || "file").toUpperCase();
+        const fileName = result.file_name || "your export file";
+        const savedPath = result.path || result.file_path || fileName;
+        window.showSoftToast(`Exported ${format}`, `Saved as ${fileName}`);
+        window.showActionConfirm("Export saved", "Your file is ready in the exports folder.", savedPath);
+      }
+      if (path === "/api/delete") {
+        window.showActionConfirm("Moved to bin", "You can restore it from the Bin section.");
+      }
+      if (path === "/api/restore") {
+        window.showActionConfirm("Restored", "The project is back in Recent Projects.");
+      }
+      if (path === "/api/save-profile") {
+        window.showActionConfirm("Preferences saved", "Your business details will be used in new packages.");
+      }
+      return result;
+    };
+  }
+
+  function improvePreviewLabels() {
+    const preview = $("#preview");
+    if (!preview || !window.MutationObserver) return;
+    const observer = new MutationObserver(() => {
+      $$("#preview .btn[data-export='txt']").forEach((button) => button.textContent = "Export TXT");
+      $$("#preview .btn[data-export='md']").forEach((button) => button.textContent = "Export MD");
+      $$("#preview #shareBtn").forEach((button) => button.textContent = "Share");
+      $$("#preview .output h3").forEach((heading) => heading.setAttribute("tabindex", "0"));
+    });
+    observer.observe(preview, { childList: true, subtree: true });
+  }
+
+  improvePreviewLabels();
+})();
+
 </script>
 </body></html>'''
 

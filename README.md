@@ -45,3 +45,12 @@ The app includes keyboard navigation, visible focus rings, semantic sections, sk
 ## Optional Claude Or OpenAI
 
 Claude and OpenAI are optional. The local app works without them.
+
+## Export feedback
+
+When you export a project, the app shows a small confirmation message with the saved file name and location. This helps beginners know exactly what happened and where to find the file.
+
+## User experience polish
+
+The dashboard includes clearer spacing, softer feedback messages, better tooltips, and lightweight motion. It still works locally and does not need Claude or OpenAI for the browser app.
+

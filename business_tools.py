@@ -19,7 +19,7 @@ DEFAULT_SERVICES = {
 }
 
 DEFAULT_PROFILE = {
-    "business_name": "Creative Studio",
+    "business_name": "Senseiglobal Creative Studio",
     "owner_name": "Thomas Ogun",
     "email": "",
     "phone": "",
