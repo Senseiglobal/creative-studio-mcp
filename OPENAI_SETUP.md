@@ -1,8 +1,8 @@
 ﻿# OpenAI And Other AI Apps
 
-Creative Studio MCP now has a local browser app.
+Creative Studio MCP works first as a local browser app.
 
-Use this first:
+Use:
 
 ```text
 START_APP.bat
@@ -17,6 +17,8 @@ Use:
 ```text
 SETUP_WINDOWS.bat
 ```
+
+Then fully quit Claude Desktop and open it again.
 
 ## OpenAI
 

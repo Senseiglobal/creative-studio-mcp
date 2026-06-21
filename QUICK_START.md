@@ -1,8 +1,6 @@
 ﻿# Quick Start
 
-## Best Option
-
-Use the local browser app first.
+## Use The App
 
 1. Extract the ZIP file.
 2. Open the `creative-studio-mcp` folder.
@@ -11,7 +9,7 @@ Use the local browser app first.
 
 This works without Claude.
 
-## Test It
+## Test The App
 
 Double-click:
 
@@ -21,7 +19,7 @@ TEST_APP.bat
 
 If it says success, the app is working.
 
-## Claude
+## Optional Claude Setup
 
 Claude is optional.
 
@@ -32,8 +30,4 @@ If you want Claude to use the tool:
 3. Open Claude Desktop again.
 4. Ask: `Use the Creative Studio MCP tool to list our services.`
 
-## If Claude Fails
-
-Use `START_APP.bat`.
-
-The local app is the reliable beginner version.
+If Claude fails, use `START_APP.bat`. The local app is the reliable beginner version.

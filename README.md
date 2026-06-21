@@ -12,7 +12,7 @@ Developer: Thomas Ogun
 Organization: Senseiglobal  
 Repository: https://github.com/Senseiglobal/creative-studio-mcp
 
-## Easiest Way To Use It
+## Start Here
 
 Download the ZIP file, extract it, then open the `creative-studio-mcp` folder.
 
@@ -22,16 +22,16 @@ Double-click:
 START_APP.bat
 ```
 
-Your browser will open the app.
+The app opens in your browser.
 
-## What The App Does
+## What It Does
 
 - Lists creative services
 - Creates client quotes
 - Calculates payment breakdowns
 - Builds project checklists
 
-## Test The App
+## Test It
 
 Double-click:
 
@@ -39,13 +39,13 @@ Double-click:
 TEST_APP.bat
 ```
 
-If it says success, the app is ready.
+If it says success, the app works.
 
 ## Claude Desktop
 
 Claude Desktop is optional.
 
-If you want Claude to use the tool, double-click:
+If you want Claude to use this tool, double-click:
 
 ```text
 SETUP_WINDOWS.bat
@@ -53,18 +53,12 @@ SETUP_WINDOWS.bat
 
 Then fully quit Claude Desktop and open it again.
 
-If Claude still cannot see the tool, double-click:
-
-```text
-CONNECT_CLAUDE.bat
-```
-
 ## OpenAI And ChatGPT
 
-OpenAI needs a remote MCP server URL, so it needs deployment first.
+OpenAI needs a remote MCP server URL.
 
 Use the local browser app first.
 
-## Keep Private
+## Important
 
 Do not share your `.env` file or API keys.
