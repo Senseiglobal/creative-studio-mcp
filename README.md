@@ -54,3 +54,7 @@ When you export a project, the app shows a small confirmation message with the s
 
 The dashboard includes clearer spacing, softer feedback messages, better tooltips, and lightweight motion. It still works locally and does not need Claude or OpenAI for the browser app.
 
+## Personal greeting
+
+The dashboard greeting uses the name saved in Preferences. If no name is saved, it only shows the time-based greeting. Morning, afternoon, evening, and night are based on the device time zone.
+
