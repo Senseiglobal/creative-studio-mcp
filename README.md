@@ -55,6 +55,7 @@ Read: [OPENAI_SETUP.md](OPENAI_SETUP.md)
 - [install.bat](install.bat): installs the tool
 - [CHECK_INSTALL.bat](CHECK_INSTALL.bat): checks the install
 - [CONNECT_CLAUDE.bat](CONNECT_CLAUDE.bat): connects Claude Desktop
+- [REPAIR_CLAUDE.bat](REPAIR_CLAUDE.bat): fixes Claude if it cannot see the tool
 - [QUICK_START.md](QUICK_START.md): short setup guide
 - [FIRST_CLAUDE_PROMPT.txt](FIRST_CLAUDE_PROMPT.txt): first prompt to test Claude
 
@@ -107,4 +108,5 @@ https://github.com/sponsors/Senseiglobal
 Join the community:
 
 https://github.com/Senseiglobal/creative-studio-mcp/discussions
+
 

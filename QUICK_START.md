@@ -63,3 +63,17 @@ Claude Desktop is the easiest first option.
 OpenAI needs this tool to be deployed online as a remote MCP server.
 
 Read `OPENAI_SETUP.md` when you are ready for that.
+
+## If Claude Still Cannot See The Tool
+
+Run this file:
+
+```text
+REPAIR_CLAUDE.bat
+```
+
+Then fully close Claude Desktop.
+
+Open Claude Desktop again and start a new chat.
+
+Paste the prompt from `FIRST_CLAUDE_PROMPT.txt`.
