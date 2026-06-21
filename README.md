@@ -96,3 +96,23 @@ Read:
 
 - [SECURITY.md](SECURITY.md)
 - [SAFE_DOWNLOAD.md](SAFE_DOWNLOAD.md)
+
+## Project Bin And Exports
+
+Saved projects can be moved to the local bin instead of being lost immediately.
+
+- `deleted_projects.json` stores deleted projects.
+- `exports` stores exported files.
+
+Export formats:
+
+- TXT
+- Markdown
+- HTML
+- JSON
+- CSV
+- Word-compatible DOC
+- PDF
+
+Use the buttons beside each recent project to export or delete it.
+

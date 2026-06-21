@@ -29,3 +29,6 @@ htmlcov/
 projects.json
 .cleanup_test.py
 checksums.txt
+deleted_projects.json
+exports/
+.bin_export_test.py

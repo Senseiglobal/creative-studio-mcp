@@ -32,3 +32,4 @@ If you want Claude to use the tool:
 
 If Claude fails, use `START_APP.bat`. The local app is the reliable beginner version.
 
+
