@@ -8,6 +8,11 @@ from business_tools import (
     list_recent_projects as list_recent_projects_data,
     list_services as list_services_data,
     save_project as save_project_data,
+    delete_project as delete_project_data,
+    list_deleted_projects as list_deleted_projects_data,
+    restore_project as restore_project_data,
+    empty_project_bin as empty_project_bin_data,
+    export_project as export_project_data,
 )
 
 
@@ -80,5 +85,36 @@ def list_recent_projects(limit: int = 8) -> list[dict]:
     return list_recent_projects_data(limit)
 
 
+@mcp.tool()
+def delete_project(project_id: str) -> dict:
+    """Move a saved project to the local bin."""
+    return delete_project_data(project_id)
+
+
+@mcp.tool()
+def list_deleted_projects(limit: int = 20) -> list[dict]:
+    """List projects in the local bin."""
+    return list_deleted_projects_data(limit)
+
+
+@mcp.tool()
+def restore_project(project_id: str) -> dict:
+    """Restore a project from the local bin."""
+    return restore_project_data(project_id)
+
+
+@mcp.tool()
+def empty_project_bin() -> dict:
+    """Empty the local project bin."""
+    return empty_project_bin_data()
+
+
+@mcp.tool()
+def export_project(project_id: str, file_format: str = "txt") -> dict:
+    """Export a project package to a local file."""
+    return export_project_data(project_id, file_format)
+
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
+

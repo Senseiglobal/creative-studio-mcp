@@ -12,6 +12,11 @@ from business_tools import (
     list_recent_projects,
     list_services,
     save_project,
+    delete_project,
+    list_deleted_projects,
+    restore_project,
+    empty_project_bin,
+    export_project,
 )
 
 
@@ -442,6 +447,22 @@ HTML = r"""<!doctype html>
           <div id="services-output"></div>
         </div>
       </section>
+          <section id="bin" class="section" aria-labelledby="bin-title">
+        <h1 id="bin-title">Project Bin</h1>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Deleted Projects</h2>
+              <p>Deleted projects are saved locally in deleted_projects.json.</p>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-secondary" type="button" id="refresh-bin">Refresh</button>
+              <button class="btn btn-danger" type="button" id="empty-bin">Empty Bin</button>
+            </div>
+          </div>
+          <div id="bin-list" class="recent-list" aria-live="polite"></div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -455,7 +476,7 @@ HTML = r"""<!doctype html>
       document.querySelectorAll(`[data-view="${id}"]`).forEach((item) => {
         if (item.tagName === "BUTTON") item.classList.add("active");
       });
-      if (id === "home") loadRecent();
+      if (id === "home") loadRecent();`r`n      if (id === "bin") loadBin();
     }
 
     document.querySelectorAll("[data-view]").forEach((item) => {
@@ -522,6 +543,46 @@ HTML = r"""<!doctype html>
           select.appendChild(option);
         });
       });
+    }
+
+        async function exportProject(projectId, format) {
+      const result = await api("/api/export-project", { project_id: projectId, file_format: format });
+      toast(`Exported ${result.file_name}`);
+    }
+
+    async function deleteProject(projectId) {
+      await api("/api/delete-project", { project_id: projectId });
+      toast("Moved to bin");
+      await loadRecent();
+    }
+
+    async function restoreProject(projectId) {
+      await api("/api/restore-project", { project_id: projectId });
+      toast("Project restored");
+      await loadBin();
+      await loadRecent();
+    }
+
+    async function loadBin() {
+      const target = document.getElementById("bin-list");
+      if (!target) return;
+      const projects = await api("/api/deleted-projects", { limit: 30 });
+      if (!projects.length) {
+        target.innerHTML = `<div class="empty">The bin is empty.</div>`;
+        return;
+      }
+      target.innerHTML = projects.map((project) => `
+        <article class="recent-item">
+          <div>
+            <h3>${escapeHtml(project.client_name)}</h3>
+            <p>${escapeHtml(project.service)} at $${Number(project.design_fee).toLocaleString()}</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn btn-secondary" type="button" data-restore-project="${project.id}">Restore</button>
+            <button class="btn btn-secondary" type="button" data-export-project="${project.id}" data-format="pdf">PDF</button>
+          </div>
+        </article>
+      `).join("");
     }
 
     async function loadRecent() {
@@ -611,7 +672,13 @@ HTML = r"""<!doctype html>
       document.getElementById("services-output").innerHTML = outputBlock("Services", result);
     });
 
-    document.getElementById("refresh-recent").addEventListener("click", loadRecent);
+        document.getElementById("refresh-recent").addEventListener("click", loadRecent);
+    document.getElementById("refresh-bin")?.addEventListener("click", loadBin);
+    document.getElementById("empty-bin")?.addEventListener("click", async () => {
+      await api("/api/empty-bin");
+      toast("Bin emptied");
+      await loadBin();
+    });
 
     loadServices().then(loadRecent);
   </script>
@@ -714,3 +781,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
