@@ -68,3 +68,7 @@ Claude is optional. The local browser app works by itself.
 
 When you click `Generate`, the app now shows the full project package under the form and in the preview panel. If something is missing, it shows a clear message instead of failing silently.
 
+## Minimal Generate repair
+
+The local app uses one simple Generate flow. Click `Generate` and the project package appears on the same page with copy and export buttons.
+
