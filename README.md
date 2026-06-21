@@ -77,3 +77,22 @@ If it says success, the app works.
 ## Keep Private
 
 Do not share your `.env` file or API keys.
+
+## Security Check
+
+Before using a fresh download, double-click:
+
+```text
+SECURITY_CHECK.bat
+```
+
+Use this only from the official GitHub repository:
+
+https://github.com/Senseiglobal/creative-studio-mcp
+
+Do not run modified copies from unknown websites.
+
+Read:
+
+- [SECURITY.md](SECURITY.md)
+- [SAFE_DOWNLOAD.md](SAFE_DOWNLOAD.md)

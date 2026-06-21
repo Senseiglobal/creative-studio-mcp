@@ -28,3 +28,4 @@ htmlcov/
 *.tmp
 projects.json
 .cleanup_test.py
+checksums.txt

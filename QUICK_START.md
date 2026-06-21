@@ -31,3 +31,4 @@ If you want Claude to use the tool:
 4. Ask: `Use the Creative Studio MCP tool to list our services.`
 
 If Claude fails, use `START_APP.bat`. The local app is the reliable beginner version.
+
