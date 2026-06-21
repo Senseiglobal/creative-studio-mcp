@@ -2,42 +2,32 @@
 
 Creative Studio MCP is a local MCP server.
 
-That means it is easiest to connect with desktop apps that can run a local MCP server, such as Claude Desktop.
+## Use Claude First
 
-## Best Beginner Choice
+Claude Desktop is the easiest option because it can run this tool from your computer.
 
-Use Claude Desktop first.
+Use this setup:
 
-On Windows:
+1. `install.bat`
+2. `CHECK_INSTALL.bat`
+3. `CONNECT_CLAUDE.bat`
+4. Restart Claude Desktop
 
-1. Double-click `install.bat`
-2. Double-click `CHECK_INSTALL.bat`
-3. Double-click `CONNECT_CLAUDE.bat`
-4. Fully close Claude Desktop
-5. Open Claude Desktop again
-6. Ask: `What services do we offer?`
+## OpenAI
 
-## About OpenAI
+OpenAI works differently.
 
-OpenAI supports MCP through remote MCP servers in the Responses API.
+OpenAI needs a remote MCP server URL.
 
-This is different from Claude Desktop.
+That means this project must be hosted online before OpenAI can connect to it through the API.
 
-Claude Desktop can run this project from your computer.
+For now, use Claude Desktop for the live connection.
 
-OpenAI API needs a server URL, which means this project must first be deployed online as a remote MCP server.
+Later, deploy the project online and connect OpenAI to the remote server URL.
 
-## Simple OpenAI Path
+## Other MCP Apps
 
-For now, use one of these options:
-
-1. Use Claude Desktop for the live MCP connection.
-2. Copy results from Claude into ChatGPT when needed.
-3. Ask a developer to deploy this project as a remote MCP server before connecting it to OpenAI.
-
-## Other Apps
-
-For any AI app that supports local MCP servers, use these values:
+Use this pattern if your app supports local MCP servers:
 
 ```json
 {
@@ -52,6 +42,4 @@ For any AI app that supports local MCP servers, use these values:
 }
 ```
 
-Replace `C:\\FULL\\PATH\\TO\\creative-studio-mcp` with the real folder path on your computer.
-
-On Windows, you can use `CONNECT_CLAUDE.bat` to create the Claude Desktop version automatically.
+Replace the path with your real project folder.
