@@ -26,3 +26,5 @@ htmlcov/
 # Local logs and temporary files
 *.log
 *.tmp
+projects.json
+.cleanup_test.py

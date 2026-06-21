@@ -6,13 +6,13 @@
   </a>
 </p>
 
-Creative Studio MCP helps creative professionals create quotes, payment breakdowns, service lists, and project checklists.
+Creative Studio MCP is a daily-use creative business workspace for quotes, payments, checklists, and project packages.
 
 Developer: Thomas Ogun  
 Organization: Senseiglobal  
 Repository: https://github.com/Senseiglobal/creative-studio-mcp
 
-## Start Here
+## Use Without Claude
 
 Download the ZIP file, extract it, then open the `creative-studio-mcp` folder.
 
@@ -22,16 +22,49 @@ Double-click:
 START_APP.bat
 ```
 
-The app opens in your browser.
+The app opens in your browser. Claude and OpenAI are not required.
 
-## What It Does
+## New Project Workflow
 
-- Lists creative services
-- Creates client quotes
-- Calculates payment breakdowns
-- Builds project checklists
+Use `New Project` to enter:
 
-## Test It
+- Client name
+- Service
+- Design fee
+- Upfront percent
+- Project type
+
+The app creates one project package with:
+
+- Client quote
+- Payment breakdown
+- Project checklist
+- Deliverables list
+- Client email draft
+
+## Local Saved Projects
+
+Generated projects are saved locally in:
+
+```text
+projects.json
+```
+
+Recent projects appear on the dashboard.
+
+## Optional Claude Or OpenAI Connection
+
+Claude Desktop is optional.
+
+Use:
+
+```text
+SETUP_WINDOWS.bat
+```
+
+OpenAI needs a remote MCP server URL, so use the local browser app first.
+
+## Test The App
 
 Double-click:
 
@@ -41,24 +74,6 @@ TEST_APP.bat
 
 If it says success, the app works.
 
-## Claude Desktop
-
-Claude Desktop is optional.
-
-If you want Claude to use this tool, double-click:
-
-```text
-SETUP_WINDOWS.bat
-```
-
-Then fully quit Claude Desktop and open it again.
-
-## OpenAI And ChatGPT
-
-OpenAI needs a remote MCP server URL.
-
-Use the local browser app first.
-
-## Important
+## Keep Private
 
 Do not share your `.env` file or API keys.

@@ -45,7 +45,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-%PYTHON_CMD% -c "from business_tools import list_services, calculate_payment, create_quote; assert 'Brand Identity Design' in list_services(); assert calculate_payment(5000)['upfront_payment'] == '$3,500'; assert 'John' in create_quote('John','Brand Identity Design',3000); print('Success. The local app tools work.')"
+%PYTHON_CMD% -c "from business_tools import calculate_payment, create_project_package; assert calculate_payment(5000)['upfront_payment'] == '$3,500'; pkg=create_project_package('John Smith','Brand Identity Design',3000,70,'Brand identity project'); assert 'client_quote' in pkg and 'client_email' in pkg and 'deliverables' in pkg; print('Success. Daily project workflow works.')"
 if errorlevel 1 (
     echo Test failed.
     echo.
