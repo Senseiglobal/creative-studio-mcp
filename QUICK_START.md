@@ -1,46 +1,28 @@
 ﻿# Quick Start
 
-## Install
-
-1. Download the project ZIP.
-2. Extract the ZIP.
-3. Open the `creative-studio-mcp` folder.
-
 ## Start The App
 
-Double-click:
-
-```text
-START_APP.bat
-```
+1. Extract the ZIP.
+2. Open the `creative-studio-mcp` folder.
+3. Double-click `START_APP.bat`.
 
 ## Create Your First Project
 
-1. Open `Business Settings`.
-2. Add your business details and services.
-3. Open `New Project`.
-4. Fill in the project form.
-5. Click `Generate`.
-6. Copy the result you need.
+1. Click `New Project`.
+2. Enter the client name, service, fee, payment percent, and project type.
+3. Click `Generate`.
+4. Use `Copy`, `Export`, or `Share` in the preview panel.
 
-## Optional Claude Setup
+## Edit Your Business
 
-Claude is optional.
+Open `Preferences` to change business name, payment terms, services, and contact details.
 
-Double-click:
+## Delete Or Restore
 
-```text
-SETUP_WINDOWS.bat
-```
+Use `Delete` on a saved project to move it to the Bin.
 
-Then fully quit Claude Desktop and open it again.
+Open `Bin` to restore old projects.
 
-## Troubleshooting
+## Theme
 
-If something fails, double-click:
-
-```text
-TEST_APP.bat
-```
-
-If Claude fails, continue using `START_APP.bat`.
+Use `Theme` to switch system, dark, and light mode.

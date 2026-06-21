@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
-
 BASE_DIR = Path(__file__).resolve().parent
 PROJECTS_FILE = BASE_DIR / "projects.json"
 DELETED_PROJECTS_FILE = BASE_DIR / "deleted_projects.json"
@@ -32,32 +31,27 @@ DEFAULT_PROFILE = {
     "services": DEFAULT_SERVICES,
 }
 
-
-def ensure_json_file(path: Path, default_value) -> None:
+def ensure_json(path, default):
     if not path.exists():
-        path.write_text(json.dumps(default_value, indent=2), encoding="utf-8")
+        path.write_text(json.dumps(default, indent=2), encoding="utf-8")
 
-
-def read_json(path: Path, default_value):
-    ensure_json_file(path, default_value)
+def read_json(path, default):
+    ensure_json(path, default)
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
-        data = default_value
-    return data
+        value = default
+    return value
 
-
-def write_json(path: Path, value) -> None:
+def write_json(path, value):
     path.write_text(json.dumps(value, indent=2), encoding="utf-8")
 
-
-def format_currency(value, currency: str | None = None) -> str:
+def format_currency(value, currency=None):
     amount = int(float(value))
     symbol = "$" if (currency or "USD").upper() == "USD" else f"{currency} "
     return f"{symbol}{amount:,}"
 
-
-def get_brand_profile() -> dict:
+def get_brand_profile():
     data = read_json(BRAND_PROFILE_FILE, DEFAULT_PROFILE)
     profile = dict(DEFAULT_PROFILE)
     if isinstance(data, dict):
@@ -66,38 +60,22 @@ def get_brand_profile() -> dict:
         profile["services"] = dict(DEFAULT_SERVICES)
     return profile
 
-
-def save_brand_profile(profile: dict) -> dict:
+def save_brand_profile(profile):
     current = get_brand_profile()
     cleaned = dict(current)
-    for key in [
-        "business_name",
-        "owner_name",
-        "email",
-        "phone",
-        "website",
-        "location",
-        "brand_voice",
-        "payment_terms",
-        "currency",
-    ]:
+    for key in ["business_name", "owner_name", "email", "phone", "website", "location", "brand_voice", "payment_terms", "currency"]:
         if key in profile:
             cleaned[key] = str(profile.get(key, "")).strip()
     services = profile.get("services")
     if isinstance(services, dict):
-        cleaned["services"] = {
-            str(name).strip(): str(price).strip()
-            for name, price in services.items()
-            if str(name).strip() and str(price).strip()
-        } or dict(DEFAULT_SERVICES)
+        cleaned["services"] = {str(k).strip(): str(v).strip() for k, v in services.items() if str(k).strip() and str(v).strip()} or dict(DEFAULT_SERVICES)
     write_json(BRAND_PROFILE_FILE, cleaned)
     return cleaned
 
-
-def parse_services_text(text: str) -> dict:
+def parse_services_text(text):
     services = {}
-    for raw_line in (text or "").splitlines():
-        line = raw_line.strip()
+    for raw in (text or "").splitlines():
+        line = raw.strip()
         if not line:
             continue
         if "|" in line:
@@ -106,18 +84,14 @@ def parse_services_text(text: str) -> dict:
             name, price = line.split(":", 1)
         else:
             continue
-        name = name.strip()
-        price = price.strip()
-        if name and price:
-            services[name] = price
+        if name.strip() and price.strip():
+            services[name.strip()] = price.strip()
     return services
 
-
-def list_services() -> dict:
+def list_services():
     return dict(get_brand_profile()["services"])
 
-
-def validate_project_inputs(client_name, service, design_fee, upfront_percent=70, project_type="") -> dict:
+def validate_project_inputs(client_name, service, design_fee, upfront_percent=70, project_type=""):
     client_name = (client_name or "").strip()
     service = (service or "").strip()
     project_type = (project_type or service or "Creative project").strip()
@@ -137,16 +111,9 @@ def validate_project_inputs(client_name, service, design_fee, upfront_percent=70
         raise ValueError("Design fee must be greater than zero.")
     if upfront_percent < 0 or upfront_percent > 100:
         raise ValueError("Upfront percent must be between 0 and 100.")
-    return {
-        "client_name": client_name,
-        "service": service,
-        "design_fee": design_fee,
-        "upfront_percent": upfront_percent,
-        "project_type": project_type,
-    }
+    return {"client_name": client_name, "service": service, "design_fee": design_fee, "upfront_percent": upfront_percent, "project_type": project_type}
 
-
-def calculate_payment(total_fee: int, upfront_percent: int = 70) -> dict:
+def calculate_payment(total_fee, upfront_percent=70):
     profile = get_brand_profile()
     total_fee = int(float(total_fee))
     upfront_percent = int(float(upfront_percent))
@@ -156,55 +123,25 @@ def calculate_payment(total_fee: int, upfront_percent: int = 70) -> dict:
         raise ValueError("Upfront percent must be between 0 and 100.")
     upfront = round(total_fee * upfront_percent / 100)
     balance = total_fee - upfront
-    return {
-        "total_fee": format_currency(total_fee, profile["currency"]),
-        "upfront_percent": f"{upfront_percent}%",
-        "upfront_payment": format_currency(upfront, profile["currency"]),
-        "balance_payment": format_currency(balance, profile["currency"]),
-    }
+    return {"total_fee": format_currency(total_fee, profile["currency"]), "upfront_percent": f"{upfront_percent}%", "upfront_payment": format_currency(upfront, profile["currency"]), "balance_payment": format_currency(balance, profile["currency"])}
 
-
-def generate_project_checklist(project_type: str) -> list[str]:
+def generate_project_checklist(project_type):
     project_type = (project_type or "Creative project").strip()
-    return [
-        f"Confirm project type: {project_type}",
-        "Confirm client brief and brand goals",
-        "Collect logo, references, and content assets",
-        "Define deliverables",
-        "Confirm design direction",
-        "Create first draft",
-        "Review client feedback",
-        "Apply revisions",
-        "Prepare final files",
-        "Confirm printing or production separately if needed",
-    ]
+    return [f"Confirm project type: {project_type}", "Confirm client brief and brand goals", "Collect logo, references, and content assets", "Define deliverables", "Confirm design direction", "Create first draft", "Review client feedback", "Apply revisions", "Prepare final files", "Confirm printing or production separately if needed"]
 
-
-def create_deliverables_list(service: str, project_type: str = "") -> list[str]:
+def create_deliverables_list(service, project_type=""):
     service = (service or "Creative Service").strip()
     project_type = (project_type or service).strip()
-    return [
-        f"Creative direction for {project_type}",
-        f"Design execution for {service}",
-        "Client review version",
-        "Revision support based on agreed scope",
-        "Final client-ready files",
-        "Basic usage or handover notes",
-    ]
+    return [f"Creative direction for {project_type}", f"Design execution for {service}", "Client review version", "Revision support based on agreed scope", "Final client-ready files", "Basic usage or handover notes"]
 
-
-def create_quote(client_name: str, service: str, design_fee: int, includes_printing: bool = False) -> str:
+def create_quote(client_name, service, design_fee, includes_printing=False):
     profile = get_brand_profile()
     client_name = (client_name or "Client").strip()
     service = (service or "Creative Service").strip()
     design_fee = int(float(design_fee))
     if design_fee <= 0:
         raise ValueError("Design fee must be greater than zero.")
-    printing_note = (
-        "Printing or production is included in this quote."
-        if includes_printing
-        else "Printing or production is not included and will be quoted separately after design approval."
-    )
+    printing_note = "Printing or production is included in this quote." if includes_printing else "Printing or production is not included and will be quoted separately after design approval."
     return f"""Hello {client_name},
 
 Thank you for your interest in {profile['business_name']}.
@@ -222,21 +159,15 @@ Best regards,
 {profile['owner_name']}
 """
 
-
-def create_client_email(client_name: str, service: str, design_fee: int, upfront_percent: int = 70, project_type: str = "") -> str:
+def create_client_email(client_name, service, design_fee, upfront_percent=70, project_type=""):
     profile = get_brand_profile()
     values = validate_project_inputs(client_name, service, design_fee, upfront_percent, project_type)
     payment = calculate_payment(values["design_fee"], values["upfront_percent"])
-    contact_lines = []
-    if profile.get("email"):
-        contact_lines.append(f"Email: {profile['email']}")
-    if profile.get("phone"):
-        contact_lines.append(f"Phone: {profile['phone']}")
-    if profile.get("website"):
-        contact_lines.append(f"Website: {profile['website']}")
-    contact = "\n".join(contact_lines)
-    if contact:
-        contact = "\n\n" + contact
+    contact = []
+    for key, label in [("email", "Email"), ("phone", "Phone"), ("website", "Website")]:
+        if profile.get(key):
+            contact.append(f"{label}: {profile[key]}")
+    contact_text = "\n\n" + "\n".join(contact) if contact else ""
     return f"""Subject: Project Quote For {values['service']}
 
 Hello {values['client_name']},
@@ -253,73 +184,48 @@ Once approved, we can confirm the brief, timeline, and required files.
 
 Best regards,
 {profile['owner_name']}
-{profile['business_name']}{contact}
+{profile['business_name']}{contact_text}
 """
 
-
-def create_project_package(client_name: str, service: str, design_fee: int, upfront_percent: int = 70, project_type: str = "") -> dict:
+def create_project_package(client_name, service, design_fee, upfront_percent=70, project_type=""):
     values = validate_project_inputs(client_name, service, design_fee, upfront_percent, project_type)
     return {
         "client_quote": create_quote(values["client_name"], values["service"], values["design_fee"]),
         "payment_breakdown": calculate_payment(values["design_fee"], values["upfront_percent"]),
         "project_checklist": generate_project_checklist(values["project_type"]),
         "deliverables": create_deliverables_list(values["service"], values["project_type"]),
-        "client_email": create_client_email(
-            values["client_name"],
-            values["service"],
-            values["design_fee"],
-            values["upfront_percent"],
-            values["project_type"],
-        ),
+        "client_email": create_client_email(values["client_name"], values["service"], values["design_fee"], values["upfront_percent"], values["project_type"]),
     }
 
-
-def _read_projects() -> list[dict]:
+def _read_projects():
     data = read_json(PROJECTS_FILE, [])
     return data if isinstance(data, list) else []
 
-
-def _write_projects(projects: list[dict]) -> None:
+def _write_projects(projects):
     write_json(PROJECTS_FILE, projects)
 
-
-def _read_deleted_projects() -> list[dict]:
+def _read_deleted_projects():
     data = read_json(DELETED_PROJECTS_FILE, [])
     return data if isinstance(data, list) else []
 
-
-def _write_deleted_projects(projects: list[dict]) -> None:
+def _write_deleted_projects(projects):
     write_json(DELETED_PROJECTS_FILE, projects)
 
-
-def save_project(client_name: str, service: str, design_fee: int, upfront_percent: int = 70, project_type: str = "", generated_package: dict | None = None) -> dict:
+def save_project(client_name, service, design_fee, upfront_percent=70, project_type="", generated_package=None):
     values = validate_project_inputs(client_name, service, design_fee, upfront_percent, project_type)
     package = generated_package or create_project_package(**values)
-    project = {
-        "id": str(uuid4()),
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "client_name": values["client_name"],
-        "service": values["service"],
-        "design_fee": values["design_fee"],
-        "upfront_percent": values["upfront_percent"],
-        "project_type": values["project_type"],
-        "generated_package": package,
-    }
+    project = {"id": str(uuid4()), "created_at": datetime.now(timezone.utc).isoformat(), "client_name": values["client_name"], "service": values["service"], "design_fee": values["design_fee"], "upfront_percent": values["upfront_percent"], "project_type": values["project_type"], "generated_package": package}
     projects = _read_projects()
     projects.insert(0, project)
     _write_projects(projects)
     return project
 
-
-def list_recent_projects(limit: int = 8) -> list[dict]:
+def list_recent_projects(limit=8):
     return _read_projects()[: max(1, int(limit))]
 
-
-def delete_project(project_id: str) -> dict:
-    project_id = str(project_id or "").strip()
+def delete_project(project_id):
     projects = _read_projects()
-    keep = []
-    removed = None
+    keep, removed = [], None
     for project in projects:
         if project.get("id") == project_id:
             removed = dict(project)
@@ -334,16 +240,12 @@ def delete_project(project_id: str) -> dict:
     _write_deleted_projects(deleted)
     return removed
 
-
-def list_deleted_projects(limit: int = 20) -> list[dict]:
+def list_deleted_projects(limit=20):
     return _read_deleted_projects()[: max(1, int(limit))]
 
-
-def restore_project(project_id: str) -> dict:
-    project_id = str(project_id or "").strip()
+def restore_project(project_id):
     deleted = _read_deleted_projects()
-    keep = []
-    restored = None
+    keep, restored = [], None
     for project in deleted:
         if project.get("id") == project_id:
             restored = dict(project)
@@ -358,92 +260,57 @@ def restore_project(project_id: str) -> dict:
     _write_deleted_projects(keep)
     return restored
 
-
-def empty_project_bin() -> dict:
+def empty_project_bin():
     count = len(_read_deleted_projects())
     _write_deleted_projects([])
     return {"deleted_count": count}
 
-
-def _find_project(project_id: str) -> dict:
+def _find_project(project_id):
     for project in _read_projects() + _read_deleted_projects():
         if project.get("id") == project_id:
             return project
     raise ValueError("Project was not found.")
 
-
-def _package_to_text(project: dict) -> str:
+def package_to_text(project):
     package = project.get("generated_package", {})
-    parts = [
-        f"Project: {project.get('project_type', '')}",
-        f"Client: {project.get('client_name', '')}",
-        f"Service: {project.get('service', '')}",
-        "",
-        "CLIENT QUOTE",
-        str(package.get("client_quote", "")),
-        "",
-        "PAYMENT BREAKDOWN",
-        "\n".join(f"{key}: {value}" for key, value in package.get("payment_breakdown", {}).items()),
-        "",
-        "PROJECT CHECKLIST",
-        "\n".join(f"{index + 1}. {item}" for index, item in enumerate(package.get("project_checklist", []))),
-        "",
-        "DELIVERABLES",
-        "\n".join(f"{index + 1}. {item}" for index, item in enumerate(package.get("deliverables", []))),
-        "",
-        "CLIENT EMAIL",
-        str(package.get("client_email", "")),
-    ]
-    return "\n".join(parts).strip() + "\n"
+    def lines(title, value):
+        if isinstance(value, dict):
+            body = "\n".join(f"{k}: {v}" for k, v in value.items())
+        elif isinstance(value, list):
+            body = "\n".join(f"{i + 1}. {item}" for i, item in enumerate(value))
+        else:
+            body = str(value)
+        return f"{title}\n{body}"
+    return "\n\n".join([f"Project: {project.get('project_type', '')}", f"Client: {project.get('client_name', '')}", f"Service: {project.get('service', '')}", lines("CLIENT QUOTE", package.get("client_quote", "")), lines("PAYMENT BREAKDOWN", package.get("payment_breakdown", {})), lines("PROJECT CHECKLIST", package.get("project_checklist", [])), lines("DELIVERABLES", package.get("deliverables", [])), lines("CLIENT EMAIL", package.get("client_email", ""))]) + "\n"
 
+def package_to_markdown(project):
+    title = project.get("project_type") or "Creative Project"
+    return f"# {title}\n\n```text\n{package_to_text(project)}\n```\n"
 
-def _package_to_html(project: dict) -> str:
+def _package_to_html(project):
     import html
-    profile = get_brand_profile()
     title = html.escape(project.get("project_type") or "Creative Project")
-    body = html.escape(_package_to_text(project)).replace("\n", "<br>")
-    business = html.escape(profile.get("business_name", "Creative Studio"))
-    return f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>{title}</title>
-<style>body{{font-family:Arial,sans-serif;line-height:1.5;margin:40px;color:#172018}}h1{{margin-bottom:4px}}.brand{{color:#5f6b63;margin-bottom:24px}}</style>
-</head><body><h1>{title}</h1><div class="brand">{business}</div><div>{body}</div></body></html>
-"""
+    body = html.escape(package_to_text(project)).replace("\n", "<br>")
+    return f"<!doctype html><html><head><meta charset='utf-8'><title>{title}</title><style>body{{font-family:Arial,sans-serif;line-height:1.5;margin:40px;color:#172018}}</style></head><body><h1>{title}</h1><div>{body}</div></body></html>"
 
-
-def _package_to_csv(project: dict) -> str:
+def _package_to_csv(project):
     package = project.get("generated_package", {})
-    rows = [
-        ["field", "value"],
-        ["client_name", project.get("client_name", "")],
-        ["service", project.get("service", "")],
-        ["design_fee", project.get("design_fee", "")],
-        ["upfront_percent", project.get("upfront_percent", "")],
-        ["project_type", project.get("project_type", "")],
-        ["client_quote", package.get("client_quote", "")],
-        ["client_email", package.get("client_email", "")],
-    ]
+    rows = [["field", "value"], ["client_name", project.get("client_name", "")], ["service", project.get("service", "")], ["design_fee", project.get("design_fee", "")], ["upfront_percent", project.get("upfront_percent", "")], ["project_type", project.get("project_type", "")], ["client_quote", package.get("client_quote", "")], ["client_email", package.get("client_email", "")]]
     output = []
     for row in rows:
-        escaped = [str(cell).replace('"', '""') for cell in row]
-        output.append(",".join(f'"{cell}"' for cell in escaped))
+        output.append(",".join(f'"{str(cell).replace(chr(34), chr(34) + chr(34))}"' for cell in row))
     return "\n".join(output) + "\n"
 
-
-def _simple_pdf_bytes(text: str) -> bytes:
-    def esc(value: str) -> str:
+def _simple_pdf_bytes(text):
+    def esc(value):
         return value.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
     lines = []
     for raw in text.splitlines():
-        if len(raw) <= 92:
-            lines.append(raw)
-        else:
-            for index in range(0, len(raw), 92):
-                lines.append(raw[index:index + 92])
+        lines.extend([raw[i:i + 92] for i in range(0, max(len(raw), 1), 92)])
     pages = []
     for start in range(0, len(lines), 44):
-        chunk = lines[start:start + 44]
         commands = ["BT", "/F1 10 Tf", "50 790 Td", "14 TL"]
-        for line in chunk:
+        for line in lines[start:start + 44]:
             commands.append(f"({esc(line)}) Tj")
             commands.append("T*")
         commands.append("ET")
@@ -461,30 +328,26 @@ def _simple_pdf_bytes(text: str) -> bytes:
     objects.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
     result = bytearray(b"%PDF-1.4\n")
     offsets = [0]
-    for number, obj in enumerate(objects, start=1):
+    for number, obj in enumerate(objects, 1):
         offsets.append(len(result))
-        result.extend(f"{number} 0 obj\n".encode())
-        result.extend(obj)
-        result.extend(b"\nendobj\n")
+        result.extend(f"{number} 0 obj\n".encode() + obj + b"\nendobj\n")
     xref = len(result)
-    result.extend(f"xref\n0 {len(objects) + 1}\n".encode())
-    result.extend(b"0000000000 65535 f \n")
+    result.extend(f"xref\n0 {len(objects)+1}\n0000000000 65535 f \n".encode())
     for offset in offsets[1:]:
         result.extend(f"{offset:010d} 00000 n \n".encode())
-    result.extend(f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode())
+    result.extend(f"trailer\n<< /Size {len(objects)+1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode())
     return bytes(result)
 
-
-def export_project(project_id: str, file_format: str = "txt") -> dict:
+def export_project(project_id, file_format="txt"):
     project = _find_project(project_id)
     EXPORTS_DIR.mkdir(exist_ok=True)
     safe_client = "".join(ch if ch.isalnum() else "-" for ch in project.get("client_name", "project")).strip("-").lower() or "project"
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     file_format = (file_format or "txt").lower().strip()
-    if file_format in {"text", "txt"}:
-        suffix, content = "txt", _package_to_text(project).encode("utf-8")
+    if file_format in {"txt", "text"}:
+        suffix, content = "txt", package_to_text(project).encode("utf-8")
     elif file_format in {"md", "markdown"}:
-        suffix, content = "md", f"# {project.get('project_type') or 'Creative Project'}\n\n```text\n{_package_to_text(project)}\n```\n".encode("utf-8")
+        suffix, content = "md", package_to_markdown(project).encode("utf-8")
     elif file_format in {"html", "htm"}:
         suffix, content = "html", _package_to_html(project).encode("utf-8")
     elif file_format == "json":
@@ -494,7 +357,7 @@ def export_project(project_id: str, file_format: str = "txt") -> dict:
     elif file_format in {"doc", "word"}:
         suffix, content = "doc", _package_to_html(project).encode("utf-8")
     elif file_format == "pdf":
-        suffix, content = "pdf", _simple_pdf_bytes(_package_to_text(project))
+        suffix, content = "pdf", _simple_pdf_bytes(package_to_text(project))
     else:
         raise ValueError("Unsupported export format.")
     path = EXPORTS_DIR / f"{safe_client}-{stamp}.{suffix}"

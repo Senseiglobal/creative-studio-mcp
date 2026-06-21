@@ -6,59 +6,42 @@
   </a>
 </p>
 
-Creative Studio MCP is a local-first creative business workspace for quotes, payments, checklists, project packages, and business preferences.
+Creative Studio MCP is a local-first creative business dashboard for quotes, project packages, exports, and brand preferences.
 
 ## Install
 
-1. Download the ZIP file from GitHub.
-2. Right-click the ZIP file.
-3. Choose `Extract All`.
-4. Open the extracted `creative-studio-mcp` folder.
+1. Download the ZIP from GitHub.
+2. Extract the ZIP.
+3. Open the `creative-studio-mcp` folder.
+4. Double-click `START_APP.bat`.
 
-## Start Local App
+## Dashboard Tour
 
-Double-click:
+- `Dashboard`: recent projects and quick actions.
+- `New Project`: generate a full project package.
+- `Preferences`: edit business name, payment terms, and services.
+- `Bin`: restore deleted projects.
+- `Preview`: copy, export, or share the current package.
 
-```text
-START_APP.bat
-```
+## Export And Share
 
-The app opens in your browser and works without Claude or OpenAI.
+Use the preview buttons to:
 
-## Create First Project
+- Copy the full package
+- Export TXT
+- Export Markdown
+- Share with the browser share tool when available
 
-1. Click `Business Settings`.
-2. Save your business name, payment terms, and services.
-3. Click `New Project`.
-4. Fill in the client and project details.
-5. Click `Generate`.
-6. Copy the quote, email draft, or full package.
+Saved projects can also export PDF from the recent projects list.
 
-## Optional Claude Or OpenAI Connection
+## Light And Dark Mode
 
-Claude Desktop is optional.
+Use the Theme button. It supports system, dark, and light mode and saves your choice on the device.
 
-Use:
+## Accessibility
 
-```text
-SETUP_WINDOWS.bat
-```
+The app includes keyboard navigation, visible focus rings, semantic sections, skip-to-content, readable contrast, and reduced motion support.
 
-OpenAI needs a remote MCP server URL, so deploy the project online before connecting OpenAI.
+## Optional Claude Or OpenAI
 
-## Troubleshooting
-
-If the app does not open, double-click:
-
-```text
-TEST_APP.bat
-```
-
-If Claude cannot see the tool, use the local app first. The local app is the main reliable version.
-
-## Local Files
-
-- `brand_profile.json` stores business preferences.
-- `projects.json` stores saved projects.
-
-Do not share these files if they contain private business information.
+Claude and OpenAI are optional. The local app works without them.
