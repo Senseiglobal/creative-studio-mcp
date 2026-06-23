@@ -39,7 +39,7 @@ HTML = """<!doctype html>
       --bg: #0b0d12; --surface: #11151d; --surface-2: #161b25; --surface-3: #1e2531;
       --text: #f8fafc; --muted: #a7b0bf; --soft: #778195; --line: #2b3342;
       --accent: #8b5cf6; --accent-2: #7c3aed; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
-      --shadow-1: 0 1px 2px rgba(0,0,0,.2); --shadow-2: 0 16px 40px rgba(0,0,0,.28); --focus: 0 0 0 4px rgba(139,92,246,.28);
+      --shadow-1: 0 1px 2px rgba(0,0,0,.16); --shadow-2: 0 10px 28px rgba(0,0,0,.20); --focus: 0 0 0 4px rgba(139,92,246,.22);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     }
     [data-theme="light"] {
@@ -66,7 +66,7 @@ HTML = """<!doctype html>
     .shell.inspector-closed { grid-template-columns: 240px minmax(0, 1fr); }
     .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--line); background: color-mix(in srgb, var(--surface), transparent 4%); overflow: auto; }
     .brand { display: flex; gap: var(--space-3); align-items: center; padding: 0 var(--space-2) var(--space-6); }
-    .logo { width: 42px; height: 42px; border-radius: var(--radius-2); display: grid; place-items: center; background: var(--accent); color: white; font-weight: 900; box-shadow: 0 12px 26px color-mix(in srgb, var(--accent), transparent 68%); }
+    .logo { width: 42px; height: 42px; border-radius: var(--radius-2); display: grid; place-items: center; background: var(--accent); color: white; font-weight: 900; box-shadow: 0 8px 22px color-mix(in srgb, var(--accent), transparent 84%); }
     .brand strong { display: block; font-size: 15px; line-height: 1.15; }
     .brand span { color: var(--muted); font-size: var(--caption); }
     .nav-group { margin-top: var(--space-5); }
@@ -78,7 +78,7 @@ HTML = """<!doctype html>
     .theme-dots { display: flex; gap: var(--space-2); padding: var(--space-3); }
     .dot { width: 34px; height: 34px; border-radius: 999px; border: 2px solid transparent; display: grid; place-items: center; background: var(--surface-2); }
     .dot span { width: 18px; height: 18px; border-radius: 999px; display: block; }
-    .dot.active { border-color: var(--accent); box-shadow: var(--focus); }
+    .dot.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 78%); }
     .dot.red span { background: #ef4444; } .dot.green span { background: #22c55e; } .dot.blue span { background: #3b82f6; }
     .workspace-wrap { min-width: 0; padding: var(--space-7); }
     .workspace { max-width: 1200px; margin: 0 auto; }
@@ -92,15 +92,15 @@ HTML = """<!doctype html>
     h3 { margin-bottom: var(--space-2); font-size: var(--section); line-height: 1.2; letter-spacing: -.015em; }
     p { color: var(--muted); }
     .display { font-size: clamp(40px, 5vw, var(--display)); line-height: .98; letter-spacing: -.05em; }
-    .btn { min-height: 44px; border-radius: var(--radius-2); display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 var(--space-4); border: 1px solid var(--line); background: var(--surface); color: var(--text); font-weight: 780; text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease; }
+    .btn { min-height: 44px; border-radius: var(--radius-2); display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 var(--space-4); border: 1px solid var(--line); background: var(--surface); color: var(--text); font-weight: 780; line-height: 1; white-space: nowrap; text-align: center; flex-shrink: 0; text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease; }
     .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-1); }
     .btn:active { transform: scale(.98); }
-    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent), transparent 68%); }
-    .btn.primary:hover { background: var(--accent-2); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 8px 24px color-mix(in srgb, var(--accent), transparent 86%); }
+    .btn.primary:hover { background: var(--accent-2); box-shadow: 0 10px 28px color-mix(in srgb, var(--accent), transparent 82%); }
     .btn.secondary { background: var(--surface-2); }
     .btn.ghost { background: transparent; border-color: transparent; }
     .btn.danger { color: var(--danger); background: color-mix(in srgb, var(--danger), transparent 92%); border-color: color-mix(in srgb, var(--danger), transparent 78%); }
-    .btn.icon { width: 44px; padding: 0; }
+    .btn.icon { width: 44px; min-width: 44px; height: 44px; padding: 0; }
     .btn[disabled] { opacity: .5; pointer-events: none; }
     .btn.loading::after { content: ""; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 999px; animation: spin .8s linear infinite; }
     .hero, .panel, .learning-card, .feedback-card { border: 1px solid var(--line); border-radius: var(--radius-4); background: var(--surface); box-shadow: var(--shadow-1); }
@@ -112,7 +112,7 @@ HTML = """<!doctype html>
     .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
     .quick-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .card { min-height: 150px; border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); padding: var(--space-5); text-align: left; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
-    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); border-color: color-mix(in srgb, var(--accent), var(--line) 56%); }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.16); border-color: color-mix(in srgb, var(--accent), var(--line) 70%); }
     .card-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-2); background: color-mix(in srgb, var(--accent), transparent 88%); color: var(--accent); margin-bottom: var(--space-4); }
     .card-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
     .panel { max-width: 900px; padding: var(--space-7); }
@@ -158,8 +158,9 @@ HTML = """<!doctype html>
     .shell.inspector-collapsed .inspector { display: none; }
     .shell.inspector-collapsed .inspector-rail { display: grid; align-content: start; gap: var(--space-3); }
     .shell.inspector-closed .inspector, .shell.inspector-closed .inspector-rail { display: none; }
-    .tooltip { position: fixed; z-index: 120; max-width: 280px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--text); color: var(--bg); font-size: var(--caption); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity 150ms ease, transform 150ms ease; }
+    .tooltip { position: fixed; z-index: 120; max-width: 280px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--text); color: var(--bg); font-size: var(--caption); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(6px); pointer-events: auto; transition: opacity 150ms ease, transform 150ms ease; display: flex; align-items: start; gap: var(--space-2); }
     .tooltip.show { opacity: 1; transform: translateY(0); }
+    .tooltip button { border: 0; background: transparent; color: inherit; min-width: 24px; min-height: 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 90; max-width: min(420px, calc(100vw - 32px)); background: var(--text); color: var(--bg); padding: 14px 16px; border-radius: var(--radius-2); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(10px); transition: opacity 160ms ease, transform 160ms ease; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .modal-backdrop { position: fixed; inset: 0; z-index: 130; display: none; place-items: center; background: rgba(0,0,0,.48); padding: var(--space-5); }
@@ -225,10 +226,10 @@ HTML = """<!doctype html>
       <div class="workspace">
         <section id="dashboard" class="view active">
           <div class="hero">
-            <p class="eyebrow">Creative business command center</p>
+            <p class="eyebrow">Studio HQ</p>
             <div class="page-head"><div>
               <h1 class="display" id="greeting">Creative Studio MCP</h1>
-              <p>Build quotes, payments, checklists, deliverables, and client emails from one focused local workspace.</p>
+              <p>Pick up where you left off or start a new client package.</p>
               <div class="hero-actions">
                 <button class="btn primary" data-view="project" type="button" data-tip="Create a complete client package in one step."><span class="mi">add</span>New Project</button>
                 <button class="btn secondary" id="continueRecent" type="button" data-tip="Go back to the last project you worked on."><span class="mi">play_arrow</span>Continue Recent</button>
@@ -603,7 +604,7 @@ HTML = """<!doctype html>
     async function loadRecent() {
       lastRecent = await api("/api/recent", { limit: 5 });
       $("#continueRecent").disabled = !lastRecent.length && !getMemory("lastActiveProjectId");
-      $("#recent").innerHTML = lastRecent.length ? lastRecent.map(project => `<div class="recent-item"><div><strong>${escapeHtml(project.client_name)}</strong><p>${escapeHtml(project.service)} at $${Number(project.design_fee).toLocaleString()}</p></div><button class="btn secondary" data-open-project="${project.id}" type="button"><span class="mi">visibility</span>Preview</button></div>`).join("") : `<div class="empty"><div><span class="mi">folder_open</span><h3>No projects yet. Start your first client package.</h3><p>Create your first project and it will appear here.</p><button class="btn primary" data-view="project" type="button"><span class="mi">add</span>Create your first project</button></div></div>`;
+      $("#recent").innerHTML = lastRecent.length ? lastRecent.map(project => `<div class="recent-item"><div><strong>${escapeHtml(project.client_name)}</strong><p>${escapeHtml(project.service)} at ${Number(project.design_fee).toLocaleString()}</p></div><button class="btn secondary" data-open-project="${project.id}" type="button"><span class="mi">visibility</span>Preview</button></div>`).join("") : `<div class="empty"><div><span class="mi">folder_open</span><h3>No projects yet.</h3><p>Create your first client package and it will appear here.</p><div class="actions" style="justify-content:center;"><button class="btn primary" data-view="project" type="button"><span class="mi">add</span>Create your first project</button><button class="btn ghost" data-view="learn" type="button">Learn how projects work</button></div></div></div>`;
     }
     function renderProject(project, label = "Project package") {
       const pkg = project.generated_package || {};
@@ -630,7 +631,7 @@ HTML = """<!doctype html>
       const percent = Math.round(done / lessons.length * 100);
       $("#learnProgress").style.width = `${percent}%`;
       $("#learnProgressText").textContent = `${percent}% complete`;
-      $("#lessonList").innerHTML = lessons.map(([id, title, text, view]) => `<article class="lesson-card ${progress[id] ? "complete" : ""}"><div><strong>${progress[id] ? "âœ“ " : ""}${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></div><div class="actions"><button class="btn secondary" data-lesson="${id}" data-view="${view}" type="button">Try it</button><button class="btn ghost" data-complete-lesson="${id}" type="button">${progress[id] ? "Done" : "Mark done"}</button></div></article>`).join("");
+      $("#lessonList").innerHTML = lessons.map(([id, title, text, view]) => `<article class="lesson-card ${progress[id] ? "complete" : ""}"><div><strong style="display:inline-flex;align-items:center;gap:8px;">${progress[id] ? `<span class="mi" aria-hidden="true">check_circle</span>` : `<span class="mi" aria-hidden="true">radio_button_unchecked</span>`}${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></div><div class="actions"><button class="btn secondary" data-lesson="${id}" data-view="${view}" type="button">Try it</button><button class="btn ghost" data-complete-lesson="${id}" type="button">${progress[id] ? "Done" : "Mark done"}</button></div></article>`).join("");
     }
     function completeLesson(id) {
       const progress = getMemory("learnProgress") || {};
@@ -677,7 +678,7 @@ HTML = """<!doctype html>
       function show(el) {
         const text = el.getAttribute("data-tip");
         if (!text) return;
-        tip.textContent = text;
+        tip.innerHTML = `<span>${escapeHtml(text)}</span><button type="button" aria-label="Dismiss tooltip">x</button>`;
         const rect = el.getBoundingClientRect();
         tip.style.left = `${Math.min(rect.left, window.innerWidth - 300)}px`;
         tip.style.top = `${rect.bottom + 10}px`;
@@ -688,6 +689,12 @@ HTML = """<!doctype html>
       document.addEventListener("focusin", event => { const el = event.target.closest("[data-tip]"); if (el) show(el); });
       document.addEventListener("mouseout", event => { if (event.target.closest("[data-tip]")) hide(); });
       document.addEventListener("focusout", event => { if (event.target.closest("[data-tip]")) hide(); });
+      tip.addEventListener("click", event => {
+        if (event.target.closest("button")) {
+          hide();
+          saveMemory("dismissedTooltips", { lastDismissedAt: now() }, { source: "tooltip" });
+        }
+      });
       document.addEventListener("keydown", event => { if (event.key === "Escape") hide(); });
     }
     function trackFormMemory() {
@@ -996,4 +1003,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
