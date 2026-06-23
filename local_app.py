@@ -242,7 +242,7 @@ HTML = """<!doctype html>
           <div class="hero">
             <p class="eyebrow">Studio HQ</p>
             <div class="page-head"><div>
-              <h1 class="display" id="greeting">Creative Studio MCP</h1>
+              <h1 class="display" id="greeting">Welcome to Creative Studio</h1>
               <p>Pick up where you left off or start a new client package.</p>
               <div class="hero-actions">
                 <button class="btn primary" data-view="project" type="button" data-tip="Create a complete client package in one step."><span class="mi">add</span>New Project</button>
@@ -294,7 +294,7 @@ HTML = """<!doctype html>
           <div class="panel">
             <form id="projectForm">
               <div class="form-grid">
-                <label>Client name<input name="client_name" value="Israel Thomas" required data-tip="Who is this job for?"></label>
+                <label>Client name<input name="client_name" value="New Client" required data-tip="Who is this job for?"></label>
                 <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type new service, then create package"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button><small>Choose a saved service or add one quickly.</small></label>
                 <label>Design fee<input name="design_fee" type="number" min="1" value="3000" required data-tip="Use numbers only, like 3000."></label>
                 <label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required data-tip="This is what the client pays before work starts."></label>
@@ -396,6 +396,7 @@ HTML = """<!doctype html>
   </nav>
   <div class="tooltip" id="tooltip" role="tooltip"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-backdrop" id="nameOnboardingModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="nameOnboardingTitle"><p class="eyebrow">First setup</p><h2 id="nameOnboardingTitle">Welcome to Creative Studio</h2><p>Add your name so the dashboard can greet you properly. You can skip this and keep the greeting neutral.</p><label>Your name<input id="onboardingName" autocomplete="name" placeholder="Your name"></label><div class="actions" style="margin-top:16px;"><button class="btn primary" id="saveOnboardingName" type="button"><span class="mi">check</span>Save name</button><button class="btn secondary" id="skipOnboardingName" type="button">Skip for now</button></div></div></div>
   <div class="modal-backdrop" id="feedbackModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle"><h2 id="feedbackTitle">Share feedback</h2><p>What felt useful, confusing, or missing?</p><textarea id="feedbackText" placeholder="Optional comment"></textarea><div class="actions" style="margin-top:16px;"><button class="btn primary" id="saveFeedback" type="button">Save feedback</button><button class="btn secondary" id="closeFeedback" type="button">Close</button></div></div></div>
 
   <script>
@@ -663,11 +664,18 @@ HTML = """<!doctype html>
       });
       syncOtherFields(form);
     }
+    function savedDisplayName(profile) {
+      const fullName = String(profile?.owner_name || "").trim();
+      const legacyDefault = ["Tho", "mas", " Og", "un"].join("");
+      if (!localStorage.getItem("creativeStudioNameOnboarded") && fullName === legacyDefault) return "";
+      return fullName;
+    }
     function greeting(profile) {
       const hour = new Date().getHours();
       const word = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Good night";
-      const name = String(profile.owner_name || "").trim().split(/\\s+/)[0];
-      $("#greeting").textContent = name ? `${word}, ${name}` : "Creative Studio MCP";
+      const fullName = savedDisplayName(profile);
+      const name = fullName.split(/\\s+/)[0];
+      $("#greeting").textContent = name ? `${word}, ${name}` : `${word}. Welcome to Creative Studio`;
     }
     function optionList(values, includeOther = true) {
       const unique = Array.from(new Set(values.filter(Boolean).map(item => String(item).trim()).filter(Boolean)));
@@ -736,10 +744,30 @@ HTML = """<!doctype html>
         form.elements.services_text.value = Object.entries(profile.services || {}).map(([name, price]) => `${name} | ${price}`).join("\\n");
       }
     }
+    let currentProfile = {};
+    function shouldShowNameOnboarding(profile) {
+      return !localStorage.getItem("creativeStudioNameOnboarded") && !savedDisplayName(profile);
+    }
+    function showNameOnboarding(profile) {
+      const modal = $("#nameOnboardingModal");
+      const input = $("#onboardingName");
+      if (!modal || !input || !shouldShowNameOnboarding(profile)) return;
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      setTimeout(() => input.focus(), 80);
+    }
+    function closeNameOnboarding() {
+      const modal = $("#nameOnboardingModal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
     async function loadProfile() {
       const profile = await api("/api/profile");
-      greeting(profile);
-      syncSettingsProfile(profile);
+      currentProfile = profile || {};
+      greeting(currentProfile);
+      syncSettingsProfile(currentProfile);
+      showNameOnboarding(currentProfile);
     }
     async function loadRecent() {
       lastRecent = await api("/api/recent", { limit: 5 });
@@ -1060,6 +1088,25 @@ HTML = """<!doctype html>
       toast(memoryOn() ? "Creative Studio can remember where you left off for 7 days." : "Memory is off.");
     });
     $("#clearMemory").addEventListener("click", clearMemory);
+    $("#saveOnboardingName").addEventListener("click", async () => {
+      const name = String($("#onboardingName")?.value || "").trim();
+      if (!name) return toast("Type your name or choose Skip for now.");
+      try {
+        const saved = await api("/api/save-profile", { ...currentProfile, owner_name: name });
+        currentProfile = saved || { ...currentProfile, owner_name: name };
+        localStorage.setItem("creativeStudioNameOnboarded", "yes");
+        syncSettingsProfile(currentProfile);
+        greeting(currentProfile);
+        closeNameOnboarding();
+        toast("Name saved.");
+      } catch (error) { toast(error.message); }
+    });
+    $("#skipOnboardingName").addEventListener("click", () => {
+      localStorage.setItem("creativeStudioNameOnboarded", "skipped");
+      closeNameOnboarding();
+      greeting(currentProfile || {});
+      toast("No problem. You can add your name in Settings later.");
+    });
     $("#saveFeedback").addEventListener("click", () => {
       const feedback = JSON.parse(localStorage.getItem("creativeStudioFeedback") || "[]");
       feedback.unshift({ createdAt: new Date().toISOString(), comment: $("#feedbackText").value.trim(), choice: getMemory("lastFeedbackChoice") });

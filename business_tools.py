@@ -1,4 +1,4 @@
-﻿import json
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -20,7 +20,7 @@ DEFAULT_SERVICES = {
 
 DEFAULT_PROFILE = {
     "business_name": "Senseiglobal Creative Studio",
-    "owner_name": "Thomas Ogun",
+    "owner_name": "",
     "email": "",
     "phone": "",
     "website": "",
@@ -156,7 +156,7 @@ Note:
 {printing_note}
 
 Best regards,
-{profile['owner_name']}
+{profile.get('owner_name') or profile.get('business_name', '')}
 """
 
 def create_client_email(client_name, service, design_fee, upfront_percent=70, project_type=""):
@@ -183,7 +183,7 @@ Balance payment: {payment['balance_payment']}
 Once approved, we can confirm the brief, timeline, and required files.
 
 Best regards,
-{profile['owner_name']}
+{profile.get('owner_name') or profile.get('business_name', '')}
 {profile['business_name']}{contact_text}
 """
 
