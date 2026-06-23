@@ -76,3 +76,7 @@ The local app uses one simple Generate flow. Click `Generate` and the project pa
 
 The local app is organized around a minimal dashboard, focused tools, a live preview panel, and Settings for personalization. Quote, payment, checklist, project package, copy, export, and theme controls remain available without crowding the dashboard.
 
+## Preview controls and typography polish
+
+The local app includes a cleaner visual hierarchy, stronger typography, and preview controls for minimize, expand, and close. The latest result always opens the preview again.
+
