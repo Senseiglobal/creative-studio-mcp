@@ -281,10 +281,10 @@ HTML = """<!doctype html>
             <form id="projectForm">
               <div class="form-grid">
                 <label>Client name<input name="client_name" value="Israel Thomas" required data-tip="Who is this job for?"></label>
-                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type service name"><small>Choose a saved service or add one quickly.</small></label>
+                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type new service, then create package"><small>Choose a saved service or add one quickly.</small></label>
                 <label>Design fee<input name="design_fee" type="number" min="1" value="3000" required data-tip="Use numbers only, like 3000."></label>
                 <label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required data-tip="This is what the client pays before work starts."></label>
-                <label>Project type<select name="project_type" id="projectTypeSelect" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="projectTypeOther" placeholder="Type project type"><small>Used for the checklist.</small></label>
+                <label>Project type<select name="project_type" id="projectTypeSelect" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="projectTypeOther" placeholder="Type new project type, then create package"><small>Used for the checklist.</small></label>
                 <label>Deadline<input name="deadline" disabled placeholder="Future feature"><small>Coming later.</small></label>
               </div>
               <div class="actions"><button class="btn primary" id="projectGenerate" type="submit"><span class="mi">auto_awesome</span>Create client package</button><button class="btn secondary" data-clear type="button">Clear</button></div>
@@ -295,7 +295,7 @@ HTML = """<!doctype html>
 
         <section id="quote" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Quote</h1><p>A Quote is like a price note you send before work begins.</p></div></div>
-          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type service name"></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
+          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
         </section>
 
         <section id="payment" class="view">
@@ -305,7 +305,7 @@ HTML = """<!doctype html>
 
         <section id="checklist" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type project type"></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
         </section>
 
         <section id="services" class="view">
@@ -364,7 +364,7 @@ HTML = """<!doctype html>
             <button class="btn secondary" id="copyInspector" type="button" data-tip="Copy everything in the preview."><span class="mi">content_copy</span>Copy</button>
             <button class="btn secondary" id="exportTxt" type="button" data-tip="Download a plain text version."><span class="mi">article</span>TXT</button>
             <button class="btn secondary" id="exportMd" type="button" data-tip="Download a Markdown version."><span class="mi">description</span>Markdown</button>
-            <button class="btn secondary" type="button" disabled><span class="mi">picture_as_pdf</span>PDF</button>
+            <button class="btn secondary" id="exportPdf" type="button" data-tip="Download a PDF version."><span class="mi">picture_as_pdf</span>PDF</button>
           </div>
           <div id="inspectorBody" class="inspector-body"><div class="empty"><div><span class="mi">preview</span><h3>No preview yet</h3><p>Run a tool to see the latest result.</p></div></div></div>
         </div>
@@ -388,6 +388,8 @@ HTML = """<!doctype html>
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => Array.from(document.querySelectorAll(selector));
     const MEMORY_KEY = "creativeStudioMemory";
+    const CUSTOM_SERVICES_KEY = "creativeStudioCustomServices";
+    const CUSTOM_PROJECT_TYPES_KEY = "creativeStudioCustomProjectTypes";
     const MEMORY_DAYS = 7;
     let lastProject = null;
     let lastPreviewText = "";
@@ -528,10 +530,31 @@ HTML = """<!doctype html>
     function notice(target, message, type = "") {
       target.innerHTML = `<div class="notice ${type}">${escapeHtml(message)}</div>`;
     }
+    function readList(key) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key) || "[]");
+        return Array.isArray(value) ? value : [];
+      } catch {
+        return [];
+      }
+    }
+    function saveListItem(key, value) {
+      const cleaned = String(value || "").trim();
+      if (!cleaned) return;
+      const list = readList(key).filter(item => item.toLowerCase() !== cleaned.toLowerCase());
+      list.unshift(cleaned);
+      localStorage.setItem(key, JSON.stringify(list.slice(0, 20)));
+    }
     function normalizePayload(payload) {
       const cleaned = { ...payload };
-      if (cleaned.service === "__other__") cleaned.service = String(cleaned.service_other || "").trim();
-      if (cleaned.project_type === "__other__") cleaned.project_type = String(cleaned.project_type_other || "").trim();
+      if (cleaned.service === "__other__") {
+        cleaned.service = String(cleaned.service_other || "").trim();
+        saveListItem(CUSTOM_SERVICES_KEY, cleaned.service);
+      }
+      if (cleaned.project_type === "__other__") {
+        cleaned.project_type = String(cleaned.project_type_other || "").trim();
+        saveListItem(CUSTOM_PROJECT_TYPES_KEY, cleaned.project_type);
+      }
       delete cleaned.service_other;
       delete cleaned.project_type_other;
       return cleaned;
@@ -566,12 +589,12 @@ HTML = """<!doctype html>
       $("#greeting").textContent = name ? `${word}, ${name}` : "Creative Studio MCP";
     }
     function optionList(values, includeOther = true) {
-      const unique = Array.from(new Set(values.filter(Boolean)));
+      const unique = Array.from(new Set(values.filter(Boolean).map(item => String(item).trim()).filter(Boolean)));
       const options = unique.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
       return includeOther ? `${options}<option value="__other__">Other</option>` : options;
     }
     function loadProjectTypes() {
-      const options = optionList(defaultProjectTypes.filter(item => item !== "Other"));
+      const options = optionList([...readList(CUSTOM_PROJECT_TYPES_KEY), ...defaultProjectTypes.filter(item => item !== "Other")]);
       $("#projectTypeSelect").innerHTML = options;
       $("#checklistProjectType").innerHTML = options;
     }
@@ -582,11 +605,12 @@ HTML = """<!doctype html>
         const show = select.value === "__other__";
         other.classList.toggle("show", show);
         other.required = show;
+        if (show && document.activeElement === select) setTimeout(() => other.focus(), 60);
       });
     }
     async function loadServices() {
       const services = await api("/api/services");
-      const options = optionList(Object.keys(services));
+      const options = optionList([...readList(CUSTOM_SERVICES_KEY), ...Object.keys(services)]);
       $("#projectService").innerHTML = options;
       $("#quoteService").innerHTML = options;
       loadProjectTypes();
@@ -759,6 +783,8 @@ HTML = """<!doctype html>
       try {
         const payload = parseForm(event.currentTarget);
         const project = await api("/api/project", payload);
+        await loadServices();
+        fillForm($("#projectForm"), project);
         renderProject(project);
         saveMemory("lastActiveProjectId", project.id, { activity: "project_generated", requireMeaningful: true });
         saveMemory("lastUsedService", payload.service, { activity: "project_generated", requireMeaningful: true });
@@ -777,9 +803,12 @@ HTML = """<!doctype html>
       const button = event.submitter;
       setLoading(button, true);
       try {
-        const quote = await api("/api/quote", parseForm(event.currentTarget));
+        const payload = parseForm(event.currentTarget);
+        await loadServices();
+        fillForm(event.currentTarget, payload);
+        const quote = await api("/api/quote", payload);
         preview("Quote", [{ title: "Quote", value: quote }]);
-        saveMemory("lastQuoteForm", parseForm(event.currentTarget), { activity: "quote_generated", requireMeaningful: true });
+        saveMemory("lastQuoteForm", payload, { activity: "quote_generated", requireMeaningful: true });
         completeLesson("quote");
         toast("Quote ready.");
       } catch (error) { toast(error.message); } finally { setLoading(button, false); }
@@ -801,7 +830,10 @@ HTML = """<!doctype html>
       const button = event.submitter;
       setLoading(button, true);
       try {
-        const checklist = await api("/api/checklist", parseForm(event.currentTarget));
+        const payload = parseForm(event.currentTarget);
+        loadProjectTypes();
+        fillForm(event.currentTarget, payload);
+        const checklist = await api("/api/checklist", payload);
         preview("Checklist", [{ title: "Checklist", value: checklist }]);
         completeLesson("checklist");
         toast("Checklist ready.");
@@ -851,6 +883,13 @@ HTML = """<!doctype html>
       saveMemory("lastExportFormat", "md", { activity: "export_clicked", requireMeaningful: true });
       completeLesson("export");
       toast(`Saved: ${result.file_name || "Markdown file"}`);
+    });
+    $("#exportPdf").addEventListener("click", async () => {
+      if (!lastProject) return toast("Create a project first.");
+      const result = await api("/api/export", { project_id: lastProject.id, file_format: "pdf" });
+      saveMemory("lastExportFormat", "pdf", { activity: "export_clicked", requireMeaningful: true });
+      completeLesson("export");
+      toast(`Saved: ${result.file_name || "PDF file"}`);
     });
     $("#themeBtn").addEventListener("click", () => {
       const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
@@ -1003,5 +1042,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
