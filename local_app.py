@@ -174,6 +174,11 @@ HTML = """<!doctype html>
     .tooltip button { border: 0; background: transparent; color: inherit; min-width: 24px; min-height: 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 90; max-width: min(420px, calc(100vw - 32px)); background: var(--text); color: var(--bg); padding: 14px 16px; border-radius: var(--radius-2); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(10px); transition: opacity 160ms ease, transform 160ms ease; }
     .toast.show { opacity: 1; transform: translateY(0); }
+    .help-fab { position: fixed; right: 18px; bottom: 84px; z-index: 88; min-height: 52px; padding: 0 18px; border-radius: 999px; box-shadow: var(--shadow-2); }
+    .walkthrough-list { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
+    .walkthrough-step { border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface-2); padding: var(--space-4); display: grid; gap: var(--space-2); }
+    .walkthrough-step strong { display: inline-flex; align-items: center; gap: var(--space-2); }
+    .walkthrough-step p { margin-bottom: 0; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 130; display: none; place-items: center; background: rgba(0,0,0,.48); padding: var(--space-5); }
     .modal-backdrop.show { display: grid; }
     .modal { width: min(520px, 100%); border: 1px solid var(--line); border-radius: var(--radius-4); background: var(--surface); box-shadow: var(--shadow-2); padding: var(--space-6); }
@@ -194,6 +199,8 @@ HTML = """<!doctype html>
       .bottom-nav { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 80; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 22px; background: color-mix(in srgb, var(--surface), transparent 5%); box-shadow: var(--shadow-2); }
       .bottom-nav button { min-height: 48px; border: 0; border-radius: 16px; background: transparent; color: var(--muted); display: grid; place-items: center; }
       .bottom-nav button.active { background: color-mix(in srgb, var(--accent), transparent 84%); color: var(--text); }
+      .help-fab { right: 16px; bottom: 86px; width: 56px; min-width: 56px; padding: 0; }
+      .help-fab .help-text { display: none; }
     }
     @media (max-width: 760px) {
       .page-head, .section-head { align-items: start; flex-direction: column; }
@@ -396,7 +403,9 @@ HTML = """<!doctype html>
   </nav>
   <div class="tooltip" id="tooltip" role="tooltip"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <button class="btn primary help-fab" id="walkthroughHelp" type="button" data-tip="Open simple tips for where you are now."><span class="mi">help</span><span class="help-text">Need help?</span></button>
   <div class="modal-backdrop" id="nameOnboardingModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="nameOnboardingTitle"><p class="eyebrow">First setup</p><h2 id="nameOnboardingTitle">Welcome to Creative Studio</h2><p>Add your name so the dashboard can greet you properly. You can skip this and keep the greeting neutral.</p><label>Your name<input id="onboardingName" autocomplete="name" placeholder="Your name"></label><div class="actions" style="margin-top:16px;"><button class="btn primary" id="saveOnboardingName" type="button"><span class="mi">check</span>Save name</button><button class="btn secondary" id="skipOnboardingName" type="button">Skip for now</button></div></div></div>
+  <div class="modal-backdrop" id="walkthroughModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="walkthroughTitle"><p class="eyebrow">Walkthrough</p><h2 id="walkthroughTitle">Feeling lost?</h2><p id="walkthroughIntro">Here is the easiest next move.</p><div id="walkthroughSteps" class="walkthrough-list"></div><div class="actions" style="margin-top:16px;"><button class="btn primary" id="walkthroughPrimary" type="button"><span class="mi">play_arrow</span>Guide me</button><button class="btn secondary" id="walkthroughLearn" type="button"><span class="mi">school</span>Open Learn</button><button class="btn ghost" id="closeWalkthrough" type="button">Close</button></div></div></div>
   <div class="modal-backdrop" id="feedbackModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle"><h2 id="feedbackTitle">Share feedback</h2><p>What felt useful, confusing, or missing?</p><textarea id="feedbackText" placeholder="Optional comment"></textarea><div class="actions" style="margin-top:16px;"><button class="btn primary" id="saveFeedback" type="button">Save feedback</button><button class="btn secondary" id="closeFeedback" type="button">Close</button></div></div></div>
 
   <script>
@@ -449,7 +458,107 @@ HTML = """<!doctype html>
       ["What is Markdown?", "Markdown is a clean text format that works well for docs, GitHub, and notes apps."],
       ["Why should I save services?", "Saved services make quotes faster and help keep pricing consistent."],
     ];
-
+    const walkthroughTips = {
+      dashboard: {
+        intro: "Start here if you are unsure what to do next.",
+        view: "project",
+        steps: [
+          ["Start a project", "Use New Project when you want the app to prepare the full client package."],
+          ["Check recent work", "Recent Projects is like your desk. It shows the jobs you saved on this computer."],
+          ["Use Learn", "Learn explains the app in simple words if any tool feels unclear."]
+        ]
+      },
+      project: {
+        intro: "A project is one client job. Fill the form, then generate.",
+        view: "project",
+        steps: [
+          ["Add client details", "Type the client name, choose a service, and enter the fee."],
+          ["Generate once", "Create client package builds the quote, payment, checklist, deliverables, and email together."],
+          ["Use the preview", "The right panel shows the client-ready result. Copy or export from there."]
+        ]
+      },
+      quote: {
+        intro: "Use Quote when you only need the client price message.",
+        view: "quote",
+        steps: [
+          ["Pick a service", "Choose a saved service or Other if you need a new one quickly."],
+          ["Enter the fee", "Use numbers only, such as 3000."],
+          ["Create quote", "The result appears in the preview panel for copying."]
+        ]
+      },
+      payment: {
+        intro: "Payment shows what the client pays now and later.",
+        view: "payment",
+        steps: [
+          ["Add total fee", "Type the full project amount."],
+          ["Set upfront percent", "70 means the client pays 70 percent before work starts."],
+          ["Calculate", "The preview shows upfront payment and balance payment."]
+        ]
+      },
+      checklist: {
+        intro: "Checklist is your project recipe.",
+        view: "checklist",
+        steps: [
+          ["Choose project type", "Pick the kind of job you are doing."],
+          ["Use Other for new work", "If your job type is missing, choose Other and type it."],
+          ["Create checklist", "The preview gives you tickable steps you can follow."]
+        ]
+      },
+      services: {
+        intro: "Services are the things your business sells.",
+        view: "services",
+        steps: [
+          ["Show services", "View your saved service list."],
+          ["Add with Other", "Use Other inside Quote or Project to quickly add a new service."],
+          ["Remove mistakes", "User-added options can be removed without opening Settings."]
+        ]
+      },
+      settings: {
+        intro: "Settings makes the app feel like your business.",
+        view: "settings",
+        steps: [
+          ["Add your name", "This controls the dashboard greeting and client-ready signature."],
+          ["Add business details", "Business name, email, phone, and website can appear in client messages."],
+          ["Save settings", "Your details stay on this computer."]
+        ]
+      },
+      learn: {
+        intro: "Learn is the simple guide inside the app.",
+        view: "learn",
+        steps: [
+          ["Read one lesson", "Each card explains one part of the app."],
+          ["Try it", "Use the Try it button to jump straight to that tool."],
+          ["Mark done", "Mark lessons as done so you know what you already understand."]
+        ]
+      }
+    };
+    function activeViewId() {
+      return document.querySelector(".view.active")?.id || "dashboard";
+    }
+    function currentWalkthrough() {
+      return walkthroughTips[activeViewId()] || walkthroughTips.dashboard;
+    }
+    function openWalkthrough() {
+      const tip = currentWalkthrough();
+      const modal = $("#walkthroughModal");
+      $("#walkthroughIntro").textContent = tip.intro;
+      $("#walkthroughSteps").innerHTML = tip.steps.map(([title, body], index) => `<article class="walkthrough-step"><strong><span class="mi" aria-hidden="true">looks_${index + 1}</span>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></article>`).join("");
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      saveMemory("walkthroughOpenedAt", now(), { source: "walkthrough" });
+    }
+    function closeWalkthrough() {
+      const modal = $("#walkthroughModal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
+    function guideFromWalkthrough() {
+      const tip = currentWalkthrough();
+      closeWalkthrough();
+      setView(tip.view || "project");
+      toast("Follow the highlighted section. You can reopen Need help anytime.");
+    }
     function now() { return Date.now(); }
     function expiry() { return now() + MEMORY_DAYS * 24 * 60 * 60 * 1000; }
     function readStore() {
@@ -1049,6 +1158,10 @@ HTML = """<!doctype html>
     });
     $("#continueRecent").addEventListener("click", continueRecentProject);
     $("#continueLearning").addEventListener("click", continueLearning);
+    $("#walkthroughHelp").addEventListener("click", openWalkthrough);
+    $("#closeWalkthrough").addEventListener("click", closeWalkthrough);
+    $("#walkthroughPrimary").addEventListener("click", guideFromWalkthrough);
+    $("#walkthroughLearn").addEventListener("click", () => { closeWalkthrough(); setView("learn"); toast("Learn is open."); });
     $("#refreshRecent").addEventListener("click", loadRecent);
     $("#copyInspector").addEventListener("click", async () => {
       if (!lastPreviewText) return toast("Nothing to copy yet.");
