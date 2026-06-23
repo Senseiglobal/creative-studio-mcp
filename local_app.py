@@ -208,7 +208,7 @@ HTML = """<!doctype html>
   <a class="skip" href="#workspace">Skip to content</a>
   <div class="shell" id="shell">
     <aside class="sidebar" aria-label="Sidebar navigation">
-      <div class="brand"><div class="logo">CS</div><div><strong>Creative Studio MCP</strong><span>Local business workspace</span></div></div>
+      <div class="brand"><div class="logo">CS</div><div><strong>Creative Studio</strong></div></div>
       <div class="nav-group"><div class="nav-label">Workspace</div><nav class="nav">
         <button class="active" data-view="dashboard" data-tip="Your home desk. Start, continue, or check recent work."><span class="mi">dashboard</span>Dashboard</button>
         <button data-view="project" data-tip="Start a new client job from scratch."><span class="mi">folder_open</span>Projects</button>
@@ -305,17 +305,17 @@ HTML = """<!doctype html>
 
         <section id="quote" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Quote</h1><p>A Quote is like a price note you send before work begins.</p></div></div>
-          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
+          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" id="quoteGenerate" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form><div id="quoteStatus"></div></div>
         </section>
 
         <section id="payment" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Payment</h1><p>Payment Breakdown shows what the client pays now and what they pay later.</p></div></div>
-          <div class="panel"><form id="paymentForm"><div class="form-grid"><label>Total fee<input name="total_fee" type="number" min="1" value="5000" required></label><label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">calculate</span>Calculate</button></div></form></div>
+          <div class="panel"><form id="paymentForm"><div class="form-grid"><label>Total fee<input name="total_fee" type="number" min="1" value="5000" required></label><label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required></label></div><div class="actions"><button class="btn primary" id="paymentGenerate" type="submit"><span class="mi">calculate</span>Calculate</button></div></form><div id="paymentStatus"></div></div>
         </section>
 
         <section id="checklist" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" id="checklistGenerate" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form><div id="checklistStatus"></div></div>
         </section>
 
         <section id="services" class="view">
@@ -556,14 +556,32 @@ HTML = """<!doctype html>
       localStorage.setItem(key, JSON.stringify(list.slice(0, 20)));
       renderCustomAdditions();
     }
-    function removeListItem(key, value) {
-      const cleaned = String(value || "").trim().toLowerCase();
+    async function removeListItem(key, value) {
+      const original = String(value || "").trim();
+      const cleaned = original.toLowerCase();
       if (!cleaned) return;
-      const list = readList(key).filter(item => item.toLowerCase() !== cleaned);
+      const before = readList(key);
+      const list = before.filter(item => item.toLowerCase() !== cleaned);
+      if (list.length === before.length) {
+        toast("This saved option was already removed.");
+        updateRemoveSelected();
+        return;
+      }
       localStorage.setItem(key, JSON.stringify(list));
-      loadServices().catch(error => toast(error.message));
+      document.querySelectorAll("select").forEach(select => {
+        Array.from(select.options).forEach(option => {
+          if (String(option.value || "").trim().toLowerCase() === cleaned) option.remove();
+        });
+        if (!select.options.length) select.innerHTML = `<option value="__other__">Other</option>`;
+      });
+      resetRemovedSelections(cleaned);
+      try {
+        await loadServices();
+      } catch (error) {
+        toast(error.message);
+      }
       renderCustomAdditions();
-      toast("Removed.");
+      toast(`Removed ${original}.`);
     }
     function renderCustomList(target, key, emptyText) {
       const host = $(target);
@@ -633,6 +651,14 @@ HTML = """<!doctype html>
     function isCustomValue(key, value) {
       const text = String(value || "").trim().toLowerCase();
       return Boolean(text) && readList(key).some(item => item.toLowerCase() === text);
+    }
+    function resetRemovedSelections(removedValue) {
+      document.querySelectorAll("select").forEach(select => {
+        if (String(select.value || "").trim().toLowerCase() === removedValue) {
+          select.selectedIndex = 0;
+        }
+      });
+      syncOtherFields();
     }
     function updateRemoveSelected(scope = document) {
       if (!scope || !scope.querySelectorAll) return;
@@ -711,8 +737,15 @@ HTML = """<!doctype html>
       progress[id] = true;
       saveMemory("learnProgress", progress, { source: "learn-center" });
       renderLearn();
-    renderCustomAdditions();
+      renderCustomAdditions();
       toast("Lesson saved.");
+    }
+    function safeCompleteLesson(id) {
+      try {
+        completeLesson(id);
+      } catch (error) {
+        console.warn("Lesson progress could not update", error);
+      }
     }
     function continueLearning() {
       const progress = getMemory("learnProgress") || {};
@@ -818,14 +851,18 @@ HTML = """<!doctype html>
       const accent = event.target.closest("[data-accent-dot]");
       if (accent) setAccent(accent.dataset.accentDot);
       const removeCustom = event.target.closest("[data-remove-custom]");
-      if (removeCustom) removeListItem(removeCustom.dataset.removeCustom, decodeURIComponent(removeCustom.dataset.customValue || ""));
+      if (removeCustom) {
+        event.preventDefault();
+        await removeListItem(removeCustom.dataset.removeCustom, decodeURIComponent(removeCustom.dataset.customValue || ""));
+      }
       const removeSelected = event.target.closest("[data-remove-selected]");
       if (removeSelected) {
+        event.preventDefault();
         const label = removeSelected.closest("label");
         const select = label?.querySelector("select");
         if (select) {
           const key = removeSelected.dataset.removeSelected === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
-          removeListItem(key, select.value);
+          await removeListItem(key, select.value);
         }
       }
       const feedback = event.target.closest("[data-feedback]");
@@ -849,7 +886,7 @@ HTML = """<!doctype html>
         saveMemory("lastActiveProjectId", project.id, { activity: "project_generated", requireMeaningful: true });
         saveMemory("lastUsedService", payload.service, { activity: "project_generated", requireMeaningful: true });
         saveMemory("preferredUpfrontPercent", payload.upfront_percent, { activity: "project_generated", requireMeaningful: true });
-        completeLesson("first_project");
+        safeCompleteLesson("first_project");
         notice($("#projectStatus"), "Created. Review it in the client-ready preview.", "success");
         toast("Client package created.");
         loadRecent().then(renderFeedbackPrompt);
@@ -860,43 +897,58 @@ HTML = """<!doctype html>
     });
     $("#quoteForm").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const button = event.submitter;
+      const button = event.submitter || $("#quoteGenerate");
       setLoading(button, true);
+      notice($("#quoteStatus"), "Creating quote...");
       try {
         const payload = parseForm(event.currentTarget);
         const quote = await api("/api/quote", payload);
-        loadServices().catch(error => toast(error.message));
         preview("Quote", [{ title: "Quote", value: quote }]);
+        notice($("#quoteStatus"), "Quote ready. Check the preview panel.", "success");
+        loadServices().catch(error => toast(error.message));
         saveMemory("lastQuoteForm", payload, { activity: "quote_generated", requireMeaningful: true });
-        completeLesson("quote");
+        safeCompleteLesson("quote");
         toast("Quote ready.");
-      } catch (error) { toast(error.message); } finally { setLoading(button, false); }
+      } catch (error) {
+        notice($("#quoteStatus"), error.message, "error");
+        toast(error.message);
+      } finally { setLoading(button, false); }
     });
     $("#paymentForm").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const button = event.submitter;
+      const button = event.submitter || $("#paymentGenerate");
       setLoading(button, true);
+      notice($("#paymentStatus"), "Calculating payment...");
       try {
         const payment = await api("/api/payment", parseForm(event.currentTarget));
         preview("Payment", [{ title: "Payment", value: payment }]);
+        notice($("#paymentStatus"), "Payment breakdown ready. Check the preview panel.", "success");
         saveMemory("preferredUpfrontPercent", event.currentTarget.elements.upfront_percent.value, { activity: "quote_generated", requireMeaningful: true });
-        completeLesson("payment");
+        safeCompleteLesson("payment");
         toast("Payment ready.");
-      } catch (error) { toast(error.message); } finally { setLoading(button, false); }
+      } catch (error) {
+        notice($("#paymentStatus"), error.message, "error");
+        toast(error.message);
+      } finally { setLoading(button, false); }
     });
     $("#checklistForm").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const button = event.submitter;
+      const button = event.submitter || $("#checklistGenerate");
       setLoading(button, true);
+      notice($("#checklistStatus"), "Creating checklist...");
       try {
         const payload = parseForm(event.currentTarget);
         const checklist = await api("/api/checklist", payload);
+        preview("Checklist", [{ title: "Checklist", value: checklist }]);
+        notice($("#checklistStatus"), "Checklist ready. Check the preview panel.", "success");
         loadProjectTypes();
         syncOtherFields();
-        preview("Checklist", [{ title: "Checklist", value: checklist }]);
-        completeLesson("checklist");
+        safeCompleteLesson("checklist");
         toast("Checklist ready.");
-      } catch (error) { toast(error.message); } finally { setLoading(button, false); }
+      } catch (error) {
+        notice($("#checklistStatus"), error.message, "error");
+        toast(error.message);
+      } finally { setLoading(button, false); }
     });
     $("#settingsForm").addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -918,7 +970,7 @@ HTML = """<!doctype html>
     $("#showServices").addEventListener("click", async () => {
       const services = await api("/api/services");
       preview("Services", [{ title: "Services", value: services }]);
-      completeLesson("services");
+      safeCompleteLesson("services");
       toast("Services shown.");
     });
     $("#continueRecent").addEventListener("click", continueRecentProject);
@@ -933,21 +985,21 @@ HTML = """<!doctype html>
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "txt" });
       saveMemory("lastExportFormat", "txt", { activity: "export_clicked", requireMeaningful: true });
-      completeLesson("export");
+      safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "TXT file"}`);
     });
     $("#exportMd").addEventListener("click", async () => {
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "md" });
       saveMemory("lastExportFormat", "md", { activity: "export_clicked", requireMeaningful: true });
-      completeLesson("export");
+      safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "Markdown file"}`);
     });
     $("#exportPdf").addEventListener("click", async () => {
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "pdf" });
       saveMemory("lastExportFormat", "pdf", { activity: "export_clicked", requireMeaningful: true });
-      completeLesson("export");
+      safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "PDF file"}`);
     });
     $("#themeBtn").addEventListener("click", () => {
@@ -1103,6 +1155,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
 
 
