@@ -118,6 +118,8 @@ HTML = """<!doctype html>
     .panel { max-width: 900px; padding: var(--space-7); }
     form { display: grid; gap: var(--space-7); }
     .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+    .other-field { display: none; margin-top: var(--space-2); }
+    .other-field.show { display: grid; }
     label { display: grid; gap: var(--space-2); font-weight: 780; }
     small { color: var(--muted); font-size: var(--caption); font-weight: 500; }
     input, select, textarea { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-2); color: var(--text); padding: 0 var(--space-4); transition: border-color 160ms ease, box-shadow 160ms ease; }
@@ -278,10 +280,10 @@ HTML = """<!doctype html>
             <form id="projectForm">
               <div class="form-grid">
                 <label>Client name<input name="client_name" value="Israel Thomas" required data-tip="Who is this job for?"></label>
-                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service. You can edit services in Settings."></select><small>Choose a saved service.</small></label>
+                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type service name"><small>Choose a saved service or add one quickly.</small></label>
                 <label>Design fee<input name="design_fee" type="number" min="1" value="3000" required data-tip="Use numbers only, like 3000."></label>
                 <label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required data-tip="This is what the client pays before work starts."></label>
-                <label>Project type<input name="project_type" value="Brand Identity Design" required data-tip="Short category for the checklist."></label>
+                <label>Project type<select name="project_type" id="projectTypeSelect" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="projectTypeOther" placeholder="Type project type"><small>Used for the checklist.</small></label>
                 <label>Deadline<input name="deadline" disabled placeholder="Future feature"><small>Coming later.</small></label>
               </div>
               <div class="actions"><button class="btn primary" id="projectGenerate" type="submit"><span class="mi">auto_awesome</span>Create client package</button><button class="btn secondary" data-clear type="button">Clear</button></div>
@@ -292,7 +294,7 @@ HTML = """<!doctype html>
 
         <section id="quote" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Quote</h1><p>A Quote is like a price note you send before work begins.</p></div></div>
-          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService"></select></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
+          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type service name"></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
         </section>
 
         <section id="payment" class="view">
@@ -302,7 +304,7 @@ HTML = """<!doctype html>
 
         <section id="checklist" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<input name="project_type" value="Brand Identity Design" required></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type project type"></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
         </section>
 
         <section id="services" class="view">
@@ -401,6 +403,18 @@ HTML = """<!doctype html>
       ["export", "Exporting TXT and MD", "Export is like putting your work into a file you can send, save, or reuse.", "project"],
       ["continue", "Saving and Continuing Work", "Continue Recent brings you back to the last project, like reopening the folder you were using.", "dashboard"],
       ["faq", "FAQ", "Quick answers for common questions, all inside the app.", "learn"],
+    ];
+    const defaultProjectTypes = [
+      "Brand Identity Design",
+      "Product Packaging Design",
+      "Corporate Profile Design",
+      "Proposal / Presentation Design",
+      "Merchandise Design",
+      "Banner & Event Visual Design",
+      "Social Media Design",
+      "Website Design",
+      "Logo Design",
+      "Other"
     ];
     const faqs = [
       ["What is Creative Studio MCP?", "It is a local workspace that helps creative businesses prepare quotes, payments, checklists, deliverables, and client emails."],
@@ -513,11 +527,36 @@ HTML = """<!doctype html>
     function notice(target, message, type = "") {
       target.innerHTML = `<div class="notice ${type}">${escapeHtml(message)}</div>`;
     }
-    function parseForm(form) { return Object.fromEntries(new FormData(form).entries()); }
+    function normalizePayload(payload) {
+      const cleaned = { ...payload };
+      if (cleaned.service === "__other__") cleaned.service = String(cleaned.service_other || "").trim();
+      if (cleaned.project_type === "__other__") cleaned.project_type = String(cleaned.project_type_other || "").trim();
+      delete cleaned.service_other;
+      delete cleaned.project_type_other;
+      return cleaned;
+    }
+    function parseForm(form) { return normalizePayload(Object.fromEntries(new FormData(form).entries())); }
+    function setSelectOrOther(select, otherInput, value) {
+      if (!select || value === undefined || value === null) return;
+      const found = Array.from(select.options).some(option => option.value === String(value));
+      select.value = found ? String(value) : "__other__";
+      if (otherInput) {
+        otherInput.value = found ? "" : String(value);
+        otherInput.classList.toggle("show", !found);
+        otherInput.required = !found;
+      }
+    }
     function fillForm(form, values = {}) {
       Object.entries(values).forEach(([key, value]) => {
-        if (form.elements[key] && value !== undefined && value !== null) form.elements[key].value = value;
+        if (key === "service") {
+          setSelectOrOther(form.elements.service, form.elements.service_other, value);
+        } else if (key === "project_type") {
+          setSelectOrOther(form.elements.project_type, form.elements.project_type_other, value);
+        } else if (form.elements[key] && value !== undefined && value !== null) {
+          form.elements[key].value = value;
+        }
       });
+      syncOtherFields(form);
     }
     function greeting(profile) {
       const hour = new Date().getHours();
@@ -525,11 +564,32 @@ HTML = """<!doctype html>
       const name = String(profile.owner_name || "").trim().split(/\\s+/)[0];
       $("#greeting").textContent = name ? `${word}, ${name}` : "Creative Studio MCP";
     }
+    function optionList(values, includeOther = true) {
+      const unique = Array.from(new Set(values.filter(Boolean)));
+      const options = unique.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
+      return includeOther ? `${options}<option value="__other__">Other</option>` : options;
+    }
+    function loadProjectTypes() {
+      const options = optionList(defaultProjectTypes.filter(item => item !== "Other"));
+      $("#projectTypeSelect").innerHTML = options;
+      $("#checklistProjectType").innerHTML = options;
+    }
+    function syncOtherFields(scope = document) {
+      scope.querySelectorAll("select").forEach(select => {
+        const other = select.parentElement?.querySelector(".other-field");
+        if (!other) return;
+        const show = select.value === "__other__";
+        other.classList.toggle("show", show);
+        other.required = show;
+      });
+    }
     async function loadServices() {
       const services = await api("/api/services");
-      const options = Object.keys(services).map(name => `<option>${escapeHtml(name)}</option>`).join("");
+      const options = optionList(Object.keys(services));
       $("#projectService").innerHTML = options;
       $("#quoteService").innerHTML = options;
+      loadProjectTypes();
+      syncOtherFields();
     }
     async function loadProfile() {
       const profile = await api("/api/profile");
@@ -657,6 +717,10 @@ HTML = """<!doctype html>
       saveMemory("lastActiveProjectId", project.id, { activity: "return_project", requireMeaningful: true });
       toast("Restored your last project.");
     }
+
+    document.addEventListener("change", (event) => {
+      if (event.target.matches("select")) syncOtherFields(event.target.closest("form") || document);
+    });
 
     document.addEventListener("click", async (event) => {
       const viewButton = event.target.closest("[data-view]");
@@ -932,3 +996,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
