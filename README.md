@@ -72,3 +72,7 @@ When you click `Generate`, the app now shows the full project package under the 
 
 The local app uses one simple Generate flow. Click `Generate` and the project package appears on the same page with copy and export buttons.
 
+## Focused workspace rebuild
+
+The local app is organized around a minimal dashboard, focused tools, a live preview panel, and Settings for personalization. Quote, payment, checklist, project package, copy, export, and theme controls remain available without crowding the dashboard.
+
