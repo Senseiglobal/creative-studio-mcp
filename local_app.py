@@ -125,7 +125,10 @@ HTML = """<!doctype html>
     input, select, textarea { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-2); color: var(--text); padding: 0 var(--space-4); transition: border-color 160ms ease, box-shadow 160ms ease; }
     textarea { min-height: 132px; padding-top: var(--space-4); resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: var(--focus); outline: 0; }
-    .recent-list, .lesson-list, .faq-list { display: grid; gap: var(--space-3); }
+    .recent-list, .lesson-list, .faq-list, .custom-list { display: grid; gap: var(--space-3); }
+    .custom-manager { margin-top: var(--space-5); display: grid; gap: var(--space-4); }
+    .custom-chip { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-2); padding: var(--space-2) var(--space-3); }
+    .custom-chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .recent-item, .lesson-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4); align-items: center; border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface); padding: var(--space-4); }
     .lesson-card.complete { border-color: color-mix(in srgb, var(--success), var(--line) 45%); }
     .lesson-card p { margin-bottom: 0; }
@@ -310,7 +313,7 @@ HTML = """<!doctype html>
 
         <section id="services" class="view">
           <div class="page-head"><div><p class="eyebrow">Services</p><h1>Service library</h1><p>Services are your usual offers, saved so quotes are faster.</p></div></div>
-          <div class="panel"><div class="actions"><button class="btn primary" id="showServices" type="button"><span class="mi">design_services</span>Show services</button><button class="btn secondary" data-view="settings" type="button"><span class="mi">edit</span>Edit in Settings</button></div></div>
+          <div class="panel"><div class="actions"><button class="btn primary" id="showServices" type="button"><span class="mi">design_services</span>Show services</button><button class="btn secondary" data-view="settings" type="button"><span class="mi">edit</span>Edit in Settings</button></div><div class="custom-manager"><div><h3>Quick additions</h3><p>Items you added with Other appear here. Remove anything you no longer need.</p></div><div class="form-grid"><div><h3>Custom services</h3><div id="customServicesList" class="custom-list"></div></div><div><h3>Custom project types</h3><div id="customProjectTypesList" class="custom-list"></div></div></div></div></div>
         </section>
 
         <section id="clients" class="view">
@@ -544,6 +547,25 @@ HTML = """<!doctype html>
       const list = readList(key).filter(item => item.toLowerCase() !== cleaned.toLowerCase());
       list.unshift(cleaned);
       localStorage.setItem(key, JSON.stringify(list.slice(0, 20)));
+      renderCustomAdditions();
+    }
+    function removeListItem(key, value) {
+      const cleaned = String(value || "").trim().toLowerCase();
+      const list = readList(key).filter(item => item.toLowerCase() !== cleaned);
+      localStorage.setItem(key, JSON.stringify(list));
+      loadServices();
+      renderCustomAdditions();
+      toast("Removed.");
+    }
+    function renderCustomList(target, key, emptyText) {
+      const host = $(target);
+      if (!host) return;
+      const list = readList(key);
+      host.innerHTML = list.length ? list.map(item => `<div class="custom-chip"><span>${escapeHtml(item)}</span><button class="btn danger" type="button" data-remove-custom="${key}" data-custom-value="${encodeURIComponent(item)}">Remove</button></div>`).join("") : `<div class="empty" style="min-height:90px;"><div><p>${escapeHtml(emptyText)}</p></div></div>`;
+    }
+    function renderCustomAdditions() {
+      renderCustomList("#customServicesList", CUSTOM_SERVICES_KEY, "No custom services yet.");
+      renderCustomList("#customProjectTypesList", CUSTOM_PROJECT_TYPES_KEY, "No custom project types yet.");
     }
     function normalizePayload(payload) {
       const cleaned = { ...payload };
@@ -571,7 +593,8 @@ HTML = """<!doctype html>
       }
     }
     function fillForm(form, values = {}) {
-      Object.entries(values).forEach(([key, value]) => {
+      if (!form || !form.elements) return;
+      Object.entries(values || {}).forEach(([key, value]) => {
         if (key === "service") {
           setSelectOrOther(form.elements.service, form.elements.service_other, value);
         } else if (key === "project_type") {
@@ -615,6 +638,7 @@ HTML = """<!doctype html>
       $("#quoteService").innerHTML = options;
       loadProjectTypes();
       syncOtherFields();
+      renderCustomAdditions();
     }
     async function loadProfile() {
       const profile = await api("/api/profile");
@@ -662,6 +686,7 @@ HTML = """<!doctype html>
       progress[id] = true;
       saveMemory("learnProgress", progress, { source: "learn-center" });
       renderLearn();
+    renderCustomAdditions();
       toast("Lesson saved.");
     }
     function continueLearning() {
@@ -767,6 +792,8 @@ HTML = """<!doctype html>
       if (lessonDone) completeLesson(lessonDone.dataset.completeLesson);
       const accent = event.target.closest("[data-accent-dot]");
       if (accent) setAccent(accent.dataset.accentDot);
+      const removeCustom = event.target.closest("[data-remove-custom]");
+      if (removeCustom) removeListItem(removeCustom.dataset.removeCustom, decodeURIComponent(removeCustom.dataset.customValue || ""));
       const feedback = event.target.closest("[data-feedback]");
       if (feedback) {
         saveMemory("lastFeedbackChoice", feedback.dataset.feedback, { source: "feedback" });
@@ -931,12 +958,14 @@ HTML = """<!doctype html>
     renderFAQ("#faqList");
     renderFAQ("#settingsFaqList");
     renderLearn();
+    renderCustomAdditions();
     setupTooltips();
     trackFormMemory();
     loadServices().then(loadProfile).then(loadRecent).then(() => {
       fillForm($("#projectForm"), getMemory("draft_projectForm") || {});
       const up = getMemory("preferredUpfrontPercent");
-      if (up) $("#projectForm").elements.upfront_percent.value = up;
+      const projectForm = $("#projectForm");
+      if (up && projectForm?.elements?.upfront_percent) projectForm.elements.upfront_percent.value = up;
       const lastPreview = getMemory("lastPreview");
       if (lastPreview) preview(lastPreview.title || "Restored preview", lastPreview.sections || []);
     }).catch(error => toast(error.message));
@@ -1042,6 +1071,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
