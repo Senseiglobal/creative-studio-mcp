@@ -1,4 +1,4 @@
-﻿import json
+import json
 import socket
 import threading
 import webbrowser
@@ -404,6 +404,7 @@ HTML = """<!doctype html>
     let lastProject = null;
     let lastPreviewText = "";
     let lastRecent = [];
+    let currentServiceNames = [];
     let formEditTimers = {};
 
     const lessons = [
@@ -555,19 +556,29 @@ HTML = """<!doctype html>
       list.unshift(cleaned);
       localStorage.setItem(key, JSON.stringify(list.slice(0, 20)));
       renderCustomAdditions();
+      updateRemoveSelected();
+    }
+    function removeLocalListItem(key, value) {
+      const cleaned = String(value || "").trim().toLowerCase();
+      const before = readList(key);
+      const list = before.filter(item => item.toLowerCase() !== cleaned);
+      localStorage.setItem(key, JSON.stringify(list));
+      return before.length !== list.length;
     }
     async function removeListItem(key, value) {
       const original = String(value || "").trim();
       const cleaned = original.toLowerCase();
       if (!cleaned) return;
-      const before = readList(key);
-      const list = before.filter(item => item.toLowerCase() !== cleaned);
-      if (list.length === before.length) {
-        toast("This saved option was already removed.");
-        updateRemoveSelected();
-        return;
+      let removed = removeLocalListItem(key, original);
+      if (key === CUSTOM_SERVICES_KEY) {
+        try {
+          const result = await api("/api/remove-service", { service: original });
+          removed = removed || Boolean(result.removed);
+          if (result.profile) syncSettingsProfile(result.profile);
+        } catch (error) {
+          toast(error.message);
+        }
       }
-      localStorage.setItem(key, JSON.stringify(list));
       document.querySelectorAll("select").forEach(select => {
         Array.from(select.options).forEach(option => {
           if (String(option.value || "").trim().toLowerCase() === cleaned) option.remove();
@@ -580,8 +591,10 @@ HTML = """<!doctype html>
       } catch (error) {
         toast(error.message);
       }
+      resetRemovedSelections(cleaned);
       renderCustomAdditions();
-      toast(`Removed ${original}.`);
+      updateRemoveSelected();
+      toast(removed ? `Removed ${original}.` : "That option was already removed.");
     }
     function renderCustomList(target, key, emptyText) {
       const host = $(target);
@@ -597,10 +610,12 @@ HTML = """<!doctype html>
       const cleaned = { ...payload };
       if (cleaned.service === "__other__") {
         cleaned.service = String(cleaned.service_other || "").trim();
+        if (!cleaned.service) throw new Error("Type the new service name first.");
         saveListItem(CUSTOM_SERVICES_KEY, cleaned.service);
       }
       if (cleaned.project_type === "__other__") {
         cleaned.project_type = String(cleaned.project_type_other || "").trim();
+        if (!cleaned.project_type) throw new Error("Type the new project type first.");
         saveListItem(CUSTOM_PROJECT_TYPES_KEY, cleaned.project_type);
       }
       delete cleaned.service_other;
@@ -650,7 +665,10 @@ HTML = """<!doctype html>
     }
     function isCustomValue(key, value) {
       const text = String(value || "").trim().toLowerCase();
-      return Boolean(text) && readList(key).some(item => item.toLowerCase() === text);
+      if (!text) return false;
+      if (readList(key).some(item => item.toLowerCase() === text)) return true;
+      if (key === CUSTOM_SERVICES_KEY) return currentServiceNames.some(item => item.toLowerCase() === text);
+      return false;
     }
     function resetRemovedSelections(removedValue) {
       document.querySelectorAll("select").forEach(select => {
@@ -684,21 +702,28 @@ HTML = """<!doctype html>
     }
     async function loadServices() {
       const services = await api("/api/services");
-      const options = optionList([...readList(CUSTOM_SERVICES_KEY), ...Object.keys(services)]);
+      currentServiceNames = Object.keys(services);
+      const options = optionList([...readList(CUSTOM_SERVICES_KEY), ...currentServiceNames]);
       $("#projectService").innerHTML = options;
       $("#quoteService").innerHTML = options;
       loadProjectTypes();
       syncOtherFields();
       renderCustomAdditions();
     }
-    async function loadProfile() {
-      const profile = await api("/api/profile");
-      greeting(profile);
+    function syncSettingsProfile(profile) {
       const form = $("#settingsForm");
+      if (!form || !form.elements) return;
       ["owner_name","business_name","email","phone","website","currency","payment_terms"].forEach(name => {
         if (form.elements[name]) form.elements[name].value = profile[name] || "";
       });
-      form.elements.services_text.value = Object.entries(profile.services || {}).map(([name, price]) => `${name} | ${price}`).join("\\n");
+      if (form.elements.services_text) {
+        form.elements.services_text.value = Object.entries(profile.services || {}).map(([name, price]) => `${name} | ${price}`).join("\\n");
+      }
+    }
+    async function loadProfile() {
+      const profile = await api("/api/profile");
+      greeting(profile);
+      syncSettingsProfile(profile);
     }
     async function loadRecent() {
       lastRecent = await api("/api/recent", { limit: 5 });
@@ -1092,6 +1117,19 @@ class Handler(BaseHTTPRequestHandler):
                 result = save_brand_profile(payload)
             elif self.path == "/api/services":
                 result = list_services()
+            elif self.path == "/api/remove-service":
+                service_name = str(payload.get("service", "")).strip()
+                profile = get_brand_profile()
+                services = dict(profile.get("services", {}))
+                before = len(services)
+                services = {
+                    name: value
+                    for name, value in services.items()
+                    if name.strip().lower() != service_name.lower()
+                }
+                profile["services"] = services
+                saved = save_brand_profile(profile)
+                result = {"removed": len(services) != before, "profile": saved}
             elif self.path == "/api/payment":
                 result = calculate_payment(payload.get("total_fee", 0), payload.get("upfront_percent", 70))
             elif self.path == "/api/quote":
@@ -1155,6 +1193,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 
 
 
