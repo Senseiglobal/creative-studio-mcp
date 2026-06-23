@@ -64,7 +64,7 @@ HTML = """<!doctype html>
     .shell.inspector-wide { grid-template-columns: 240px minmax(360px, .8fr) minmax(560px, 680px); }
     .shell.inspector-collapsed { grid-template-columns: 240px minmax(0, 1fr) 72px; }
     .shell.inspector-closed { grid-template-columns: 240px minmax(0, 1fr); }
-    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--line); background: color-mix(in srgb, var(--surface), transparent 4%); overflow: auto; }
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--line); background: color-mix(in srgb, var(--surface), transparent 4%); overflow: auto; display: flex; flex-direction: column; }
     .brand { display: flex; gap: var(--space-3); align-items: center; padding: 0 var(--space-2) var(--space-6); }
     .logo { width: 42px; height: 42px; border-radius: var(--radius-2); display: grid; place-items: center; background: var(--accent); color: white; font-weight: 900; box-shadow: 0 8px 22px color-mix(in srgb, var(--accent), transparent 84%); }
     .brand strong { display: block; font-size: 15px; line-height: 1.15; }
@@ -80,9 +80,8 @@ HTML = """<!doctype html>
     .dot span { width: 18px; height: 18px; border-radius: 999px; display: block; }
     .dot.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 78%); }
     .dot.red span { background: #ef4444; } .dot.green span { background: #22c55e; } .dot.blue span { background: #3b82f6; }
-    .sidebar-footer { margin-top: var(--space-7); padding: var(--space-4) var(--space-3) 0; border-top: 1px solid var(--line); color: var(--soft); font-size: 12px; display: grid; gap: var(--space-2); }
-    .version-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-    .version-pill { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--muted); background: var(--surface-2); font-weight: 800; line-height: 1; }
+    .sidebar-footer { margin-top: auto; padding: var(--space-8) var(--space-3) 0; color: var(--soft); font-size: 12px; }
+    .version-pill { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; border: 1px solid var(--line); border-radius: 999px; padding: 0 12px; color: var(--muted); background: var(--surface-2); font-weight: 800; line-height: 1; }
     .workspace-wrap { min-width: 0; padding: var(--space-7); }
     .workspace { max-width: 1200px; margin: 0 auto; }
     .view { display: none; animation: enter 160ms ease both; }
@@ -123,6 +122,8 @@ HTML = """<!doctype html>
     .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
     .other-field { display: none; margin-top: var(--space-2); }
     .other-field.show { display: grid; }
+    .remove-selected { display: none; width: max-content; margin-top: var(--space-2); }
+    .remove-selected.show { display: inline-flex; }
     label { display: grid; gap: var(--space-2); font-weight: 780; }
     small { color: var(--muted); font-size: var(--caption); font-weight: 500; }
     input, select, textarea { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-2); color: var(--text); padding: 0 var(--space-4); transition: border-color 160ms ease, box-shadow 160ms ease; }
@@ -227,8 +228,7 @@ HTML = """<!doctype html>
       </nav></div>
       <div class="nav-group"><div class="nav-label">Accent theme</div><div class="theme-dots" id="themeDots"></div></div>
       <div class="sidebar-footer" aria-label="App version">
-        <div class="version-row"><span>Creative Studio MCP</span><span class="version-pill">v1.0 beta</span></div>
-        <span>Local-first standard edition</span>
+        <span class="version-pill">Version 1.0 Beta</span>
       </div>
     </aside>
 
@@ -291,10 +291,10 @@ HTML = """<!doctype html>
             <form id="projectForm">
               <div class="form-grid">
                 <label>Client name<input name="client_name" value="Israel Thomas" required data-tip="Who is this job for?"></label>
-                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type new service, then create package"><small>Choose a saved service or add one quickly.</small></label>
+                <label>Service<select name="service" id="projectService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="projectServiceOther" placeholder="Type new service, then create package"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button><small>Choose a saved service or add one quickly.</small></label>
                 <label>Design fee<input name="design_fee" type="number" min="1" value="3000" required data-tip="Use numbers only, like 3000."></label>
                 <label>Upfront %<input name="upfront_percent" type="number" min="0" max="100" value="70" required data-tip="This is what the client pays before work starts."></label>
-                <label>Project type<select name="project_type" id="projectTypeSelect" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="projectTypeOther" placeholder="Type new project type, then create package"><small>Used for the checklist.</small></label>
+                <label>Project type<select name="project_type" id="projectTypeSelect" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="projectTypeOther" placeholder="Type new project type, then create package"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button><small>Used for the checklist.</small></label>
                 <label>Deadline<input name="deadline" disabled placeholder="Future feature"><small>Coming later.</small></label>
               </div>
               <div class="actions"><button class="btn primary" id="projectGenerate" type="submit"><span class="mi">auto_awesome</span>Create client package</button><button class="btn secondary" data-clear type="button">Clear</button></div>
@@ -305,7 +305,7 @@ HTML = """<!doctype html>
 
         <section id="quote" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Quote</h1><p>A Quote is like a price note you send before work begins.</p></div></div>
-          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
+          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form></div>
         </section>
 
         <section id="payment" class="view">
@@ -315,7 +315,7 @@ HTML = """<!doctype html>
 
         <section id="checklist" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form></div>
         </section>
 
         <section id="services" class="view">
@@ -558,9 +558,10 @@ HTML = """<!doctype html>
     }
     function removeListItem(key, value) {
       const cleaned = String(value || "").trim().toLowerCase();
+      if (!cleaned) return;
       const list = readList(key).filter(item => item.toLowerCase() !== cleaned);
       localStorage.setItem(key, JSON.stringify(list));
-      loadServices();
+      loadServices().catch(error => toast(error.message));
       renderCustomAdditions();
       toast("Removed.");
     }
@@ -601,13 +602,14 @@ HTML = """<!doctype html>
     }
     function fillForm(form, values = {}) {
       if (!form || !form.elements) return;
+      const fields = form.elements;
       Object.entries(values || {}).forEach(([key, value]) => {
-        if (key === "service") {
-          setSelectOrOther(form.elements.service, form.elements.service_other, value);
-        } else if (key === "project_type") {
-          setSelectOrOther(form.elements.project_type, form.elements.project_type_other, value);
-        } else if (form.elements[key] && value !== undefined && value !== null) {
-          form.elements[key].value = value;
+        if (key === "service" && fields.service) {
+          setSelectOrOther(fields.service, fields.service_other, value);
+        } else if (key === "project_type" && fields.project_type) {
+          setSelectOrOther(fields.project_type, fields.project_type_other, value);
+        } else if (fields[key] && value !== undefined && value !== null) {
+          fields[key].value = value;
         }
       });
       syncOtherFields(form);
@@ -628,15 +630,31 @@ HTML = """<!doctype html>
       $("#projectTypeSelect").innerHTML = options;
       $("#checklistProjectType").innerHTML = options;
     }
+    function isCustomValue(key, value) {
+      const text = String(value || "").trim().toLowerCase();
+      return Boolean(text) && readList(key).some(item => item.toLowerCase() === text);
+    }
+    function updateRemoveSelected(scope = document) {
+      if (!scope || !scope.querySelectorAll) return;
+      scope.querySelectorAll("[data-remove-selected]").forEach(button => {
+        const label = button.closest("label");
+        const select = label?.querySelector("select");
+        const key = button.dataset.removeSelected === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
+        const removable = select && select.value !== "__other__" && isCustomValue(key, select.value);
+        button.classList.toggle("show", Boolean(removable));
+        button.disabled = !removable;
+      });
+    }
     function syncOtherFields(scope = document) {
+      if (!scope || !scope.querySelectorAll) return;
       scope.querySelectorAll("select").forEach(select => {
         const other = select.parentElement?.querySelector(".other-field");
         if (!other) return;
         const show = select.value === "__other__";
         other.classList.toggle("show", show);
         other.required = show;
-        if (show && document.activeElement === select) setTimeout(() => other.focus(), 60);
       });
+      updateRemoveSelected(scope);
     }
     async function loadServices() {
       const services = await api("/api/services");
@@ -801,6 +819,15 @@ HTML = """<!doctype html>
       if (accent) setAccent(accent.dataset.accentDot);
       const removeCustom = event.target.closest("[data-remove-custom]");
       if (removeCustom) removeListItem(removeCustom.dataset.removeCustom, decodeURIComponent(removeCustom.dataset.customValue || ""));
+      const removeSelected = event.target.closest("[data-remove-selected]");
+      if (removeSelected) {
+        const label = removeSelected.closest("label");
+        const select = label?.querySelector("select");
+        if (select) {
+          const key = removeSelected.dataset.removeSelected === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
+          removeListItem(key, select.value);
+        }
+      }
       const feedback = event.target.closest("[data-feedback]");
       if (feedback) {
         saveMemory("lastFeedbackChoice", feedback.dataset.feedback, { source: "feedback" });
@@ -817,9 +844,8 @@ HTML = """<!doctype html>
       try {
         const payload = parseForm(event.currentTarget);
         const project = await api("/api/project", payload);
-        await loadServices();
-        fillForm($("#projectForm"), project);
         renderProject(project);
+        loadServices().catch(error => toast(error.message));
         saveMemory("lastActiveProjectId", project.id, { activity: "project_generated", requireMeaningful: true });
         saveMemory("lastUsedService", payload.service, { activity: "project_generated", requireMeaningful: true });
         saveMemory("preferredUpfrontPercent", payload.upfront_percent, { activity: "project_generated", requireMeaningful: true });
@@ -838,9 +864,8 @@ HTML = """<!doctype html>
       setLoading(button, true);
       try {
         const payload = parseForm(event.currentTarget);
-        await loadServices();
-        fillForm(event.currentTarget, payload);
         const quote = await api("/api/quote", payload);
+        loadServices().catch(error => toast(error.message));
         preview("Quote", [{ title: "Quote", value: quote }]);
         saveMemory("lastQuoteForm", payload, { activity: "quote_generated", requireMeaningful: true });
         completeLesson("quote");
@@ -865,9 +890,9 @@ HTML = """<!doctype html>
       setLoading(button, true);
       try {
         const payload = parseForm(event.currentTarget);
-        loadProjectTypes();
-        fillForm(event.currentTarget, payload);
         const checklist = await api("/api/checklist", payload);
+        loadProjectTypes();
+        syncOtherFields();
         preview("Checklist", [{ title: "Checklist", value: checklist }]);
         completeLesson("checklist");
         toast("Checklist ready.");
@@ -1078,6 +1103,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
