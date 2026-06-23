@@ -80,3 +80,7 @@ The local app is organized around a minimal dashboard, focused tools, a live pre
 
 The local app includes a cleaner visual hierarchy, stronger typography, and preview controls for minimize, expand, and close. The latest result always opens the preview again.
 
+## Material spacing and preview width
+
+The local app uses clearer Material-style spacing, Material Symbols icons, and a wider preview panel with a handle for focus mode plus minimize and close controls.
+
