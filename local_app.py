@@ -156,7 +156,11 @@ HTML = """<!doctype html>
     .preview-section summary { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--space-4); list-style: none; cursor: pointer; font-weight: 820; }
     .preview-section summary::-webkit-details-marker { display: none; }
     .preview-doc { padding: var(--space-4); border-top: 1px solid var(--line); }
-    .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.65; color: var(--text); }
+    .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.72; color: var(--text); }
+    .check-list, .bullet-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+    .check-row { display: grid; grid-template-columns: 22px 1fr; align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
+    .check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
+    .bullet-row { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
     .kv { display: grid; gap: var(--space-2); }
     .kv-row { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
     .kv-row:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -524,7 +528,15 @@ HTML = """<!doctype html>
     }
     function sectionHtml(title, value) {
       const text = toText(value);
-      if (value && typeof value === "object" && !Array.isArray(value)) {
+      if (Array.isArray(value)) {
+        const isChecklist = String(title || "").toLowerCase().includes("check");
+        const rows = value.map((item, index) => isChecklist
+          ? `<label class="check-row"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span></label>`
+          : `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
+        const body = isChecklist ? `<div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
+        return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc">${body}</div></details>`;
+      }
+      if (value && typeof value === "object") {
         return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc kv">${Object.entries(value).map(([key, item]) => `<div class="kv-row"><span class="token">${escapeHtml(key)}</span><strong>${escapeHtml(item)}</strong></div>`).join("")}</div></details>`;
       }
       return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc"><div class="doc-text">${escapeHtml(text)}</div></div></details>`;
@@ -539,6 +551,7 @@ HTML = """<!doctype html>
       saveMemory("lastPreview", { title, sections: list, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
     }
     function notice(target, message, type = "") {
+      if (!target) return;
       target.innerHTML = `<div class="notice ${type}">${escapeHtml(message)}</div>`;
     }
     function readList(key) {
@@ -622,7 +635,10 @@ HTML = """<!doctype html>
       delete cleaned.project_type_other;
       return cleaned;
     }
-    function parseForm(form) { return normalizePayload(Object.fromEntries(new FormData(form).entries())); }
+    function parseForm(form) {
+      if (!form || !form.elements) throw new Error("This form is not ready. Please refresh the app and try again.");
+      return normalizePayload(Object.fromEntries(new FormData(form).entries()));
+    }
     function setSelectOrOther(select, otherInput, value) {
       if (!select || value === undefined || value === null) return;
       const found = Array.from(select.options).some(option => option.value === String(value));
@@ -666,9 +682,7 @@ HTML = """<!doctype html>
     function isCustomValue(key, value) {
       const text = String(value || "").trim().toLowerCase();
       if (!text) return false;
-      if (readList(key).some(item => item.toLowerCase() === text)) return true;
-      if (key === CUSTOM_SERVICES_KEY) return currentServiceNames.some(item => item.toLowerCase() === text);
-      return false;
+      return readList(key).some(item => item.toLowerCase() === text);
     }
     function resetRemovedSelections(removedValue) {
       document.querySelectorAll("select").forEach(select => {
@@ -681,9 +695,11 @@ HTML = """<!doctype html>
     function updateRemoveSelected(scope = document) {
       if (!scope || !scope.querySelectorAll) return;
       scope.querySelectorAll("[data-remove-selected]").forEach(button => {
+        const fieldName = button.dataset.removeSelected;
+        const form = button.closest("form") || document;
         const label = button.closest("label");
-        const select = label?.querySelector("select");
-        const key = button.dataset.removeSelected === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
+        const select = label?.querySelector("select") || form.querySelector(`select[name="${fieldName}"]`);
+        const key = fieldName === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
         const removable = select && select.value !== "__other__" && isCustomValue(key, select.value);
         button.classList.toggle("show", Boolean(removable));
         button.disabled = !removable;
@@ -832,10 +848,11 @@ HTML = """<!doctype html>
     function trackFormMemory() {
       ["projectForm", "quoteForm", "paymentForm"].forEach(id => {
         const form = $("#" + id);
+        if (!form || !form.elements) return;
         form.addEventListener("input", () => {
           clearTimeout(formEditTimers[id]);
           formEditTimers[id] = setTimeout(() => {
-            saveMemory(`draft_${id}`, parseForm(form), { activity: "form_edit_10s", requireMeaningful: true });
+            try { saveMemory(`draft_${id}`, parseForm(form), { activity: "form_edit_10s", requireMeaningful: true }); } catch {}
           }, 10000);
         });
       });
@@ -883,10 +900,12 @@ HTML = """<!doctype html>
       const removeSelected = event.target.closest("[data-remove-selected]");
       if (removeSelected) {
         event.preventDefault();
+        const fieldName = removeSelected.dataset.removeSelected;
+        const form = removeSelected.closest("form") || document;
         const label = removeSelected.closest("label");
-        const select = label?.querySelector("select");
+        const select = label?.querySelector("select") || form.querySelector(`select[name="${fieldName}"]`);
         if (select) {
-          const key = removeSelected.dataset.removeSelected === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
+          const key = fieldName === "service" ? CUSTOM_SERVICES_KEY : CUSTOM_PROJECT_TYPES_KEY;
           await removeListItem(key, select.value);
         }
       }
@@ -945,10 +964,12 @@ HTML = """<!doctype html>
       setLoading(button, true);
       notice($("#paymentStatus"), "Calculating payment...");
       try {
-        const payment = await api("/api/payment", parseForm(event.currentTarget));
+        const form = event.currentTarget;
+        const payload = parseForm(form);
+        const payment = await api("/api/payment", payload);
         preview("Payment", [{ title: "Payment", value: payment }]);
         notice($("#paymentStatus"), "Payment breakdown ready. Check the preview panel.", "success");
-        saveMemory("preferredUpfrontPercent", event.currentTarget.elements.upfront_percent.value, { activity: "quote_generated", requireMeaningful: true });
+        saveMemory("preferredUpfrontPercent", payload.upfront_percent, { activity: "payment_generated", requireMeaningful: true });
         safeCompleteLesson("payment");
         toast("Payment ready.");
       } catch (error) {
