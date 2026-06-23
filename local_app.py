@@ -80,6 +80,9 @@ HTML = """<!doctype html>
     .dot span { width: 18px; height: 18px; border-radius: 999px; display: block; }
     .dot.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 78%); }
     .dot.red span { background: #ef4444; } .dot.green span { background: #22c55e; } .dot.blue span { background: #3b82f6; }
+    .sidebar-footer { margin-top: var(--space-7); padding: var(--space-4) var(--space-3) 0; border-top: 1px solid var(--line); color: var(--soft); font-size: 12px; display: grid; gap: var(--space-2); }
+    .version-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+    .version-pill { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--muted); background: var(--surface-2); font-weight: 800; line-height: 1; }
     .workspace-wrap { min-width: 0; padding: var(--space-7); }
     .workspace { max-width: 1200px; margin: 0 auto; }
     .view { display: none; animation: enter 160ms ease both; }
@@ -223,6 +226,10 @@ HTML = """<!doctype html>
         <a href="https://github.com/sponsors/Senseiglobal" target="_blank" rel="noreferrer" data-tip="Support open development with any contribution."><span class="mi">favorite</span>Support</a>
       </nav></div>
       <div class="nav-group"><div class="nav-label">Accent theme</div><div class="theme-dots" id="themeDots"></div></div>
+      <div class="sidebar-footer" aria-label="App version">
+        <div class="version-row"><span>Creative Studio MCP</span><span class="version-pill">v1.0 beta</span></div>
+        <span>Local-first standard edition</span>
+      </div>
     </aside>
 
     <main class="workspace-wrap" id="workspace">
@@ -1071,6 +1078,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
