@@ -84,3 +84,7 @@ The local app includes a cleaner visual hierarchy, stronger typography, and prev
 
 The local app uses clearer Material-style spacing, Material Symbols icons, and a wider preview panel with a handle for focus mode plus minimize and close controls.
 
+## Modern SaaS product shell
+
+The local app now uses a three-region shell with grouped navigation, a centered workspace, and a contextual inspector. It keeps the local-first workflow while improving hierarchy, spacing, accessibility, and preview controls.
+
