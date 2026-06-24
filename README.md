@@ -70,6 +70,17 @@ The preview inspector can copy the latest result and export saved projects as:
 
 Generated export files are saved in `exports/`. This folder is ignored by Git because exported files may contain private client information.
 
+## Recent Fix Notes
+
+This repo recently fixed the QR and preview export workflow:
+
+- Replaced the generated QR code with the provided Adobe Express QR SVG.
+- Embedded the QR code in `README.md`.
+- Added editable Quote preview text.
+- Added editable Client Email preview text.
+- Updated exports so TXT, Markdown, and PDF use the edited preview text.
+- Verified Python and browser JavaScript checks before pushing.
+
 ## Local Files
 
 Creative Studio MCP creates these local runtime files:
@@ -123,3 +134,13 @@ python server.py
 ## Privacy And Safety
 
 Creative Studio MCP is local-first. The browser app does not upload your projects, exports, or brand profile. Review [SECURITY.md](SECURITY.md) and [SAFE_DOWNLOAD.md](SAFE_DOWNLOAD.md) before sharing builds with non-technical users.
+
+## About Developer
+
+Creative Studio MCP is developed by Thomas Ogun under Senseiglobal.
+
+- Developer Linktree: https://linktr.ee/thomasogun
+- LinkedIn: https://www.linkedin.com/in/ogunthomas/
+- GitHub Sponsors: https://github.com/sponsors/Senseiglobal
+
+Support helps improve Creative Studio MCP with better exports, client management, invoice tools, templates, storage options, and future mobile app features.
