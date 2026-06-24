@@ -84,11 +84,17 @@ HTML = """<!doctype html>
     .nav button, .nav a { min-height: 44px; border: 0; border-radius: var(--radius-2); background: transparent; color: var(--muted); text-align: left; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3); font-weight: 740; text-decoration: none; transition: background 160ms ease, color 160ms ease, transform 160ms ease; }
     .nav button:hover, .nav a:hover, .nav button.active { background: color-mix(in srgb, var(--accent), transparent 86%); color: var(--text); }
     .nav button.active { box-shadow: inset 3px 0 0 var(--accent); }
-    .theme-dots { display: flex; gap: var(--space-2); padding: var(--space-3); }
-    .dot { width: 34px; height: 34px; border-radius: 999px; border: 2px solid transparent; display: grid; place-items: center; background: var(--surface-2); }
+    .theme-dots, .accent-choice-row { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3); }
+    .dot { width: 34px; height: 34px; border-radius: 999px; border: 2px solid transparent; display: grid; place-items: center; background: var(--surface-2); transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+    .dot:hover { transform: translateY(-1px) scale(1.03); }
     .dot span { width: 18px; height: 18px; border-radius: 999px; display: block; }
     .dot.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 78%); }
     .dot.red span { background: #ef4444; } .dot.green span { background: #22c55e; } .dot.blue span { background: #3b82f6; }
+    .accent-panel { display: grid; gap: var(--space-3); }
+    .accent-panel p { margin-bottom: 0; }
+    .accent-choice-row { padding: 0; }
+    .accent-choice-row .dot { width: 44px; height: 44px; }
+    .accent-choice-row .dot span { width: 24px; height: 24px; }
     .sidebar-footer { margin-top: auto; padding: var(--space-8) var(--space-3) 0; color: var(--soft); font-size: 12px; }
     .version-pill { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; border: 1px solid var(--line); border-radius: 999px; padding: 0 12px; color: var(--muted); background: var(--surface-2); font-weight: 800; line-height: 1; }
     .workspace-wrap { min-width: 0; padding: var(--space-7); }
@@ -381,6 +387,14 @@ HTML = """<!doctype html>
             </form>
           </div>
           <section class="section">
+            <div class="panel accent-panel">
+              <div>
+                <h2>Accent color</h2>
+                <p>Choose the color that feels right for your workspace.</p>
+              </div>
+              <div class="accent-choice-row" id="settingsThemeDots" aria-label="Choose accent color"></div>
+            </div>
+          </section>          <section class="section">
             <div class="panel">
               <h2>Memory</h2>
               <p>Memory helps Creative Studio remember where you left off, like a desk that keeps your papers in place for a few days.</p>
@@ -1021,8 +1035,10 @@ HTML = """<!doctype html>
       const html = dots.map(([key, label]) => `<button class="dot ${key === "purple" ? "" : key} ${selected === key ? "active" : ""}" data-accent-dot="${key}" aria-label="${label} accent theme" data-tip="Accent theme: ${label}"><span style="${key === "purple" ? "background:#8b5cf6" : ""}"></span></button>`).join("");
       const sidebarDots = $("#themeDots");
       const mobileDots = $("#mobileThemeDots");
+      const settingsDots = $("#settingsThemeDots");
       if (sidebarDots) sidebarDots.innerHTML = html;
       if (mobileDots) mobileDots.innerHTML = html;
+      if (settingsDots) settingsDots.innerHTML = html;
     }
     function setAccent(key) {
       document.documentElement.dataset.accent = key === "purple" ? "" : key;
