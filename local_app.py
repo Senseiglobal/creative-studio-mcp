@@ -205,21 +205,25 @@ HTML = """<!doctype html>
     .feedback-card { padding: var(--space-5); margin-top: var(--space-6); }
     .faq details { border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface); padding: var(--space-4); }
     .faq summary { cursor: pointer; font-weight: 820; }
+    .mobile-accent-dots { display: none; }
     .bottom-nav { display: none; }
     @keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 1180px) {
+    @media (max-width: 1360px) {
       .shell, .shell.inspector-wide, .shell.inspector-collapsed, .shell.inspector-closed { grid-template-columns: minmax(0, 1fr); }
       .sidebar { display: none; }
-      .workspace-wrap { padding: var(--space-5); padding-bottom: 88px; }
+      .workspace-wrap { padding: var(--space-5); padding-bottom: 116px; }
       .inspector { position: fixed; inset: auto 0 0 0; z-index: 70; height: min(72vh, 720px); min-width: 0; max-width: none; resize: none; border-left: 0; border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; box-shadow: var(--shadow-2); }
       .inspector-inner { grid-template-columns: 1fr; }
       .inspector-handle { display: none; }
       .shell.inspector-collapsed .inspector-rail { position: fixed; right: 16px; bottom: 86px; width: 56px; height: 56px; border-radius: 999px; padding: 0; place-items: center; box-shadow: var(--shadow-2); z-index: 75; }
+      .mobile-accent-dots { position: fixed; left: 12px; right: 12px; bottom: 80px; z-index: 80; display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--surface), transparent 5%); box-shadow: var(--shadow-1); width: max-content; max-width: calc(100vw - 24px); margin: 0 auto; }
+      .mobile-accent-dots .dot { width: 30px; height: 30px; }
+      .mobile-accent-dots .dot span { width: 16px; height: 16px; }
       .bottom-nav { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 80; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 22px; background: color-mix(in srgb, var(--surface), transparent 5%); box-shadow: var(--shadow-2); }
       .bottom-nav button { min-height: 48px; border: 0; border-radius: 16px; background: transparent; color: var(--muted); display: grid; place-items: center; }
       .bottom-nav button.active { background: color-mix(in srgb, var(--accent), transparent 84%); color: var(--text); }
-      .help-fab { right: 16px; bottom: 86px; width: 56px; min-width: 56px; padding: 0; }
+      .help-fab { right: 16px; bottom: 138px; width: 56px; min-width: 56px; padding: 0; }
       .help-fab .help-text { display: none; }
     }
     @media (max-width: 760px) {
@@ -414,6 +418,7 @@ HTML = """<!doctype html>
     <aside class="inspector-rail" id="inspectorRail" aria-label="Inspector collapsed"><button class="btn icon primary" id="restoreInspector" type="button" aria-label="Open preview"><span class="mi">dock_to_right</span></button></aside>
   </div>
 
+  <div class="mobile-accent-dots" id="mobileThemeDots" aria-label="Accent theme"></div>
   <nav class="bottom-nav" aria-label="Mobile navigation">
     <button class="active" data-view="dashboard"><span class="mi">dashboard</span></button>
     <button data-view="project"><span class="mi">folder_open</span></button>
@@ -1013,7 +1018,11 @@ HTML = """<!doctype html>
     function renderThemeDots() {
       const selected = getMemory("accentTheme") || "purple";
       const dots = [["purple", "Default"], ["red", "Warm"], ["green", "Growth"], ["blue", "Calm"]];
-      $("#themeDots").innerHTML = dots.map(([key, label]) => `<button class="dot ${key === "purple" ? "" : key} ${selected === key ? "active" : ""}" data-accent-dot="${key}" aria-label="${label} accent theme" data-tip="Accent theme: ${label}"><span style="${key === "purple" ? "background:#8b5cf6" : ""}"></span></button>`).join("");
+      const html = dots.map(([key, label]) => `<button class="dot ${key === "purple" ? "" : key} ${selected === key ? "active" : ""}" data-accent-dot="${key}" aria-label="${label} accent theme" data-tip="Accent theme: ${label}"><span style="${key === "purple" ? "background:#8b5cf6" : ""}"></span></button>`).join("");
+      const sidebarDots = $("#themeDots");
+      const mobileDots = $("#mobileThemeDots");
+      if (sidebarDots) sidebarDots.innerHTML = html;
+      if (mobileDots) mobileDots.innerHTML = html;
     }
     function setAccent(key) {
       document.documentElement.dataset.accent = key === "purple" ? "" : key;
