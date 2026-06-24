@@ -1,8 +1,11 @@
 import json
+import mimetypes
+import os
 import socket
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import unquote, urlparse
 
 from business_tools import (
     calculate_payment,
@@ -28,6 +31,11 @@ HTML = """<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
   <title>Creative Studio MCP</title>
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,0&display=swap" rel="stylesheet">
@@ -66,7 +74,8 @@ HTML = """<!doctype html>
     .shell.inspector-closed { grid-template-columns: 240px minmax(0, 1fr); }
     .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--line); background: color-mix(in srgb, var(--surface), transparent 4%); overflow: auto; display: flex; flex-direction: column; }
     .brand { display: flex; gap: var(--space-3); align-items: center; padding: 0 var(--space-2) var(--space-6); }
-    .logo { width: 42px; height: 42px; border-radius: var(--radius-2); display: grid; place-items: center; background: var(--accent); color: white; font-weight: 900; box-shadow: 0 8px 22px color-mix(in srgb, var(--accent), transparent 84%); }
+    .logo { width: 46px; height: 46px; border-radius: var(--radius-2); display: grid; place-items: center; overflow: hidden; background: var(--surface-2); border: 1px solid color-mix(in srgb, var(--accent), var(--line) 42%); box-shadow: 0 8px 22px color-mix(in srgb, var(--accent), transparent 84%); }
+    .logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .brand strong { display: block; font-size: 15px; line-height: 1.15; }
     .brand span { color: var(--muted); font-size: var(--caption); }
     .nav-group { margin-top: var(--space-5); }
@@ -104,7 +113,14 @@ HTML = """<!doctype html>
     .btn.danger { color: var(--danger); background: color-mix(in srgb, var(--danger), transparent 92%); border-color: color-mix(in srgb, var(--danger), transparent 78%); }
     .btn.icon { width: 44px; min-width: 44px; height: 44px; padding: 0; }
     .btn[disabled] { opacity: .5; pointer-events: none; }
-    .btn.loading::after { content: ""; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 999px; animation: spin .8s linear infinite; }
+    .btn.loading { min-width: 132px; opacity: 1; }
+    .btn-loader { display: inline-flex; align-items: center; gap: 10px; }
+    .loader-logo { position: relative; width: 28px; height: 28px; display: inline-grid; place-items: center; }
+    .loader-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: .42; }
+    .loader-letter { position: relative; z-index: 1; font-weight: 950; font-size: 16px; letter-spacing: 0; color: var(--text); text-shadow: 0 1px 0 rgba(0,0,0,.18); }
+    .loader-letter.c { animation: logoCFade 1.05s ease-in-out infinite; }
+    .loader-letter.s { margin-left: -4px; animation: logoSFade 1.05s ease-in-out infinite; }
+    .loader-heartline { width: 34px; height: 5px; border-radius: 999px; background: repeating-linear-gradient(90deg, #7aa262 0 5px, transparent 5px 8px); transform-origin: left center; animation: logoHeartbeat 1.05s ease-in-out infinite; }
     .hero, .panel, .learning-card, .feedback-card { border: 1px solid var(--line); border-radius: var(--radius-4); background: var(--surface); box-shadow: var(--shadow-1); }
     .hero { padding: var(--space-8); margin-bottom: var(--space-7); background: linear-gradient(180deg, color-mix(in srgb, var(--surface), transparent 0%), color-mix(in srgb, var(--surface-2), transparent 0%)); }
     .hero-actions, .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
@@ -223,7 +239,7 @@ HTML = """<!doctype html>
   <a class="skip" href="#workspace">Skip to content</a>
   <div class="shell" id="shell">
     <aside class="sidebar" aria-label="Sidebar navigation">
-      <div class="brand"><div class="logo">CS</div><div><strong>Creative Studio</strong></div></div>
+      <div class="brand"><div class="logo"><img src="/assets/logo-64.png" alt="Creative Studio logo"></div><div><strong>Creative Studio</strong></div></div>
       <div class="nav-group"><div class="nav-label">Workspace</div><nav class="nav">
         <button class="active" data-view="dashboard" data-tip="Your home desk. Start, continue, or check recent work."><span class="mi">dashboard</span>Dashboard</button>
         <button data-view="project" data-tip="Start a new client job from scratch."><span class="mi">folder_open</span>Projects</button>
@@ -627,8 +643,21 @@ HTML = """<!doctype html>
     }
     function setLoading(button, loading) {
       if (!button) return;
-      button.disabled = loading;
-      button.classList.toggle("loading", loading);
+      if (loading) {
+        if (!button.dataset.originalHtml) button.dataset.originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.setAttribute("aria-busy", "true");
+        button.classList.add("loading");
+        button.innerHTML = `<span class="btn-loader" aria-label="Working"><span class="loader-logo"><img src="/assets/logo-transparent.png" alt=""><span class="loader-letter c">C</span><span class="loader-letter s">S</span></span><span class="loader-heartline" aria-hidden="true"></span></span>`;
+        return;
+      }
+      button.disabled = false;
+      button.removeAttribute("aria-busy");
+      button.classList.remove("loading");
+      if (button.dataset.originalHtml) {
+        button.innerHTML = button.dataset.originalHtml;
+        delete button.dataset.originalHtml;
+      }
     }
     function shellState(state) {
       const shell = $("#shell");
@@ -1342,6 +1371,14 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def send_bytes(self, status, body, content_type):
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "public, max-age=86400")
+        self.end_headers()
+        self.wfile.write(body)
+
     def read_json(self):
         length = int(self.headers.get("Content-Length", "0"))
         if not length:
@@ -1349,9 +1386,18 @@ class Handler(BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(length).decode("utf-8"))
 
     def do_GET(self):
-        if self.path in ("/", "/index.html"):
+        parsed_path = unquote(urlparse(self.path).path)
+        if parsed_path in ("/", "/index.html"):
             self.send_text(200, HTML, "text/html")
             return
+        if parsed_path.startswith("/assets/"):
+            asset_name = os.path.basename(parsed_path)
+            asset_path = os.path.join(os.path.dirname(__file__), "assets", asset_name)
+            if os.path.isfile(asset_path):
+                content_type = mimetypes.guess_type(asset_path)[0] or "application/octet-stream"
+                with open(asset_path, "rb") as file:
+                    self.send_bytes(200, file.read(), content_type)
+                return
         self.send_text(404, "Not found", "text/plain")
 
     def do_POST(self):
