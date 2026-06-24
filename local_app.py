@@ -9,6 +9,7 @@ from urllib.parse import unquote, urlparse
 
 from business_tools import (
     calculate_payment,
+    create_deliverables_list,
     create_project_package,
     create_quote,
     delete_project,
@@ -186,7 +187,14 @@ HTML = """<!doctype html>
     .check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface-3) 58%, transparent); }
     .check-workspace { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
     .check-workspace .check-actions { border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface-2); }
-    .check-workspace .check-list { padding: var(--space-1); }
+    .check-workspace .check-list { padding: var(--space-1); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .deliverable-card { min-height: 96px; align-items: start; padding: var(--space-4); transition: transform 160ms ease, border-color 160ms ease, background 160ms ease; }
+    .deliverable-card:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent), var(--line) 55%); }
+    .deliverable-card.checked { border-color: color-mix(in srgb, var(--accent), var(--line) 30%); background: color-mix(in srgb, var(--accent), var(--surface-2) 92%); }
+    .deliverable-card span { text-decoration: none; color: var(--text); }
+    .deliverable-card.checked span { color: var(--text); text-decoration: none; }
+    .check-helper { display: grid; gap: 4px; }
+    .check-helper strong { font-size: 18px; }
     .bullet-row { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
     .kv { display: grid; gap: var(--space-2); }
     .kv-row { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
@@ -357,8 +365,8 @@ HTML = """<!doctype html>
         </section>
 
         <section id="checklist" class="view">
-          <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" id="checklistGenerate" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form><div id="checklistStatus"></div><div id="checklistWorkspace" class="check-workspace" aria-live="polite"></div></div>
+          <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Deliverables</h1><p>Choose what this project should include.</p></div></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then save deliverables"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button><small>Suggested deliverables appear below. Tick what applies.</small></label><div class="actions"><button class="btn primary" id="checklistGenerate" type="submit"><span class="mi">save</span>Save deliverables</button></div></form><div id="checklistStatus"></div><div id="checklistWorkspace" class="check-workspace" aria-live="polite"></div></div>
         </section>
 
         <section id="services" class="view">
@@ -469,6 +477,9 @@ HTML = """<!doctype html>
     let lastPreviewSections = [];
     let lastRecent = [];
     let currentServiceNames = [];
+    let currentDeliverables = [];
+    let currentDeliverablesTitle = "Deliverables";
+    let currentDeliverablesProjectType = "";
     let formEditTimers = {};
 
     const lessons = [
@@ -721,39 +732,61 @@ HTML = """<!doctype html>
       $("#inspectorBody").innerHTML = lastPreviewSections.map(item => sectionHtml(item.title, item.value)).join("");
       saveMemory("lastPreview", { title, sections: lastPreviewSections, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
     }
-    function checklistSection() {
-      return lastPreviewSections.find(item => String(item.title || "").toLowerCase().includes("check") && Array.isArray(item.value));
+    function selectedDeliverableIndexes() {
+      return $$("#checklistWorkspace .deliverable-card input[type='checkbox']:checked").map(input => Number(input.closest(".deliverable-card")?.dataset.deliverableIndex)).filter(Number.isInteger);
     }
-    function selectedChecklistIndexes() {
-      return $$("#checklistWorkspace .check-row input[type='checkbox']:checked").map(input => Number(input.closest(".check-row")?.dataset.checkIndex)).filter(Number.isInteger);
+    function selectedDeliverables() {
+      const indexes = selectedDeliverableIndexes();
+      return indexes.map(index => currentDeliverables[index]).filter(Boolean);
     }
-    function renderChecklistWorkspace(items, title = "Checklist") {
+    function renderDeliverablesWorkspace(items, title = "Deliverables") {
       const host = $("#checklistWorkspace");
       if (!host) return;
       const list = Array.isArray(items) ? items : [];
+      currentDeliverables = list;
+      currentDeliverablesTitle = title;
+      currentDeliverablesProjectType = title.replace(/\\s+deliverables$/i, "");
       if (!list.length) {
-        host.innerHTML = `<div class="empty"><div><span class="mi">checklist</span><h3>No checklist items yet.</h3><p>Create a checklist, then tick the items you want to track.</p></div></div>`;
+        host.innerHTML = `<div class="empty"><div><span class="mi">inventory_2</span><h3>No deliverables yet.</h3><p>Choose a project type and the app will suggest useful deliverables.</p></div></div>`;
         return;
       }
-      const rows = list.map((item, index) => `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="${escapeHtml(title)} item ${index + 1}"><span>${escapeHtml(item)}</span></label>`).join("");
-      host.innerHTML = `<div class="check-actions"><button class="btn danger" data-remove-checked-checklist type="button"><span class="mi">delete</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export checked TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export checked Markdown</button></div><div class="check-list">${rows}</div>`;
+      const rows = list.map((item, index) => `<label class="check-row deliverable-card checked" data-deliverable-index="${index}"><input type="checkbox" checked aria-label="${escapeHtml(title)} deliverable ${index + 1}"><span>${escapeHtml(item)}</span></label>`).join("");
+      host.innerHTML = `<div class="check-helper"><strong>${escapeHtml(title)}</strong><p>Tick the deliverables that belong in this project. Untick anything the client does not need.</p></div><div class="check-list">${rows}</div><div class="check-actions"><button class="btn primary" data-save-deliverables type="button"><span class="mi">save</span>Save deliverables</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export checked TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export checked Markdown</button></div>`;
+    }
+    function renderChecklistWorkspace(items, title = "Deliverables") {
+      renderDeliverablesWorkspace(items, title);
+    }
+    async function loadDeliverableSuggestions(payload = null, showMessage = false) {
+      const form = $("#checklistForm");
+      const data = payload || parseForm(form);
+      const projectType = String(data.project_type || "").trim();
+      if (!projectType) return [];
+      const result = await api("/api/deliverables", { service: projectType, project_type: projectType });
+      const list = Array.isArray(result) ? result : [];
+      renderDeliverablesWorkspace(list, `${projectType} deliverables`);
+      if (showMessage) {
+        notice($("#checklistStatus"), "Suggested deliverables are ready below. Tick what applies, then save.", "success");
+        toast("Deliverables suggested below.");
+      }
+      return list;
     }
     function refreshPreviewFromState(message) {
-      const title = $("#inspectorHint")?.textContent || "Updated preview";
-      const project = lastProject;
-      preview(title, lastPreviewSections, project);
-      const section = checklistSection();
-      if (section) renderChecklistWorkspace(section.value, section.title);
+      const selected = selectedDeliverables();
+      preview("Deliverables", [{ title: currentDeliverablesTitle || "Deliverables", value: selected }], lastProject);
       if (message) toast(message);
     }
-    function removeChecklistIndexes(indexes) {
-      const section = checklistSection();
-      if (!section) { toast("Create a checklist first."); return; }
-      const removeSet = new Set(indexes);
-      if (!removeSet.size) { toast("Tick a checklist item first."); return; }
-      section.value = section.value.filter((_, index) => !removeSet.has(index));
-      if (lastProject?.generated_package?.project_checklist) lastProject.generated_package.project_checklist = section.value;
-      refreshPreviewFromState(removeSet.size === 1 ? "Checklist item removed." : "Checked checklist items removed.");
+    function saveDeliverablesSelection() {
+      const selected = selectedDeliverables();
+      if (!selected.length) {
+        toast("Tick at least one deliverable before saving.");
+        notice($("#checklistStatus"), "Tick at least one deliverable before saving.", "error");
+        return;
+      }
+      if (lastProject?.generated_package) lastProject.generated_package.deliverables = selected;
+      preview("Deliverables", [{ title: currentDeliverablesTitle || "Deliverables", value: selected }], lastProject);
+      notice($("#checklistStatus"), "Saved. The preview now shows your selected deliverables.", "success");
+      safeCompleteLesson("checklist");
+      toast("Deliverables saved to preview.");
     }
     function downloadTextFile(filename, text) {
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -767,15 +800,12 @@ HTML = """<!doctype html>
       setTimeout(() => URL.revokeObjectURL(url), 800);
     }
     function exportSelectedChecklist(format = "txt") {
-      const section = checklistSection();
-      if (!section) { toast("Create a checklist first."); return; }
-      const indexes = selectedChecklistIndexes();
-      if (!indexes.length) { toast("Select at least one checklist item before exporting."); return; }
-      const items = indexes.map(index => section.value[index]).filter(Boolean);
-      const title = `${section.title || "Checklist"}`;
+      const items = selectedDeliverables();
+      if (!items.length) { toast("Tick at least one deliverable before exporting."); return; }
+      const title = currentDeliverablesTitle || "Deliverables";
       const content = format === "md" ? [`# ${title}`, "", ...items.map(item => `- ${item}`)].join("\\n") : [`${title}`, "", ...items.map(item => `- ${item}`)].join("\\n");
-      downloadTextFile(`selected-checklist.${format === "md" ? "md" : "txt"}`, content);
-      toast(format === "md" ? "Selected checklist saved as Markdown." : "Selected checklist saved as a text file.");
+      downloadTextFile(`selected-deliverables.${format === "md" ? "md" : "txt"}`, content);
+      toast(format === "md" ? "Checked deliverables saved as Markdown." : "Checked deliverables saved as a text file.");
     }
     function notice(target, message, type = "") {
       if (!target) return;
@@ -1138,11 +1168,25 @@ HTML = """<!doctype html>
 
     document.addEventListener("change", (event) => {
       if (event.target.matches("select")) syncOtherFields(event.target.closest("form") || document);
-      if (event.target.matches(".check-row input[type='checkbox']")) {
+      if (event.target.id === "checklistProjectType") {
+        loadDeliverableSuggestions(null, true).catch(error => {
+          if (String(error.message || "").includes("Type the new project type first")) return;
+          toast(error.message);
+        });
+      }
+      if (event.target.matches(".deliverable-card input[type='checkbox']")) {
         const row = event.target.closest(".check-row");
         row?.classList.toggle("checked", event.target.checked);
-        toast(event.target.checked ? "Checked. Use Remove checked if you do not need it." : "Unchecked. It will stay on the checklist.");
+        toast(event.target.checked ? "Included." : "Removed from this project.");
       }
+    });
+    document.addEventListener("input", (event) => {
+      if (event.target.id !== "checklistProjectTypeOther") return;
+      clearTimeout(formEditTimers.checklistOther);
+      formEditTimers.checklistOther = setTimeout(() => {
+        const value = String(event.target.value || "").trim();
+        if (value.length >= 2) loadDeliverableSuggestions(null, true).catch(error => toast(error.message));
+      }, 350);
     });
 
     document.addEventListener("click", async (event) => {
@@ -1150,8 +1194,8 @@ HTML = """<!doctype html>
       if (viewButton) setView(viewButton.dataset.view);
       const copyButton = event.target.closest("[data-copy]");
       if (copyButton) { await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy)); toast("Copied. You can paste it anywhere now."); }
-      const removeCheckedChecklist = event.target.closest("[data-remove-checked-checklist]");
-      if (removeCheckedChecklist) { event.preventDefault(); removeChecklistIndexes(selectedChecklistIndexes()); }
+      const saveDeliverablesButton = event.target.closest("[data-save-deliverables]");
+      if (saveDeliverablesButton) { event.preventDefault(); saveDeliverablesSelection(); }
       const exportSelectedChecklistButton = event.target.closest("[data-export-selected-checklist]");
       if (exportSelectedChecklistButton) { event.preventDefault(); exportSelectedChecklist(exportSelectedChecklistButton.dataset.exportSelectedChecklist); }
       const openProject = event.target.closest("[data-open-project]");
@@ -1252,17 +1296,16 @@ HTML = """<!doctype html>
       event.preventDefault();
       const button = event.submitter || $("#checklistGenerate");
       setLoading(button, true);
-      notice($("#checklistStatus"), "Creating checklist...");
+      notice($("#checklistStatus"), "Saving deliverables...");
       try {
         const payload = parseForm(event.currentTarget);
-        const checklist = await api("/api/checklist", payload);
-        renderChecklistWorkspace(checklist, `${payload.project_type} Checklist`);
-        preview("Checklist", [{ title: "Checklist", value: checklist }]);
-        notice($("#checklistStatus"), "Checklist created below. Tick the boxes you want to track.", "success");
+        if (!currentDeliverables.length || currentDeliverablesProjectType !== payload.project_type) {
+          await loadDeliverableSuggestions(payload, false);
+        }
+        saveDeliverablesSelection();
         loadProjectTypes();
         syncOtherFields();
         safeCompleteLesson("checklist");
-        toast("Checklist is ready below. The preview stays clean for sharing.");
       } catch (error) {
         notice($("#checklistStatus"), error.message, "error");
         toast(error.message);
@@ -1386,7 +1429,10 @@ HTML = """<!doctype html>
     renderCustomAdditions();
     setupTooltips();
     trackFormMemory();
-    loadServices().then(loadProfile).then(loadRecent).then(() => {
+    loadServices().then(() => {
+      loadDeliverableSuggestions(null, false).catch(() => {});
+      return loadProfile();
+    }).then(loadRecent).then(() => {
       fillForm($("#projectForm"), getMemory("draft_projectForm") || {});
       const up = getMemory("preferredUpfrontPercent");
       const projectForm = $("#projectForm");
@@ -1467,6 +1513,8 @@ class Handler(BaseHTTPRequestHandler):
                 result = calculate_payment(payload.get("total_fee", 0), payload.get("upfront_percent", 70))
             elif self.path == "/api/quote":
                 result = create_quote(payload.get("client_name", ""), payload.get("service", ""), payload.get("design_fee", 0), payload.get("project_type", ""))
+            elif self.path == "/api/deliverables":
+                result = create_deliverables_list(payload.get("service", payload.get("project_type", "")), payload.get("project_type", ""))
             elif self.path == "/api/checklist":
                 result = generate_project_checklist(payload.get("project_type", ""))
             elif self.path == "/api/project":

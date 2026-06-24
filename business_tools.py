@@ -132,7 +132,26 @@ def generate_project_checklist(project_type):
 def create_deliverables_list(service, project_type=""):
     service = (service or "Creative Service").strip()
     project_type = (project_type or service).strip()
-    return [f"Creative direction for {project_type}", f"Design execution for {service}", "Client review version", "Revision support based on agreed scope", "Final client-ready files", "Basic usage or handover notes"]
+    key = project_type.lower()
+    presets = [
+        ("brand", ["Logo concepts", "Final logo files", "Color palette", "Typography guide", "Brand usage guide", "Social media profile assets"]),
+        ("logo", ["Logo concepts", "Primary logo", "Secondary logo", "Icon or mark", "Black and white version", "Final logo files"]),
+        ("packaging", ["Packaging concept", "Front label design", "Back label design", "Print-ready artwork", "Mockup preview", "Production notes"]),
+        ("corporate profile", ["Company profile layout", "Cover page design", "About section", "Services section", "Team or leadership section", "PDF-ready final file"]),
+        ("proposal", ["Proposal cover", "Project overview pages", "Pricing page", "Timeline page", "Call-to-action page", "Editable presentation file"]),
+        ("presentation", ["Presentation cover", "Slide template", "Content slides", "Section divider slides", "Closing slide", "Editable presentation file"]),
+        ("merchandise", ["Merchandise concept", "Artwork placement", "Mockup preview", "Color options", "Print-ready files", "Production notes"]),
+        ("banner", ["Banner layout", "Event key visual", "Size adaptations", "Print-ready file", "Digital sharing file", "Production notes"]),
+        ("event", ["Event key visual", "Banner layout", "Social media announcement", "Directional signage", "Print-ready files", "Digital sharing files"]),
+        ("social", ["Post design templates", "Story design templates", "Campaign visual direction", "Editable source files", "Exported image files", "Usage notes"]),
+        ("website", ["Homepage concept", "Inner page layout", "Mobile layout", "Asset handoff", "Basic content structure", "Launch-ready design files"]),
+    ]
+    for needle, deliverables in presets:
+        if needle in key:
+            return deliverables
+    words = [word.capitalize() for word in project_type.replace("/", " ").replace("-", " ").split() if len(word) > 2]
+    focus = " ".join(words[:3]) or project_type
+    return [f"{focus} concept direction", f"{focus} design draft", "Client review version", "Revision support based on agreed scope", "Final client-ready files", "Basic handover notes"]
 
 def create_quote(client_name, service, design_fee, project_type="", includes_printing=False):
     if isinstance(project_type, bool):
