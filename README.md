@@ -1,4 +1,4 @@
-﻿# Creative Studio MCP
+# Creative Studio MCP
 
 <p>
   <a href="https://github.com/sponsors/Senseiglobal">
@@ -6,85 +6,110 @@
   </a>
 </p>
 
-Creative Studio MCP is a local-first creative business dashboard for quotes, project packages, exports, and brand preferences.
+Creative Studio MCP is a local-first creative business workspace for quotes, project packages, payment breakdowns, checklists, deliverables, client email drafts, saved projects, exports, and brand preferences.
 
-## Install
+It works as a browser app on your computer and can also run as an MCP server for Claude Desktop.
 
-1. Download the ZIP from GitHub.
-2. Extract the ZIP.
-3. Open the `creative-studio-mcp` folder.
-4. Double-click `START_APP.bat`.
+## What It Does
 
-## Dashboard Tour
+- Creates client-ready project packages from a client name, service, fee, upfront percentage, and project type.
+- Generates quotes, payment breakdowns, checklists, deliverables, and client email drafts.
+- Saves recent projects locally in `projects.json`.
+- Saves business settings and services locally in `brand_profile.json`.
+- Exports saved projects as TXT, Markdown, or PDF from the app preview.
+- Supports additional MCP export formats from the tool layer: HTML, JSON, CSV, and DOC.
+- Keeps deleted projects in a local bin that can be reviewed or emptied.
+- Uses a responsive three-region workspace with sidebar navigation, a main work area, and a preview inspector.
+- Includes app logo, loading, favicon, mobile icon, and manifest assets in `assets/`.
 
-- `Dashboard`: recent projects and quick actions.
-- `New Project`: generate a full project package.
-- `Preferences`: edit business name, payment terms, and services.
-- `Bin`: restore deleted projects.
-- `Preview`: copy, export, or share the current package.
+## Start The Local App
 
-## Export And Share
+On Windows:
 
-Use the preview buttons to:
+```text
+START_APP.bat
+```
 
-- Copy the full package
-- Export TXT
-- Export Markdown
-- Share with the browser share tool when available
+Or run directly:
 
-Saved projects can also export PDF from the recent projects list.
+```text
+python local_app.py
+```
 
-## Light And Dark Mode
+The app opens in your browser on a local address. No Claude or OpenAI setup is required for the browser app.
 
-Use the Theme button. It supports system, dark, and light mode and saves your choice on the device.
+## Main Views
 
-## Accessibility
+- `Dashboard`: recent projects, quick actions, beginner guidance, and app status.
+- `Projects`: create a full project package.
+- `Quote`: create a standalone quote.
+- `Payment`: calculate upfront and balance payments.
+- `Checklist`: generate and edit checklist items.
+- `Services`: view saved services and remove custom entries.
+- `Settings`: update business details, payment terms, services, theme, accent color, and local memory preferences.
+- `Clients`: planned client database placeholder.
+- `Learn`: short in-app lessons for new users.
 
-The app includes keyboard navigation, visible focus rings, semantic sections, skip-to-content, readable contrast, and reduced motion support.
+## Exports
 
-## Optional Claude Or OpenAI
+The preview inspector can copy the latest result and export saved projects as:
 
-Claude and OpenAI are optional. The local app works without them.
+- TXT
+- Markdown
+- PDF
 
-## Export feedback
+Generated export files are saved in `exports/`. This folder is ignored by Git because exported files may contain private client information.
 
-When you export a project, the app shows a small confirmation message with the saved file name and location. This helps beginners know exactly what happened and where to find the file.
+## Local Files
 
-## User experience polish
+Creative Studio MCP creates these local runtime files:
 
-The dashboard includes clearer spacing, softer feedback messages, better tooltips, and lightweight motion. It still works locally and does not need Claude or OpenAI for the browser app.
+- `brand_profile.json`: business profile, payment terms, currency, and saved services.
+- `projects.json`: saved active projects.
+- `deleted_projects.json`: deleted project bin.
+- `exports/`: generated project export files.
 
-## Personal greeting
+These files are intentionally ignored by Git and should not be shared publicly.
 
-The dashboard greeting uses the name saved in Preferences. If no name is saved, it only shows the time-based greeting. Morning, afternoon, evening, and night are based on the device time zone.
+## Claude Desktop
 
-## Dashboard connection cards
+Claude Desktop support is optional.
 
-The dashboard shows the app version, developer team, contact links, and beginner cards for connecting Claude, enabling more tools, and future storage options like Google Drive.
+On Windows, run:
 
-Claude is optional. The local browser app works by itself.
+```text
+SETUP_WINDOWS.bat
+```
 
-## Generate results
+If Claude was not open during setup, open Claude Desktop once and then run:
 
-When you click `Generate`, the app now shows the full project package under the form and in the preview panel. If something is missing, it shows a clear message instead of failing silently.
+```text
+CONNECT_CLAUDE.bat
+```
 
-## Minimal Generate repair
+After setup, fully quit Claude Desktop and open it again.
 
-The local app uses one simple Generate flow. Click `Generate` and the project package appears on the same page with copy and export buttons.
+## MCP Tools
 
-## Focused workspace rebuild
+The MCP server exposes tools for:
 
-The local app is organized around a minimal dashboard, focused tools, a live preview panel, and Settings for personalization. Quote, payment, checklist, project package, copy, export, and theme controls remain available without crowding the dashboard.
+- Brand profile management
+- Service listing
+- Quote generation
+- Payment calculation
+- Project checklist generation
+- Project package creation
+- Project saving and recent project lookup
+- Project deletion and bin listing
+- Bin emptying
+- Project export
 
-## Preview controls and typography polish
+Run the server with:
 
-The local app includes a cleaner visual hierarchy, stronger typography, and preview controls for minimize, expand, and close. The latest result always opens the preview again.
+```text
+python server.py
+```
 
-## Material spacing and preview width
+## Privacy And Safety
 
-The local app uses clearer Material-style spacing, Material Symbols icons, and a wider preview panel with a handle for focus mode plus minimize and close controls.
-
-## Modern SaaS product shell
-
-The local app now uses a three-region shell with grouped navigation, a centered workspace, and a contextual inspector. It keeps the local-first workflow while improving hierarchy, spacing, accessibility, and preview controls.
-
+Creative Studio MCP is local-first. The browser app does not upload your projects, exports, or brand profile. Review [SECURITY.md](SECURITY.md) and [SAFE_DOWNLOAD.md](SAFE_DOWNLOAD.md) before sharing builds with non-technical users.

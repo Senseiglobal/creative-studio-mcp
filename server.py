@@ -1,4 +1,4 @@
-﻿from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 from business_tools import (
     calculate_payment as calculate_payment_data,

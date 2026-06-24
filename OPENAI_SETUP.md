@@ -1,6 +1,17 @@
-﻿# OpenAI And Other AI Apps
+# OpenAI And Other AI Apps
 
-Creative Studio MCP works first as a local browser app.
+Creative Studio MCP currently works best in two local modes:
+
+- Local browser app: `START_APP.bat`
+- Local Claude Desktop MCP server: `SETUP_WINDOWS.bat`
+
+## OpenAI
+
+OpenAI-hosted MCP clients need a reachable remote MCP server URL.
+
+This repo runs locally by default, so it must be deployed online before OpenAI or another hosted client can connect to it remotely. Until a hosted deployment is added, use the local browser app or Claude Desktop setup.
+
+## Local App First
 
 Use:
 
@@ -8,22 +19,4 @@ Use:
 START_APP.bat
 ```
 
-## Claude Desktop
-
-Claude Desktop is optional.
-
-Use:
-
-```text
-SETUP_WINDOWS.bat
-```
-
-Then fully quit Claude Desktop and open it again.
-
-## OpenAI
-
-OpenAI needs a remote MCP server URL.
-
-That means this project must be deployed online before OpenAI can connect to it through the API.
-
-Use the local browser app first.
+The local app does not require an API key.

@@ -1,4 +1,4 @@
-﻿# Quick Start
+# Quick Start
 
 ## Start The App
 
@@ -6,32 +6,35 @@
 2. Open the `creative-studio-mcp` folder.
 3. Double-click `START_APP.bat`.
 
+The app opens in your browser. It works locally without Claude or OpenAI.
+
 ## Create Your First Project
 
-1. Click `New Project`.
-2. Enter the client name, service, fee, payment percent, and project type.
-3. Click `Generate`.
-4. Use `Copy`, `Export`, or `Share` in the preview panel.
+1. Open `Projects`.
+2. Enter the client name, service, design fee, upfront percent, and project type.
+3. Click `Create package`.
+4. Use the preview inspector to copy the result or export TXT, Markdown, or PDF.
 
-## Edit Your Business
+## Edit Your Business Profile
 
-Open `Preferences` to change business name, payment terms, services, and contact details.
+Open `Settings` to update your business name, owner name, payment terms, currency, contact details, and service list.
 
-## Delete Or Restore
+Your settings are saved locally in `brand_profile.json`.
 
-Use `Delete` on a saved project to move it to the Bin.
+## Manage Saved Work
 
-Open `Bin` to restore old projects.
+- Recent projects appear on the dashboard.
+- Deleted projects move to the local bin.
+- The bin can be reviewed or emptied.
+- Exported files are saved in `exports/`.
 
-## Theme
+## Connect Claude Desktop
 
-Use `Theme` to switch system, dark, and light mode.
+Claude Desktop is optional.
 
-## Connect Claude from the dashboard
+1. Double-click `SETUP_WINDOWS.bat`.
+2. Fully quit Claude Desktop.
+3. Open Claude Desktop again.
+4. Ask Claude to use Creative Studio MCP.
 
-1. Open the local app.
-2. Click `Connect Claude`.
-3. Follow the short steps shown there.
-
-You can still use Creative Studio MCP without Claude.
-
+If setup could not find Claude, open Claude Desktop once and then double-click `CONNECT_CLAUDE.bat`.

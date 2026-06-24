@@ -10,6 +10,7 @@ venv/
 .idea/
 .DS_Store
 .env
+brand_profile.json
 
 # Build and package output
 build/

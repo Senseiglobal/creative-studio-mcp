@@ -180,11 +180,10 @@ HTML = """<!doctype html>
     .preview-doc { padding: var(--space-4); border-top: 1px solid var(--line); }
     .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.72; color: var(--text); }
     .check-list, .bullet-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
-    .check-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 16px; line-height: 1.6; }
+    .check-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 16px; line-height: 1.6; cursor: pointer; }
     .check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
     .check-row.checked span { color: var(--muted); text-decoration: line-through; }
     .check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface-3) 58%, transparent); }
-    .check-row .mini-action { min-height: 36px; padding: 0 10px; font-size: var(--caption); }
     .bullet-row { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
     .kv { display: grid; gap: var(--space-2); }
     .kv-row { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
@@ -702,9 +701,9 @@ HTML = """<!doctype html>
       if (Array.isArray(value)) {
         const isChecklist = String(title || "").toLowerCase().includes("check");
         const rows = value.map((item, index) => isChecklist
-          ? `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span><button class="btn ghost mini-action" data-select-check-item="${index}" type="button">Select</button><button class="btn danger mini-action" data-remove-check-item="${index}" type="button"><span class="mi">delete</span>Remove</button></label>`
+          ? `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span></label>`
           : `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
-        const body = isChecklist ? `<div class="check-actions"><button class="btn secondary" data-remove-checked-checklist type="button"><span class="mi">checklist_rtl</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export selected TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export selected Markdown</button></div><div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
+        const body = isChecklist ? `<div class="check-actions"><button class="btn danger" data-remove-checked-checklist type="button"><span class="mi">delete</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export checked TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export checked Markdown</button></div><div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
         return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc">${body}</div></details>`;
       }
       if (value && typeof value === "object") {
@@ -717,7 +716,7 @@ HTML = """<!doctype html>
       lastProject = project;
       const list = Array.isArray(sections) ? sections : [{ title, value: sections }];
       lastPreviewSections = list.map(item => ({ title: item.title, value: Array.isArray(item.value) ? [...item.value] : item.value }));
-      lastPreviewText = lastPreviewSections.map(item => `${item.title.toUpperCase()}\n${toText(item.value)}`).join("\n\n");
+      lastPreviewText = lastPreviewSections.map(item => `${item.title.toUpperCase()}\\n${toText(item.value)}`).join("\\n\\n");
       $("#inspectorHint").textContent = title;
       $("#inspectorBody").innerHTML = lastPreviewSections.map(item => sectionHtml(item.title, item.value)).join("");
       saveMemory("lastPreview", { title, sections: lastPreviewSections, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
@@ -761,7 +760,7 @@ HTML = """<!doctype html>
       if (!indexes.length) { toast("Select at least one checklist item before exporting."); return; }
       const items = indexes.map(index => section.value[index]).filter(Boolean);
       const title = `${section.title || "Checklist"}`;
-      const content = format === "md" ? [`# ${title}`, "", ...items.map(item => `- ${item}`)].join("\n") : [`${title}`, "", ...items.map(item => `- ${item}`)].join("\n");
+      const content = format === "md" ? [`# ${title}`, "", ...items.map(item => `- ${item}`)].join("\\n") : [`${title}`, "", ...items.map(item => `- ${item}`)].join("\\n");
       downloadTextFile(`selected-checklist.${format === "md" ? "md" : "txt"}`, content);
       toast(format === "md" ? "Selected checklist saved as Markdown." : "Selected checklist saved as a text file.");
     }
@@ -1129,7 +1128,7 @@ HTML = """<!doctype html>
       if (event.target.matches(".check-row input[type='checkbox']")) {
         const row = event.target.closest(".check-row");
         row?.classList.toggle("checked", event.target.checked);
-        toast(event.target.checked ? "Checked. You can remove it if you do not need it." : "Unchecked. It will stay on the checklist.");
+        toast(event.target.checked ? "Checked. Use Remove checked if you do not need it." : "Unchecked. It will stay on the checklist.");
       }
     });
 
@@ -1138,15 +1137,6 @@ HTML = """<!doctype html>
       if (viewButton) setView(viewButton.dataset.view);
       const copyButton = event.target.closest("[data-copy]");
       if (copyButton) { await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy)); toast("Copied. You can paste it anywhere now."); }
-      const selectCheckItem = event.target.closest("[data-select-check-item]");
-      if (selectCheckItem) {
-        event.preventDefault();
-        const row = selectCheckItem.closest(".check-row");
-        const box = row?.querySelector("input[type='checkbox']");
-        if (box) { box.checked = !box.checked; row.classList.toggle("checked", box.checked); toast(box.checked ? "Selected for export." : "Removed from export selection."); }
-      }
-      const removeCheckItem = event.target.closest("[data-remove-check-item]");
-      if (removeCheckItem) { event.preventDefault(); removeChecklistIndexes([Number(removeCheckItem.dataset.removeCheckItem)]); }
       const removeCheckedChecklist = event.target.closest("[data-remove-checked-checklist]");
       if (removeCheckedChecklist) { event.preventDefault(); removeChecklistIndexes(selectedChecklistIndexes()); }
       const exportSelectedChecklistButton = event.target.closest("[data-export-selected-checklist]");
