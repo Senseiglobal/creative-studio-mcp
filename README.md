@@ -137,6 +137,10 @@ Creative Studio MCP is local-first. The browser app does not upload your project
 
 ## About Developer
 
+<p>
+  <img src="assets/thomas-ogun.jpg" alt="Thomas Ogun" width="140">
+</p>
+
 Creative Studio MCP is developed by Thomas Ogun under Senseiglobal.
 
 - Developer Linktree: https://linktr.ee/thomasogun
