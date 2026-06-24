@@ -450,6 +450,14 @@ HTML = """<!doctype html>
   <script>
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+    function bind(selector, eventName, handler) {
+      const target = $(selector);
+      if (!target) {
+        console.warn(`Button setup skipped because ${selector} was not found.`);
+        return;
+      }
+      target.addEventListener(eventName, handler);
+    }
     const MEMORY_KEY = "creativeStudioMemory";
     const CUSTOM_SERVICES_KEY = "creativeStudioCustomServices";
     const CUSTOM_PROJECT_TYPES_KEY = "creativeStudioCustomProjectTypes";
@@ -890,8 +898,10 @@ HTML = """<!doctype html>
     }
     function loadProjectTypes() {
       const options = optionList([...readList(CUSTOM_PROJECT_TYPES_KEY), ...defaultProjectTypes.filter(item => item !== "Other")]);
-      $("#projectTypeSelect").innerHTML = options;
-      $("#checklistProjectType").innerHTML = options;
+      ["#projectTypeSelect", "#quoteProjectType", "#checklistProjectType"].forEach(selector => {
+        const select = $(selector);
+        if (select) select.innerHTML = options;
+      });
     }
     function isCustomValue(key, value) {
       const text = String(value || "").trim().toLowerCase();
@@ -1271,58 +1281,58 @@ HTML = """<!doctype html>
         toast("Settings saved.");
       } catch (error) { toast(error.message); }
     });
-    $("#showServices").addEventListener("click", async () => {
+    bind("#showServices", "click", async () => {
       const services = await api("/api/services");
       preview("Services", [{ title: "Services", value: services }]);
       safeCompleteLesson("services");
       toast("Services shown.");
     });
-    $("#continueRecent").addEventListener("click", continueRecentProject);
-    $("#continueLearning").addEventListener("click", continueLearning);
-    $("#walkthroughHelp").addEventListener("click", openWalkthrough);
-    $("#closeWalkthrough").addEventListener("click", closeWalkthrough);
-    $("#walkthroughPrimary").addEventListener("click", guideFromWalkthrough);
-    $("#walkthroughLearn").addEventListener("click", () => { closeWalkthrough(); setView("learn"); toast("Learn is open."); });
-    $("#refreshRecent").addEventListener("click", loadRecent);
-    $("#copyInspector").addEventListener("click", async () => {
+    bind("#continueRecent", "click", continueRecentProject);
+    bind("#continueLearning", "click", continueLearning);
+    bind("#walkthroughHelp", "click", openWalkthrough);
+    bind("#closeWalkthrough", "click", closeWalkthrough);
+    bind("#walkthroughPrimary", "click", guideFromWalkthrough);
+    bind("#walkthroughLearn", "click", () => { closeWalkthrough(); setView("learn"); toast("Learn is open."); });
+    bind("#refreshRecent", "click", loadRecent);
+    bind("#copyInspector", "click", async () => {
       if (!lastPreviewText) return toast("Nothing to copy yet.");
       await navigator.clipboard.writeText(lastPreviewText);
       toast("Preview copied.");
     });
-    $("#exportTxt").addEventListener("click", async () => {
+    bind("#exportTxt", "click", async () => {
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "txt" });
       saveMemory("lastExportFormat", "txt", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "TXT file"}`);
     });
-    $("#exportMd").addEventListener("click", async () => {
+    bind("#exportMd", "click", async () => {
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "md" });
       saveMemory("lastExportFormat", "md", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "Markdown file"}`);
     });
-    $("#exportPdf").addEventListener("click", async () => {
+    bind("#exportPdf", "click", async () => {
       if (!lastProject) return toast("Create a project first.");
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "pdf" });
       saveMemory("lastExportFormat", "pdf", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
       toast(`Saved: ${result.file_name || "PDF file"}`);
     });
-    $("#themeBtn").addEventListener("click", () => {
+    bind("#themeBtn", "click", () => {
       const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
       document.documentElement.dataset.theme = next;
       localStorage.setItem("theme", next);
       toast(`${next === "dark" ? "Dark" : "Light"} mode`);
     });
-    $("#toggleMemory").addEventListener("click", () => {
+    bind("#toggleMemory", "click", () => {
       saveMemory("memoryStatus", memoryOn() ? "off" : "on", { source: "settings" });
       renderMemorySettings();
       toast(memoryOn() ? "Creative Studio can remember where you left off for 7 days." : "Memory is off.");
     });
-    $("#clearMemory").addEventListener("click", clearMemory);
-    $("#saveOnboardingName").addEventListener("click", async () => {
+    bind("#clearMemory", "click", clearMemory);
+    bind("#saveOnboardingName", "click", async () => {
       const name = String($("#onboardingName")?.value || "").trim();
       if (!name) return toast("Type your name or choose Skip for now.");
       try {
@@ -1335,13 +1345,13 @@ HTML = """<!doctype html>
         toast("Name saved.");
       } catch (error) { toast(error.message); }
     });
-    $("#skipOnboardingName").addEventListener("click", () => {
+    bind("#skipOnboardingName", "click", () => {
       localStorage.setItem("creativeStudioNameOnboarded", "skipped");
       closeNameOnboarding();
       greeting(currentProfile || {});
       toast("No problem. You can add your name in Settings later.");
     });
-    $("#saveFeedback").addEventListener("click", () => {
+    bind("#saveFeedback", "click", () => {
       const feedback = JSON.parse(localStorage.getItem("creativeStudioFeedback") || "[]");
       feedback.unshift({ createdAt: new Date().toISOString(), comment: $("#feedbackText").value.trim(), choice: getMemory("lastFeedbackChoice") });
       localStorage.setItem("creativeStudioFeedback", JSON.stringify(feedback.slice(0, 20)));
@@ -1349,14 +1359,14 @@ HTML = """<!doctype html>
       $("#feedbackText").value = "";
       toast("Feedback saved locally.");
     });
-    $("#closeFeedback").addEventListener("click", () => $("#feedbackModal").classList.remove("show"));
-    $("#collapseInspector").addEventListener("click", () => shellState("collapsed"));
-    $("#expandInspector").addEventListener("click", () => shellState($("#shell").classList.contains("inspector-wide") ? "open" : "wide"));
-    $("#handleInspector").addEventListener("click", () => shellState($("#shell").classList.contains("inspector-wide") ? "open" : "wide"));
-    $("#closeInspector").addEventListener("click", () => shellState("closed"));
-    $("#restoreInspector").addEventListener("click", () => shellState("open"));
-    $("#openInspector").addEventListener("click", () => shellState("open"));
-    document.querySelector("[data-clear]").addEventListener("click", () => {
+    bind("#closeFeedback", "click", () => $("#feedbackModal")?.classList.remove("show"));
+    bind("#collapseInspector", "click", () => shellState("collapsed"));
+    bind("#expandInspector", "click", () => shellState($("#shell").classList.contains("inspector-wide") ? "open" : "wide"));
+    bind("#handleInspector", "click", () => shellState($("#shell").classList.contains("inspector-wide") ? "open" : "wide"));
+    bind("#closeInspector", "click", () => shellState("closed"));
+    bind("#restoreInspector", "click", () => shellState("open"));
+    bind("#openInspector", "click", () => shellState("open"));
+    bind("[data-clear]", "click", () => {
       $("#projectStatus").innerHTML = "";
       preview("Ready", [{ title: "Ready", value: "Run a tool to see the latest result here." }]);
     });
