@@ -14,13 +14,16 @@ from business_tools import (
     create_quote,
     delete_project,
     empty_project_bin,
+    export_projects_zip,
     export_project,
     generate_project_checklist,
     get_brand_profile,
     list_deleted_projects,
     list_recent_projects,
     list_services,
+    move_all_projects_to_bin,
     parse_services_text,
+    restore_project,
     save_brand_profile,
     save_project,
 )
@@ -157,6 +160,11 @@ HTML = """<!doctype html>
     .custom-chip { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-2); padding: var(--space-2) var(--space-3); }
     .custom-chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .recent-item, .lesson-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4); align-items: center; border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface); padding: var(--space-4); }
+    .project-manager { max-width: 100%; margin-top: var(--space-7); }
+    .project-list { display: grid; gap: var(--space-3); }
+    .project-row-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; }
+    .project-tools { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+    .bin-note { color: var(--muted); font-size: var(--caption); margin-top: var(--space-2); }
     .lesson-card.complete { border-color: color-mix(in srgb, var(--success), var(--line) 45%); }
     .lesson-card p { margin-bottom: 0; }
     .progress-wrap { height: 10px; border-radius: 999px; overflow: hidden; background: var(--surface-3); }
@@ -352,6 +360,30 @@ HTML = """<!doctype html>
             </form>
             <div id="projectStatus"></div>
           </div>
+          <section class="section project-manager">
+            <div class="section-head">
+              <div>
+                <h2>Project management</h2>
+                <p>Create new work, preview recent projects, delete old ones, or backup everything as a ZIP file.</p>
+              </div>
+              <div class="project-tools">
+                <button class="btn secondary" id="projectRefreshManager" type="button"><span class="mi">refresh</span>Refresh</button>
+                <button class="btn secondary" id="projectBackupZip" type="button"><span class="mi">folder_zip</span>Backup ZIP</button>
+                <button class="btn danger" id="projectClearAll" type="button"><span class="mi">delete_sweep</span>Move all to bin</button>
+              </div>
+            </div>
+            <div class="panel" style="max-width:100%; margin-bottom:24px;">
+              <div class="section-head"><div><h3>Recent projects</h3><p>These are saved locally on this computer.</p></div></div>
+              <div id="projectManagerList" class="project-list"></div>
+            </div>
+            <div class="panel" style="max-width:100%;">
+              <div class="section-head">
+                <div><h3>Bin</h3><p>Deleted projects stay here until the bin reaches 100 items. Older items are cleaned automatically.</p><p class="bin-note" id="projectBinCount">Bin limit: 100 projects.</p></div>
+                <button class="btn danger" id="projectEmptyBin" type="button"><span class="mi">delete_forever</span>Empty bin</button>
+              </div>
+              <div id="projectBinList" class="project-list"></div>
+            </div>
+          </section>
         </section>
 
         <section id="quote" class="view">
@@ -679,6 +711,7 @@ HTML = """<!doctype html>
       $$("[data-view]").forEach(button => button.classList.toggle("active", button.dataset.view === id));
       saveMemory("lastActiveView", id, { activity: "return_project", requireMeaningful: id !== "dashboard" });
       if (id === "dashboard") loadRecent();
+      if (id === "project") loadProjectManager();
       if (id === "learn") renderLearn();
     }
     function setLoading(button, loading) {
@@ -798,6 +831,14 @@ HTML = """<!doctype html>
       link.click();
       link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 800);
+    }
+    function downloadUrl(url, fileName = "") {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
     function exportSelectedChecklist(format = "txt") {
       const items = selectedDeliverables();
@@ -1032,6 +1073,83 @@ HTML = """<!doctype html>
       $("#continueRecent").disabled = !lastRecent.length && !getMemory("lastActiveProjectId");
       $("#recent").innerHTML = lastRecent.length ? lastRecent.map(project => `<div class="recent-item"><div><strong>${escapeHtml(project.client_name)}</strong><p>${escapeHtml(project.service)} at ${Number(project.design_fee).toLocaleString()}</p></div><button class="btn secondary" data-open-project="${project.id}" type="button"><span class="mi">visibility</span>Preview</button></div>`).join("") : `<div class="empty"><div><span class="mi">folder_open</span><h3>No projects yet.</h3><p>Create your first client package and it will appear here.</p><div class="actions" style="justify-content:center;"><button class="btn primary" data-view="project" type="button"><span class="mi">add</span>Create your first project</button><button class="btn ghost" data-view="learn" type="button">Learn how projects work</button></div></div></div>`;
     }
+    function projectLine(project) {
+      const fee = Number(project.design_fee || 0).toLocaleString();
+      return `${escapeHtml(project.service || "Creative service")} at ${fee}`;
+    }
+    function projectRow(project, inBin = false) {
+      const date = project.deleted_at ? `Deleted ${new Date(project.deleted_at).toLocaleDateString()}` : `Saved ${new Date(project.created_at || Date.now()).toLocaleDateString()}`;
+      const actions = inBin
+        ? `<button class="btn secondary" data-restore-project="${project.id}" type="button"><span class="mi">restore_from_trash</span>Restore</button>`
+        : `<button class="btn secondary" data-open-project="${project.id}" type="button"><span class="mi">visibility</span>Preview</button><button class="btn danger" data-delete-project="${project.id}" type="button"><span class="mi">delete</span>Delete</button>`;
+      return `<div class="recent-item"><div><strong>${escapeHtml(project.client_name || "Untitled client")}</strong><p>${projectLine(project)}</p><small>${escapeHtml(date)}</small></div><div class="project-row-actions">${actions}</div></div>`;
+    }
+    async function loadProjectManager() {
+      const projects = await api("/api/recent", { limit: 50 });
+      const deleted = await api("/api/bin", { limit: 100 });
+      const manager = $("#projectManagerList");
+      const bin = $("#projectBinList");
+      if (manager) {
+        manager.innerHTML = projects.length ? projects.map(project => projectRow(project)).join("") : `<div class="empty"><div><span class="mi">folder_open</span><h3>No saved projects.</h3><p>Create a client package and it will appear here.</p></div></div>`;
+      }
+      if (bin) {
+        bin.innerHTML = deleted.length ? deleted.map(project => projectRow(project, true)).join("") : `<div class="empty"><div><span class="mi">delete</span><h3>Bin is empty.</h3><p>Deleted projects will appear here before automatic cleanup.</p></div></div>`;
+      }
+      const count = $("#projectBinCount");
+      if (count) count.textContent = `Bin: ${deleted.length}/100 projects. Older deleted projects are cleaned automatically.`;
+    }
+    async function backupProjectsZip(button) {
+      setLoading(button, true);
+      try {
+        const result = await api("/api/backup-zip");
+        if (result.download_url) downloadUrl(result.download_url, result.file_name || "creative-studio-backup.zip");
+        toast(`ZIP backup ready: ${result.file_name || "backup.zip"}`);
+      } catch (error) {
+        toast(error.message);
+      } finally {
+        setLoading(button, false);
+      }
+    }
+    async function deleteProjectById(projectId) {
+      if (!confirm("Move this project to the bin? You can restore it later if the bin has not been emptied.")) return;
+      await api("/api/delete", { project_id: projectId });
+      await loadRecent();
+      await loadProjectManager();
+      toast("Project moved to bin.");
+    }
+    async function restoreProjectById(projectId) {
+      await api("/api/restore", { project_id: projectId });
+      await loadRecent();
+      await loadProjectManager();
+      toast("Project restored.");
+    }
+    async function moveAllProjectsToBin(button) {
+      if (!confirm("Move all saved projects to the bin? This keeps them recoverable until the bin is emptied or automatically cleaned.")) return;
+      setLoading(button, true);
+      try {
+        const result = await api("/api/clear-projects");
+        await loadRecent();
+        await loadProjectManager();
+        toast(`Moved ${result.moved_count || 0} projects to bin.`);
+      } catch (error) {
+        toast(error.message);
+      } finally {
+        setLoading(button, false);
+      }
+    }
+    async function emptyProjectBin(button) {
+      if (!confirm("Empty the bin permanently? This cannot be undone.")) return;
+      setLoading(button, true);
+      try {
+        const result = await api("/api/empty-bin");
+        await loadProjectManager();
+        toast(`Emptied ${result.deleted_count || 0} deleted projects.`);
+      } catch (error) {
+        toast(error.message);
+      } finally {
+        setLoading(button, false);
+      }
+    }
     function renderProject(project, label = "Project package") {
       const pkg = project.generated_package || {};
       fillForm($("#projectForm"), project);
@@ -1203,6 +1321,16 @@ HTML = """<!doctype html>
         const project = lastRecent.find(item => item.id === openProject.dataset.openProject) || (await api("/api/recent", { limit: 50 })).find(item => item.id === openProject.dataset.openProject);
         if (project) { setView("project"); renderProject(project, "Recent project"); toast("Project opened."); }
       }
+      const deleteProjectButton = event.target.closest("[data-delete-project]");
+      if (deleteProjectButton) {
+        event.preventDefault();
+        await deleteProjectById(deleteProjectButton.dataset.deleteProject);
+      }
+      const restoreProjectButton = event.target.closest("[data-restore-project]");
+      if (restoreProjectButton) {
+        event.preventDefault();
+        await restoreProjectById(restoreProjectButton.dataset.restoreProject);
+      }
       const lessonDone = event.target.closest("[data-complete-lesson]");
       if (lessonDone) completeLesson(lessonDone.dataset.completeLesson);
       const accent = event.target.closest("[data-accent-dot]");
@@ -1249,6 +1377,7 @@ HTML = """<!doctype html>
         notice($("#projectStatus"), "Created. Review it in the client-ready preview.", "success");
         toast("Client package created.");
         loadRecent().then(renderFeedbackPrompt);
+        loadProjectManager().catch(error => toast(error.message));
       } catch (error) {
         notice($("#projectStatus"), error.message, "error");
         toast("Create failed.");
@@ -1341,6 +1470,10 @@ HTML = """<!doctype html>
     bind("#walkthroughPrimary", "click", guideFromWalkthrough);
     bind("#walkthroughLearn", "click", () => { closeWalkthrough(); setView("learn"); toast("Learn is open."); });
     bind("#refreshRecent", "click", loadRecent);
+    bind("#projectRefreshManager", "click", loadProjectManager);
+    bind("#projectBackupZip", "click", event => backupProjectsZip(event.currentTarget));
+    bind("#projectClearAll", "click", event => moveAllProjectsToBin(event.currentTarget));
+    bind("#projectEmptyBin", "click", event => emptyProjectBin(event.currentTarget));
     bind("#copyInspector", "click", async () => {
       if (!lastPreviewText) return toast("Nothing to copy yet.");
       await navigator.clipboard.writeText(lastPreviewText);
@@ -1351,6 +1484,7 @@ HTML = """<!doctype html>
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "txt" });
       saveMemory("lastExportFormat", "txt", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
+      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
       toast(`Saved: ${result.file_name || "TXT file"}`);
     });
     bind("#exportMd", "click", async () => {
@@ -1358,6 +1492,7 @@ HTML = """<!doctype html>
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "md" });
       saveMemory("lastExportFormat", "md", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
+      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
       toast(`Saved: ${result.file_name || "Markdown file"}`);
     });
     bind("#exportPdf", "click", async () => {
@@ -1365,6 +1500,7 @@ HTML = """<!doctype html>
       const result = await api("/api/export", { project_id: lastProject.id, file_format: "pdf" });
       saveMemory("lastExportFormat", "pdf", { activity: "export_clicked", requireMeaningful: true });
       safeCompleteLesson("export");
+      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
       toast(`Saved: ${result.file_name || "PDF file"}`);
     });
     bind("#themeBtn", "click", () => {
@@ -1433,6 +1569,7 @@ HTML = """<!doctype html>
       loadDeliverableSuggestions(null, false).catch(() => {});
       return loadProfile();
     }).then(loadRecent).then(() => {
+      loadProjectManager().catch(error => toast(error.message));
       fillForm($("#projectForm"), getMemory("draft_projectForm") || {});
       const up = getMemory("preferredUpfrontPercent");
       const projectForm = $("#projectForm");
@@ -1481,6 +1618,14 @@ class Handler(BaseHTTPRequestHandler):
             if os.path.isfile(asset_path):
                 content_type = mimetypes.guess_type(asset_path)[0] or "application/octet-stream"
                 with open(asset_path, "rb") as file:
+                    self.send_bytes(200, file.read(), content_type)
+                return
+        if parsed_path.startswith("/exports/"):
+            export_name = os.path.basename(parsed_path)
+            export_path = os.path.join(os.path.dirname(__file__), "exports", export_name)
+            if os.path.isfile(export_path):
+                content_type = mimetypes.guess_type(export_path)[0] or "application/octet-stream"
+                with open(export_path, "rb") as file:
                     self.send_bytes(200, file.read(), content_type)
                 return
         self.send_text(404, "Not found", "text/plain")
@@ -1536,13 +1681,21 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/api/recent":
                 result = list_recent_projects(payload.get("limit", 8))
             elif self.path == "/api/bin":
-                result = list_deleted_projects(payload.get("limit", 20))
+                result = list_deleted_projects(payload.get("limit", 100))
             elif self.path == "/api/delete":
                 result = delete_project(payload.get("project_id", ""))
+            elif self.path == "/api/restore":
+                result = restore_project(payload.get("project_id", ""))
+            elif self.path == "/api/clear-projects":
+                result = move_all_projects_to_bin()
             elif self.path == "/api/empty-bin":
                 result = empty_project_bin()
+            elif self.path == "/api/backup-zip":
+                result = export_projects_zip()
+                result["download_url"] = f"/exports/{result['file_name']}"
             elif self.path == "/api/export":
                 result = export_project(payload.get("project_id", ""), payload.get("file_format", "txt"))
+                result["download_url"] = f"/exports/{result['file_name']}"
             else:
                 self.send_text(404, json.dumps({"error": "Unknown action"}))
                 return

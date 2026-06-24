@@ -1,4 +1,5 @@
 import json
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -8,6 +9,7 @@ PROJECTS_FILE = BASE_DIR / "projects.json"
 DELETED_PROJECTS_FILE = BASE_DIR / "deleted_projects.json"
 BRAND_PROFILE_FILE = BASE_DIR / "brand_profile.json"
 EXPORTS_DIR = BASE_DIR / "exports"
+DELETED_PROJECT_LIMIT = 100
 
 DEFAULT_SERVICES = {
     "Brand Identity Design": "$500 to $2,500+",
@@ -233,7 +235,11 @@ def _read_deleted_projects():
     return data if isinstance(data, list) else []
 
 def _write_deleted_projects(projects):
-    write_json(DELETED_PROJECTS_FILE, projects)
+    write_json(DELETED_PROJECTS_FILE, projects[:DELETED_PROJECT_LIMIT])
+
+def _trim_deleted_projects(projects):
+    kept = projects[:DELETED_PROJECT_LIMIT]
+    return kept, max(0, len(projects) - len(kept))
 
 def save_project(client_name, service, design_fee, upfront_percent=70, project_type="", generated_package=None):
     values = validate_project_inputs(client_name, service, design_fee, upfront_percent, project_type)
@@ -260,12 +266,32 @@ def delete_project(project_id):
     removed["deleted_at"] = datetime.now(timezone.utc).isoformat()
     deleted = _read_deleted_projects()
     deleted.insert(0, removed)
+    deleted, auto_cleaned_count = _trim_deleted_projects(deleted)
     _write_projects(keep)
     _write_deleted_projects(deleted)
+    removed["bin_count"] = len(deleted)
+    removed["auto_cleaned_count"] = auto_cleaned_count
     return removed
 
 def list_deleted_projects(limit=20):
-    return _read_deleted_projects()[: max(1, int(limit))]
+    limit = min(DELETED_PROJECT_LIMIT, max(1, int(limit)))
+    return _read_deleted_projects()[:limit]
+
+def move_all_projects_to_bin():
+    projects = _read_projects()
+    if not projects:
+        return {"moved_count": 0, "bin_count": len(_read_deleted_projects()), "auto_cleaned_count": 0}
+    now = datetime.now(timezone.utc).isoformat()
+    moved = []
+    for project in projects:
+        item = dict(project)
+        item["deleted_at"] = now
+        moved.append(item)
+    deleted = moved + _read_deleted_projects()
+    deleted, auto_cleaned_count = _trim_deleted_projects(deleted)
+    _write_projects([])
+    _write_deleted_projects(deleted)
+    return {"moved_count": len(moved), "bin_count": len(deleted), "auto_cleaned_count": auto_cleaned_count}
 
 def restore_project(project_id):
     deleted = _read_deleted_projects()
@@ -387,3 +413,21 @@ def export_project(project_id, file_format="txt"):
     path = EXPORTS_DIR / f"{safe_client}-{stamp}.{suffix}"
     path.write_bytes(content)
     return {"project_id": project.get("id"), "format": suffix, "path": str(path), "file_name": path.name}
+
+def export_projects_zip():
+    EXPORTS_DIR.mkdir(exist_ok=True)
+    projects = _read_projects()
+    deleted = _read_deleted_projects()
+    profile = get_brand_profile()
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    path = EXPORTS_DIR / f"creative-studio-backup-{stamp}.zip"
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("projects.json", json.dumps(projects, indent=2))
+        archive.writestr("deleted_projects.json", json.dumps(deleted, indent=2))
+        archive.writestr("brand_profile.json", json.dumps(profile, indent=2))
+        archive.writestr("README.txt", "Creative Studio MCP backup.\nKeep this file private because it may contain client and business information.\n")
+        for index, project in enumerate(projects, 1):
+            safe_client = "".join(ch if ch.isalnum() else "-" for ch in project.get("client_name", "project")).strip("-").lower() or "project"
+            archive.writestr(f"active-projects/{index:03d}-{safe_client}.txt", package_to_text(project))
+            archive.writestr(f"active-projects/{index:03d}-{safe_client}.md", package_to_markdown(project))
+    return {"format": "zip", "path": str(path), "file_name": path.name, "project_count": len(projects), "deleted_count": len(deleted)}
