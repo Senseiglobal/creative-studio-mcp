@@ -184,6 +184,9 @@ HTML = """<!doctype html>
     .check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
     .check-row.checked span { color: var(--muted); text-decoration: line-through; }
     .check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface-3) 58%, transparent); }
+    .check-workspace { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .check-workspace .check-actions { border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface-2); }
+    .check-workspace .check-list { padding: var(--space-1); }
     .bullet-row { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
     .kv { display: grid; gap: var(--space-2); }
     .kv-row { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
@@ -355,7 +358,7 @@ HTML = """<!doctype html>
 
         <section id="checklist" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Checklist</h1><p>Checklist is your project recipe.</p></div></div>
-          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" id="checklistGenerate" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form><div id="checklistStatus"></div></div>
+          <div class="panel"><form id="checklistForm"><label>Project type<select name="project_type" id="checklistProjectType" required data-tip="Pick the kind of job, or choose Other for a quick custom type."></select><input class="other-field" name="project_type_other" id="checklistProjectTypeOther" placeholder="Type new project type, then create checklist"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label><div class="actions"><button class="btn primary" id="checklistGenerate" type="submit"><span class="mi">checklist</span>Create checklist</button></div></form><div id="checklistStatus"></div><div id="checklistWorkspace" class="check-workspace" aria-live="polite"></div></div>
         </section>
 
         <section id="services" class="view">
@@ -699,11 +702,8 @@ HTML = """<!doctype html>
     function sectionHtml(title, value) {
       const text = toText(value);
       if (Array.isArray(value)) {
-        const isChecklist = String(title || "").toLowerCase().includes("check");
-        const rows = value.map((item, index) => isChecklist
-          ? `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span></label>`
-          : `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
-        const body = isChecklist ? `<div class="check-actions"><button class="btn danger" data-remove-checked-checklist type="button"><span class="mi">delete</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export checked TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export checked Markdown</button></div><div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
+        const rows = value.map(item => `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
+        const body = `<ul class="bullet-list">${rows}</ul>`;
         return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc">${body}</div></details>`;
       }
       if (value && typeof value === "object") {
@@ -725,12 +725,25 @@ HTML = """<!doctype html>
       return lastPreviewSections.find(item => String(item.title || "").toLowerCase().includes("check") && Array.isArray(item.value));
     }
     function selectedChecklistIndexes() {
-      return $$("#inspectorBody .check-row input[type='checkbox']:checked").map(input => Number(input.closest(".check-row")?.dataset.checkIndex)).filter(Number.isInteger);
+      return $$("#checklistWorkspace .check-row input[type='checkbox']:checked").map(input => Number(input.closest(".check-row")?.dataset.checkIndex)).filter(Number.isInteger);
+    }
+    function renderChecklistWorkspace(items, title = "Checklist") {
+      const host = $("#checklistWorkspace");
+      if (!host) return;
+      const list = Array.isArray(items) ? items : [];
+      if (!list.length) {
+        host.innerHTML = `<div class="empty"><div><span class="mi">checklist</span><h3>No checklist items yet.</h3><p>Create a checklist, then tick the items you want to track.</p></div></div>`;
+        return;
+      }
+      const rows = list.map((item, index) => `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="${escapeHtml(title)} item ${index + 1}"><span>${escapeHtml(item)}</span></label>`).join("");
+      host.innerHTML = `<div class="check-actions"><button class="btn danger" data-remove-checked-checklist type="button"><span class="mi">delete</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export checked TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export checked Markdown</button></div><div class="check-list">${rows}</div>`;
     }
     function refreshPreviewFromState(message) {
       const title = $("#inspectorHint")?.textContent || "Updated preview";
       const project = lastProject;
       preview(title, lastPreviewSections, project);
+      const section = checklistSection();
+      if (section) renderChecklistWorkspace(section.value, section.title);
       if (message) toast(message);
     }
     function removeChecklistIndexes(indexes) {
@@ -1243,12 +1256,13 @@ HTML = """<!doctype html>
       try {
         const payload = parseForm(event.currentTarget);
         const checklist = await api("/api/checklist", payload);
+        renderChecklistWorkspace(checklist, `${payload.project_type} Checklist`);
         preview("Checklist", [{ title: "Checklist", value: checklist }]);
-        notice($("#checklistStatus"), "Checklist created. You can tick items as you finish them.", "success");
+        notice($("#checklistStatus"), "Checklist created below. Tick the boxes you want to track.", "success");
         loadProjectTypes();
         syncOtherFields();
         safeCompleteLesson("checklist");
-        toast("Checklist created. You can remove or export selected items.");
+        toast("Checklist is ready below. The preview stays clean for sharing.");
       } catch (error) {
         notice($("#checklistStatus"), error.message, "error");
         toast(error.message);
