@@ -134,10 +134,14 @@ def create_deliverables_list(service, project_type=""):
     project_type = (project_type or service).strip()
     return [f"Creative direction for {project_type}", f"Design execution for {service}", "Client review version", "Revision support based on agreed scope", "Final client-ready files", "Basic usage or handover notes"]
 
-def create_quote(client_name, service, design_fee, includes_printing=False):
+def create_quote(client_name, service, design_fee, project_type="", includes_printing=False):
+    if isinstance(project_type, bool):
+        includes_printing = project_type
+        project_type = ""
     profile = get_brand_profile()
     client_name = (client_name or "Client").strip()
     service = (service or "Creative Service").strip()
+    project_type = (project_type or service).strip()
     design_fee = int(float(design_fee))
     if design_fee <= 0:
         raise ValueError("Design fee must be greater than zero.")
@@ -147,6 +151,7 @@ def create_quote(client_name, service, design_fee, includes_printing=False):
 Thank you for your interest in {profile['business_name']}.
 
 Service: {service}
+Project Type: {project_type}
 Creative Design Fee: {format_currency(design_fee, profile['currency'])}
 
 Payment Terms:
@@ -190,7 +195,7 @@ Best regards,
 def create_project_package(client_name, service, design_fee, upfront_percent=70, project_type=""):
     values = validate_project_inputs(client_name, service, design_fee, upfront_percent, project_type)
     return {
-        "client_quote": create_quote(values["client_name"], values["service"], values["design_fee"]),
+        "client_quote": create_quote(values["client_name"], values["service"], values["design_fee"], values["project_type"]),
         "payment_breakdown": calculate_payment(values["design_fee"], values["upfront_percent"]),
         "project_checklist": generate_project_checklist(values["project_type"]),
         "deliverables": create_deliverables_list(values["service"], values["project_type"]),

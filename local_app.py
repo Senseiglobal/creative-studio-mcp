@@ -158,8 +158,11 @@ HTML = """<!doctype html>
     .preview-doc { padding: var(--space-4); border-top: 1px solid var(--line); }
     .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.72; color: var(--text); }
     .check-list, .bullet-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
-    .check-row { display: grid; grid-template-columns: 22px 1fr; align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
+    .check-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 16px; line-height: 1.6; }
     .check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
+    .check-row.checked span { color: var(--muted); text-decoration: line-through; }
+    .check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface-3) 58%, transparent); }
+    .check-row .mini-action { min-height: 36px; padding: 0 10px; font-size: var(--caption); }
     .bullet-row { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 15px; line-height: 1.55; }
     .kv { display: grid; gap: var(--space-2); }
     .kv-row { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
@@ -178,6 +181,7 @@ HTML = """<!doctype html>
     .walkthrough-list { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
     .walkthrough-step { border: 1px solid var(--line); border-radius: var(--radius-3); background: var(--surface-2); padding: var(--space-4); display: grid; gap: var(--space-2); }
     .walkthrough-step strong { display: inline-flex; align-items: center; gap: var(--space-2); }
+    .step-number { width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--accent), transparent 78%); color: var(--accent); font-weight: 900; flex: 0 0 auto; }
     .walkthrough-step p { margin-bottom: 0; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 130; display: none; place-items: center; background: rgba(0,0,0,.48); padding: var(--space-5); }
     .modal-backdrop.show { display: grid; }
@@ -316,7 +320,7 @@ HTML = """<!doctype html>
 
         <section id="quote" class="view">
           <div class="page-head"><div><p class="eyebrow">Quick tool</p><h1>Quote</h1><p>A Quote is like a price note you send before work begins.</p></div></div>
-          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label></div><div class="actions"><button class="btn primary" id="quoteGenerate" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form><div id="quoteStatus"></div></div>
+          <div class="panel"><form id="quoteForm"><div class="form-grid"><label>Client name<input name="client_name" value="New Client" required></label><label>Service<select name="service" id="quoteService" data-tip="Choose a saved service, or choose Other to type a quick new one."></select><input class="other-field" name="service_other" id="quoteServiceOther" placeholder="Type new service, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="service"><span class="mi">delete</span>Remove selected</button></label><label>Design fee<input name="design_fee" type="number" min="1" value="3000" required></label><label>Project type<select name="project_type" id="quoteProjectType" data-tip="Pick the kind of job for this quote."></select><input class="other-field" name="project_type_other" id="quoteProjectTypeOther" placeholder="Type new project type, then create quote"><button class="btn danger remove-selected" type="button" data-remove-selected="project_type"><span class="mi">delete</span>Remove selected</button></label></div><div class="actions"><button class="btn primary" id="quoteGenerate" type="submit"><span class="mi">request_quote</span>Create quote</button></div></form><div id="quoteStatus"></div></div>
         </section>
 
         <section id="payment" class="view">
@@ -417,6 +421,7 @@ HTML = """<!doctype html>
     const MEMORY_DAYS = 7;
     let lastProject = null;
     let lastPreviewText = "";
+    let lastPreviewSections = [];
     let lastRecent = [];
     let currentServiceNames = [];
     let formEditTimers = {};
@@ -542,7 +547,7 @@ HTML = """<!doctype html>
       const tip = currentWalkthrough();
       const modal = $("#walkthroughModal");
       $("#walkthroughIntro").textContent = tip.intro;
-      $("#walkthroughSteps").innerHTML = tip.steps.map(([title, body], index) => `<article class="walkthrough-step"><strong><span class="mi" aria-hidden="true">looks_${index + 1}</span>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></article>`).join("");
+      $("#walkthroughSteps").innerHTML = tip.steps.map(([title, body], index) => `<article class="walkthrough-step"><strong><span class="step-number" aria-hidden="true">${index + 1}</span>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></article>`).join("");
       modal.classList.add("show");
       modal.setAttribute("aria-hidden", "false");
       saveMemory("walkthroughOpenedAt", now(), { source: "walkthrough" });
@@ -641,9 +646,9 @@ HTML = """<!doctype html>
       if (Array.isArray(value)) {
         const isChecklist = String(title || "").toLowerCase().includes("check");
         const rows = value.map((item, index) => isChecklist
-          ? `<label class="check-row"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span></label>`
+          ? `<label class="check-row" data-check-index="${index}"><input type="checkbox" aria-label="Checklist item ${index + 1}"><span>${escapeHtml(item)}</span><button class="btn ghost mini-action" data-select-check-item="${index}" type="button">Select</button><button class="btn danger mini-action" data-remove-check-item="${index}" type="button"><span class="mi">delete</span>Remove</button></label>`
           : `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
-        const body = isChecklist ? `<div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
+        const body = isChecklist ? `<div class="check-actions"><button class="btn secondary" data-remove-checked-checklist type="button"><span class="mi">checklist_rtl</span>Remove checked</button><button class="btn secondary" data-export-selected-checklist="txt" type="button"><span class="mi">download</span>Export selected TXT</button><button class="btn secondary" data-export-selected-checklist="md" type="button"><span class="mi">description</span>Export selected Markdown</button></div><div class="check-list">${rows}</div>` : `<ul class="bullet-list">${rows}</ul>`;
         return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc">${body}</div></details>`;
       }
       if (value && typeof value === "object") {
@@ -655,10 +660,54 @@ HTML = """<!doctype html>
       openInspector();
       lastProject = project;
       const list = Array.isArray(sections) ? sections : [{ title, value: sections }];
-      lastPreviewText = list.map(item => `${item.title.toUpperCase()}\\n${toText(item.value)}`).join("\\n\\n");
+      lastPreviewSections = list.map(item => ({ title: item.title, value: Array.isArray(item.value) ? [...item.value] : item.value }));
+      lastPreviewText = lastPreviewSections.map(item => `${item.title.toUpperCase()}\n${toText(item.value)}`).join("\n\n");
       $("#inspectorHint").textContent = title;
-      $("#inspectorBody").innerHTML = list.map(item => sectionHtml(item.title, item.value)).join("");
-      saveMemory("lastPreview", { title, sections: list, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
+      $("#inspectorBody").innerHTML = lastPreviewSections.map(item => sectionHtml(item.title, item.value)).join("");
+      saveMemory("lastPreview", { title, sections: lastPreviewSections, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
+    }
+    function checklistSection() {
+      return lastPreviewSections.find(item => String(item.title || "").toLowerCase().includes("check") && Array.isArray(item.value));
+    }
+    function selectedChecklistIndexes() {
+      return $$("#inspectorBody .check-row input[type='checkbox']:checked").map(input => Number(input.closest(".check-row")?.dataset.checkIndex)).filter(Number.isInteger);
+    }
+    function refreshPreviewFromState(message) {
+      const title = $("#inspectorHint")?.textContent || "Updated preview";
+      const project = lastProject;
+      preview(title, lastPreviewSections, project);
+      if (message) toast(message);
+    }
+    function removeChecklistIndexes(indexes) {
+      const section = checklistSection();
+      if (!section) { toast("Create a checklist first."); return; }
+      const removeSet = new Set(indexes);
+      if (!removeSet.size) { toast("Tick a checklist item first."); return; }
+      section.value = section.value.filter((_, index) => !removeSet.has(index));
+      if (lastProject?.generated_package?.project_checklist) lastProject.generated_package.project_checklist = section.value;
+      refreshPreviewFromState(removeSet.size === 1 ? "Checklist item removed." : "Checked checklist items removed.");
+    }
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 800);
+    }
+    function exportSelectedChecklist(format = "txt") {
+      const section = checklistSection();
+      if (!section) { toast("Create a checklist first."); return; }
+      const indexes = selectedChecklistIndexes();
+      if (!indexes.length) { toast("Select at least one checklist item before exporting."); return; }
+      const items = indexes.map(index => section.value[index]).filter(Boolean);
+      const title = `${section.title || "Checklist"}`;
+      const content = format === "md" ? [`# ${title}`, "", ...items.map(item => `- ${item}`)].join("\n") : [`${title}`, "", ...items.map(item => `- ${item}`)].join("\n");
+      downloadTextFile(`selected-checklist.${format === "md" ? "md" : "txt"}`, content);
+      toast(format === "md" ? "Selected checklist saved as Markdown." : "Selected checklist saved as a text file.");
     }
     function notice(target, message, type = "") {
       if (!target) return;
@@ -1013,13 +1062,31 @@ HTML = """<!doctype html>
 
     document.addEventListener("change", (event) => {
       if (event.target.matches("select")) syncOtherFields(event.target.closest("form") || document);
+      if (event.target.matches(".check-row input[type='checkbox']")) {
+        const row = event.target.closest(".check-row");
+        row?.classList.toggle("checked", event.target.checked);
+        toast(event.target.checked ? "Checked. You can remove it if you do not need it." : "Unchecked. It will stay on the checklist.");
+      }
     });
 
     document.addEventListener("click", async (event) => {
       const viewButton = event.target.closest("[data-view]");
       if (viewButton) setView(viewButton.dataset.view);
       const copyButton = event.target.closest("[data-copy]");
-      if (copyButton) { await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy)); toast("Copied."); }
+      if (copyButton) { await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy)); toast("Copied. You can paste it anywhere now."); }
+      const selectCheckItem = event.target.closest("[data-select-check-item]");
+      if (selectCheckItem) {
+        event.preventDefault();
+        const row = selectCheckItem.closest(".check-row");
+        const box = row?.querySelector("input[type='checkbox']");
+        if (box) { box.checked = !box.checked; row.classList.toggle("checked", box.checked); toast(box.checked ? "Selected for export." : "Removed from export selection."); }
+      }
+      const removeCheckItem = event.target.closest("[data-remove-check-item]");
+      if (removeCheckItem) { event.preventDefault(); removeChecklistIndexes([Number(removeCheckItem.dataset.removeCheckItem)]); }
+      const removeCheckedChecklist = event.target.closest("[data-remove-checked-checklist]");
+      if (removeCheckedChecklist) { event.preventDefault(); removeChecklistIndexes(selectedChecklistIndexes()); }
+      const exportSelectedChecklistButton = event.target.closest("[data-export-selected-checklist]");
+      if (exportSelectedChecklistButton) { event.preventDefault(); exportSelectedChecklist(exportSelectedChecklistButton.dataset.exportSelectedChecklist); }
       const openProject = event.target.closest("[data-open-project]");
       if (openProject) {
         const project = lastRecent.find(item => item.id === openProject.dataset.openProject) || (await api("/api/recent", { limit: 50 })).find(item => item.id === openProject.dataset.openProject);
@@ -1085,11 +1152,11 @@ HTML = """<!doctype html>
         const payload = parseForm(event.currentTarget);
         const quote = await api("/api/quote", payload);
         preview("Quote", [{ title: "Quote", value: quote }]);
-        notice($("#quoteStatus"), "Quote ready. Check the preview panel.", "success");
+        notice($("#quoteStatus"), "Quote ready. Project type is included in the preview.", "success");
         loadServices().catch(error => toast(error.message));
         saveMemory("lastQuoteForm", payload, { activity: "quote_generated", requireMeaningful: true });
         safeCompleteLesson("quote");
-        toast("Quote ready.");
+        toast("Quote ready. Check the preview panel.");
       } catch (error) {
         notice($("#quoteStatus"), error.message, "error");
         toast(error.message);
@@ -1123,11 +1190,11 @@ HTML = """<!doctype html>
         const payload = parseForm(event.currentTarget);
         const checklist = await api("/api/checklist", payload);
         preview("Checklist", [{ title: "Checklist", value: checklist }]);
-        notice($("#checklistStatus"), "Checklist ready. Check the preview panel.", "success");
+        notice($("#checklistStatus"), "Checklist created. You can tick items as you finish them.", "success");
         loadProjectTypes();
         syncOtherFields();
         safeCompleteLesson("checklist");
-        toast("Checklist ready.");
+        toast("Checklist created. You can remove or export selected items.");
       } catch (error) {
         notice($("#checklistStatus"), error.message, "error");
         toast(error.message);
@@ -1314,7 +1381,7 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/api/payment":
                 result = calculate_payment(payload.get("total_fee", 0), payload.get("upfront_percent", 70))
             elif self.path == "/api/quote":
-                result = create_quote(payload.get("client_name", ""), payload.get("service", ""), payload.get("design_fee", 0))
+                result = create_quote(payload.get("client_name", ""), payload.get("service", ""), payload.get("design_fee", 0), payload.get("project_type", ""))
             elif self.path == "/api/checklist":
                 result = generate_project_checklist(payload.get("project_type", ""))
             elif self.path == "/api/project":
