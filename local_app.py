@@ -14,6 +14,7 @@ from business_tools import (
     create_quote,
     delete_project,
     empty_project_bin,
+    export_preview_package,
     export_projects_zip,
     export_project,
     generate_project_checklist,
@@ -187,7 +188,10 @@ HTML = """<!doctype html>
     .preview-section summary { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--space-4); list-style: none; cursor: pointer; font-weight: 820; }
     .preview-section summary::-webkit-details-marker { display: none; }
     .preview-doc { padding: var(--space-4); border-top: 1px solid var(--line); }
-    .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.72; color: var(--text); }
+    .doc-text { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; line-height: 1.78; color: var(--text); }
+    .edit-hint { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .editable-doc { width: 100%; min-height: 220px; resize: vertical; border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--surface-1); color: var(--text); padding: var(--space-4); font: 500 15px/1.78 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; outline: none; transition: border-color var(--motion-fast), box-shadow var(--motion-fast), background var(--motion-fast); }
+    .editable-doc:focus { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
     .check-list, .bullet-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
     .check-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-2); background: color-mix(in srgb, var(--surface-3) 72%, transparent); font-size: 16px; line-height: 1.6; cursor: pointer; }
     .check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
@@ -505,6 +509,7 @@ HTML = """<!doctype html>
     const CUSTOM_PROJECT_TYPES_KEY = "creativeStudioCustomProjectTypes";
     const MEMORY_DAYS = 7;
     let lastProject = null;
+    let lastPreviewTitle = "";
     let lastPreviewText = "";
     let lastPreviewSections = [];
     let lastRecent = [];
@@ -743,7 +748,28 @@ HTML = """<!doctype html>
     function openInspector() {
       $("#shell").classList.remove("inspector-collapsed", "inspector-closed");
     }
-    function sectionHtml(title, value) {
+    function isEditablePreviewSection(title, value) {
+      return typeof value === "string" && /^(quote|client quote|email|client email)$/i.test(String(title || "").trim());
+    }
+    function refreshPreviewTextFromSections() {
+      lastPreviewText = lastPreviewSections.map(item => `${item.title.toUpperCase()}\\n${toText(item.value)}`).join("\\n\\n");
+    }
+    function syncPreviewEdits() {
+      $$("[data-edit-section]").forEach(field => {
+        const index = Number(field.dataset.editSection);
+        if (Number.isInteger(index) && lastPreviewSections[index]) {
+          lastPreviewSections[index].value = field.value;
+          if (lastProject?.generated_package) {
+            const title = String(lastPreviewSections[index].title || "").toLowerCase();
+            if (title.includes("quote")) lastProject.generated_package.client_quote = field.value;
+            if (title.includes("email")) lastProject.generated_package.client_email = field.value;
+          }
+        }
+      });
+      refreshPreviewTextFromSections();
+      saveMemory("lastPreview", { title: lastPreviewTitle, sections: lastPreviewSections, projectId: lastProject?.id || null }, { activity: "return_project", requireMeaningful: true });
+    }
+    function sectionHtml(title, value, index = 0) {
       const text = toText(value);
       if (Array.isArray(value)) {
         const rows = value.map(item => `<li class="bullet-row">${escapeHtml(item)}</li>`).join("");
@@ -753,16 +779,20 @@ HTML = """<!doctype html>
       if (value && typeof value === "object") {
         return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc kv">${Object.entries(value).map(([key, item]) => `<div class="kv-row"><span class="token">${escapeHtml(key)}</span><strong>${escapeHtml(item)}</strong></div>`).join("")}</div></details>`;
       }
+      if (isEditablePreviewSection(title, value)) {
+        return `<details class="preview-section editable" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc"><div class="edit-hint"><span class="mi">edit</span><span>You can edit this before copying or exporting. Your export will use the text you see here.</span></div><textarea class="editable-doc" data-edit-section="${index}" aria-label="Edit ${escapeHtml(title)}">${escapeHtml(text)}</textarea></div></details>`;
+      }
       return `<details class="preview-section" open><summary><span>${escapeHtml(title)}</span><button class="btn ghost" data-copy="${encodeURIComponent(text)}" type="button"><span class="mi">content_copy</span>Copy</button></summary><div class="preview-doc"><div class="doc-text">${escapeHtml(text)}</div></div></details>`;
     }
     function preview(title, sections, project = null) {
       openInspector();
       lastProject = project;
+      lastPreviewTitle = title;
       const list = Array.isArray(sections) ? sections : [{ title, value: sections }];
       lastPreviewSections = list.map(item => ({ title: item.title, value: Array.isArray(item.value) ? [...item.value] : item.value }));
-      lastPreviewText = lastPreviewSections.map(item => `${item.title.toUpperCase()}\\n${toText(item.value)}`).join("\\n\\n");
+      refreshPreviewTextFromSections();
       $("#inspectorHint").textContent = title;
-      $("#inspectorBody").innerHTML = lastPreviewSections.map(item => sectionHtml(item.title, item.value)).join("");
+      $("#inspectorBody").innerHTML = lastPreviewSections.map((item, index) => sectionHtml(item.title, item.value, index)).join("");
       saveMemory("lastPreview", { title, sections: lastPreviewSections, projectId: project?.id || null }, { activity: "return_project", requireMeaningful: true });
     }
     function selectedDeliverableIndexes() {
@@ -847,6 +877,23 @@ HTML = """<!doctype html>
       const content = format === "md" ? [`# ${title}`, "", ...items.map(item => `- ${item}`)].join("\\n") : [`${title}`, "", ...items.map(item => `- ${item}`)].join("\\n");
       downloadTextFile(`selected-deliverables.${format === "md" ? "md" : "txt"}`, content);
       toast(format === "md" ? "Checked deliverables saved as Markdown." : "Checked deliverables saved as a text file.");
+    }
+    async function exportCurrentPreview(format = "txt") {
+      syncPreviewEdits();
+      if (!lastPreviewSections.length) {
+        toast("Nothing to export yet. Run a tool first.");
+        return;
+      }
+      const result = await api("/api/export-preview", {
+        title: lastPreviewTitle || "Creative Studio Export",
+        sections: lastPreviewSections,
+        project: lastProject || {},
+        file_format: format
+      });
+      saveMemory("lastExportFormat", format, { activity: "export_clicked", requireMeaningful: true });
+      safeCompleteLesson("export");
+      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
+      toast(`Saved: ${result.file_name || "export file"}`);
     }
     function notice(target, message, type = "") {
       if (!target) return;
@@ -1299,6 +1346,10 @@ HTML = """<!doctype html>
       }
     });
     document.addEventListener("input", (event) => {
+      if (event.target.matches("[data-edit-section]")) {
+        syncPreviewEdits();
+        return;
+      }
       if (event.target.id !== "checklistProjectTypeOther") return;
       clearTimeout(formEditTimers.checklistOther);
       formEditTimers.checklistOther = setTimeout(() => {
@@ -1311,7 +1362,13 @@ HTML = """<!doctype html>
       const viewButton = event.target.closest("[data-view]");
       if (viewButton) setView(viewButton.dataset.view);
       const copyButton = event.target.closest("[data-copy]");
-      if (copyButton) { await navigator.clipboard.writeText(decodeURIComponent(copyButton.dataset.copy)); toast("Copied. You can paste it anywhere now."); }
+      if (copyButton) {
+        syncPreviewEdits();
+        const editedField = copyButton.closest(".preview-section.editable")?.querySelector("[data-edit-section]");
+        const copyText = editedField ? editedField.value : decodeURIComponent(copyButton.dataset.copy);
+        await navigator.clipboard.writeText(copyText);
+        toast("Copied. You can paste it anywhere now.");
+      }
       const saveDeliverablesButton = event.target.closest("[data-save-deliverables]");
       if (saveDeliverablesButton) { event.preventDefault(); saveDeliverablesSelection(); }
       const exportSelectedChecklistButton = event.target.closest("[data-export-selected-checklist]");
@@ -1475,33 +1532,19 @@ HTML = """<!doctype html>
     bind("#projectClearAll", "click", event => moveAllProjectsToBin(event.currentTarget));
     bind("#projectEmptyBin", "click", event => emptyProjectBin(event.currentTarget));
     bind("#copyInspector", "click", async () => {
+      syncPreviewEdits();
       if (!lastPreviewText) return toast("Nothing to copy yet.");
       await navigator.clipboard.writeText(lastPreviewText);
       toast("Preview copied.");
     });
     bind("#exportTxt", "click", async () => {
-      if (!lastProject) return toast("Create a project first.");
-      const result = await api("/api/export", { project_id: lastProject.id, file_format: "txt" });
-      saveMemory("lastExportFormat", "txt", { activity: "export_clicked", requireMeaningful: true });
-      safeCompleteLesson("export");
-      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
-      toast(`Saved: ${result.file_name || "TXT file"}`);
+      await exportCurrentPreview("txt");
     });
     bind("#exportMd", "click", async () => {
-      if (!lastProject) return toast("Create a project first.");
-      const result = await api("/api/export", { project_id: lastProject.id, file_format: "md" });
-      saveMemory("lastExportFormat", "md", { activity: "export_clicked", requireMeaningful: true });
-      safeCompleteLesson("export");
-      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
-      toast(`Saved: ${result.file_name || "Markdown file"}`);
+      await exportCurrentPreview("md");
     });
     bind("#exportPdf", "click", async () => {
-      if (!lastProject) return toast("Create a project first.");
-      const result = await api("/api/export", { project_id: lastProject.id, file_format: "pdf" });
-      saveMemory("lastExportFormat", "pdf", { activity: "export_clicked", requireMeaningful: true });
-      safeCompleteLesson("export");
-      if (result.download_url) downloadUrl(result.download_url, result.file_name || "");
-      toast(`Saved: ${result.file_name || "PDF file"}`);
+      await exportCurrentPreview("pdf");
     });
     bind("#themeBtn", "click", () => {
       const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
@@ -1695,6 +1738,9 @@ class Handler(BaseHTTPRequestHandler):
                 result["download_url"] = f"/exports/{result['file_name']}"
             elif self.path == "/api/export":
                 result = export_project(payload.get("project_id", ""), payload.get("file_format", "txt"))
+                result["download_url"] = f"/exports/{result['file_name']}"
+            elif self.path == "/api/export-preview":
+                result = export_preview_package(payload.get("title", "Creative Studio Export"), payload.get("sections", []), payload.get("project", {}), payload.get("file_format", "txt"))
                 result["download_url"] = f"/exports/{result['file_name']}"
             else:
                 self.send_text(404, json.dumps({"error": "Unknown action"}))

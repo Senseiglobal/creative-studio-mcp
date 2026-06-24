@@ -337,6 +337,37 @@ def package_to_markdown(project):
     title = project.get("project_type") or "Creative Project"
     return f"# {title}\n\n```text\n{package_to_text(project)}\n```\n"
 
+def sections_to_text(title, sections, project=None):
+    project = project or {}
+    lines = []
+    if title:
+        lines.append(str(title))
+    if project.get("client_name"):
+        lines.append(f"Client: {project.get('client_name')}")
+    if project.get("service"):
+        lines.append(f"Service: {project.get('service')}")
+    if project.get("project_type"):
+        lines.append(f"Project type: {project.get('project_type')}")
+    if lines:
+        lines.append("")
+    for section in sections or []:
+        section_title = section.get("title", "Section")
+        value = section.get("value", "")
+        if isinstance(value, dict):
+            body = "\n".join(f"{key}: {item}" for key, item in value.items())
+        elif isinstance(value, list):
+            body = "\n".join(f"{index + 1}. {item}" for index, item in enumerate(value))
+        else:
+            body = str(value)
+        lines.append(f"{section_title}\n{body}".strip())
+        lines.append("")
+    return "\n".join(lines).strip() + "\n"
+
+def sections_to_markdown(title, sections, project=None):
+    text = sections_to_text(title, sections, project)
+    heading = title or "Creative Studio Export"
+    return f"# {heading}\n\n```text\n{text}\n```\n"
+
 def _package_to_html(project):
     import html
     title = html.escape(project.get("project_type") or "Creative Project")
@@ -413,6 +444,24 @@ def export_project(project_id, file_format="txt"):
     path = EXPORTS_DIR / f"{safe_client}-{stamp}.{suffix}"
     path.write_bytes(content)
     return {"project_id": project.get("id"), "format": suffix, "path": str(path), "file_name": path.name}
+
+def export_preview_package(title, sections, project=None, file_format="txt"):
+    EXPORTS_DIR.mkdir(exist_ok=True)
+    project = project or {}
+    safe_client = "".join(ch if ch.isalnum() else "-" for ch in project.get("client_name", "preview")).strip("-").lower() or "preview"
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    file_format = (file_format or "txt").lower().strip()
+    if file_format in {"txt", "text"}:
+        suffix, content = "txt", sections_to_text(title, sections, project).encode("utf-8")
+    elif file_format in {"md", "markdown"}:
+        suffix, content = "md", sections_to_markdown(title, sections, project).encode("utf-8")
+    elif file_format == "pdf":
+        suffix, content = "pdf", _simple_pdf_bytes(sections_to_text(title, sections, project))
+    else:
+        raise ValueError("Unsupported preview export format.")
+    path = EXPORTS_DIR / f"{safe_client}-{stamp}.{suffix}"
+    path.write_bytes(content)
+    return {"format": suffix, "path": str(path), "file_name": path.name}
 
 def export_projects_zip():
     EXPORTS_DIR.mkdir(exist_ok=True)

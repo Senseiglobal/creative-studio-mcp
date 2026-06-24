@@ -10,6 +10,16 @@ Creative Studio MCP is a local-first creative business workspace for quotes, pro
 
 It works as a browser app on your computer and can also run as an MCP server for Claude Desktop.
 
+## Scan To Open
+
+Share this with Reddit, communities, or anyone who wants to open the repo quickly.
+
+<p>
+  <a href="https://github.com/Senseiglobal/creative-studio-mcp">
+    <img src="assets/repo-qr.svg" alt="QR code linking to the Creative Studio MCP GitHub repository" width="180">
+  </a>
+</p>
+
 ## What It Does
 
 - Creates client-ready project packages from a client name, service, fee, upfront percentage, and project type.
